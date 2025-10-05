@@ -15,12 +15,6 @@ class ApiResponse {
 
   // دالة لمعالجة استجابات Dio
   factory ApiResponse.fromResponse(Response response) {
-    print('🔄 جاري تحليل استجابة API...');
-    print('- Status Code: ${response.statusCode}');
-    print('- Headers: ${response.headers}');
-    print('- بيانات الاستجابة: ${response.data}');
-    print('- نوع بيانات الاستجابة: ${response.data.runtimeType}');
-    
     // التحقق من رمز الحالة أولاً
     final isHttpSuccess = response.statusCode != null && 
                          response.statusCode! >= 200 && 
@@ -29,24 +23,14 @@ class ApiResponse {
     if (response.data is Map<String, dynamic>) {
       final dataMap = response.data as Map<String, dynamic>;
       
-      print('📊 مفاتيح خريطة الاستجابة: ${dataMap.keys}');
-      
       // التصحيح: استخدام "success" بدلاً من "status"
       final bool apiSuccess = dataMap['success'] ?? isHttpSuccess;
       final String apiMessage = dataMap['message'] ?? 
                                (isHttpSuccess ? 'تمت العملية بنجاح' : 'فشلت العملية');
       
-      // For countries API, we want to return the ENTIRE response, not just the data field
-      // because the GetAllcountry model expects the full structure
-      final dynamic responseData = dataMap; // Return the entire response
-      
-      print('✅ القيم التي تم تحليلها:');
-      print('  - success: $apiSuccess');
-      print('  - message: $apiMessage');
-      print('  - data exists: ${responseData != null}');
-      print('  - data type: ${responseData.runtimeType}');
-      print('  - data keys: ${responseData is Map ? (responseData).keys : 'Not a Map'}');
-      
+      // إرجاع الاستجابة كاملة
+      final dynamic responseData = dataMap;
+   
       return ApiResponse(
         status: apiSuccess,
         statusCode: response.statusCode ?? 500,
@@ -55,7 +39,6 @@ class ApiResponse {
       );
     } else {
       // إذا كانت response.data ليست خريطة
-      print('⚠️ Response data is not a Map, treating as raw data');
       return ApiResponse(
         status: isHttpSuccess,
         statusCode: response.statusCode ?? 500,
@@ -68,7 +51,6 @@ class ApiResponse {
   // دالة لمعالجة أخطاء Dio أو غيرها
   factory ApiResponse.fromError(dynamic error) {
     if (error is DioException) {
-      print('خطأ في Dio: $error');
       return ApiResponse(
         status: false,
         data: error.response,
@@ -105,7 +87,6 @@ class ApiResponse {
 
   /// معالجة الأخطاء من استجابة الخادم
   static String _handleServerError(Response? response) {
-    print(response?.data.toString());
     if (response == null) return "لا توجد استجابة من الخادم.";
     if (response.data is Map<String, dynamic>) {
       return response.data["message"] ?? "حدث خطأ ما.";

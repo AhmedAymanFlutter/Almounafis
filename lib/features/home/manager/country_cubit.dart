@@ -8,40 +8,35 @@ class CountryCubit extends Cubit<CountryState> {
   CountryCubit(this.repository) : super(CountryInitial());
 
   Future<void> fetchAllCountries() async {
-    emit(CountryLoading());
-    
-    print('🟡 بدء استدعاء API...');
-    
-    final response = await repository.getAllCountries();
-
-    print('🔵 اكتمال استدعاء API');
-    print('حالة الاستجابة: ${response.status}');
-    print('رسالة الاستجابة: ${response.message}');
-    print('نوع بيانات الاستجابة: ${response.data?.runtimeType}');
+    emit(CountryLoading());        
+    final response = await repository.getAllCountries();    
     
     if (response.status) {
-      final allCountryData = response.data;
-      print('🟢 نجاح API');
-      print('AllCountryData: $allCountryData');
-      
-      if (allCountryData != null) {
-        print('كائن البيانات: ${allCountryData.data}');
-        print('قائمة الدول: ${allCountryData.data?.countries}');
-        print('طول قائمة الدول: ${allCountryData.data?.countries?.length}');
-        
-        if (allCountryData.data?.countries?.isNotEmpty == true) {
-          print('✅ تم العثور على ${allCountryData.data!.countries!.length} دولة');
-          emit(CountryLoaded(allCountryData.data!.countries!));
-        } else {
-          print('❌ قائمة الدول فارغة أو غير موجودة');
-          emit(const CountryError("لم يتم العثور على دول في الاستجابة."));
-        }
+      final allCountryData = response.data;      
+      if (allCountryData != null && allCountryData.data?.isNotEmpty == true) {
+        emit(CountryLoaded(allCountryData.data!));
       } else {
-        print('❌ بيانات الدولة كلها فارغة');
-        emit(const CountryError("تم استلام بيانات فارغة من API."));
+        emit(const CountryError("لم يتم العثور على دول في الاستجابة."));
       }
     } else {
-      print('🔴 فشل API: ${response.message}');
+      emit(CountryError(response.message));
+    }
+  }
+
+  // ✅ Add this new method
+  Future<void> fetchCountryDetails(String countryIdOrSlug) async {
+    emit(SingleCountryLoading());
+    
+    final response = await repository.getCountry(countryIdOrSlug);
+    
+    if (response.status) {
+      final countryData = response.data;
+      if (countryData != null && countryData.data != null) {
+        emit(SingleCountryLoaded(countryData.data!));
+      } else {
+        emit(const CountryError("لم يتم العثور على بيانات الدولة."));
+      }
+    } else {
       emit(CountryError(response.message));
     }
   }

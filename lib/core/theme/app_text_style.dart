@@ -10,6 +10,7 @@ class AppTextStyle {
     required Color color,
   }){
     return GoogleFonts.poppins(
+      
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: color,
@@ -68,6 +69,16 @@ class AppTextStyle {
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColor.mainBlack,
+    );
+  }
+   static TextStyle setPoppinsDeepPurple({
+    required double fontSize,
+    required FontWeight fontWeight,
+  }){
+    return GoogleFonts.poppins(
+      fontSize: fontSize.sp,
+      fontWeight: fontWeight,
+      color: AppColor.lightPurple,
     );
   }
 }

@@ -1,4 +1,3 @@
-
 import 'package:almonafs_flutter/core/network/local_data.dart' show LocalData;
 import 'package:dio/dio.dart';
 
@@ -22,86 +21,81 @@ class APIHelper {
       sendTimeout: Duration(seconds: 20),
       receiveTimeout: Duration(seconds: 20)));
 
-  // get request
+  // GET request مبسط
+ Future<ApiResponse> getRequest({
+  required String endPoint,
+  String? resourcePath,
+  Map<String, dynamic>? data,
+  Map<String, dynamic>? queryParameters,
+  bool isFormData = true,
+  bool isProtected = false,
+  bool sendRefreshToken = false,
+}) async {
+  try {
+    final String finalEndpoint = resourcePath != null && resourcePath.isNotEmpty
+        ? '$endPoint/$resourcePath'
+        : endPoint;
 
-  Future<ApiResponse> getRequest(
-      {required String endPoint,
-      Map<String, dynamic>? queryParameters,
-      bool isAuthorized = false}) async {
+    print('🌐 Full URL: ${dio.options.baseUrl}$finalEndpoint');
+
+    final response = await dio.get(
+      finalEndpoint,
+      queryParameters: queryParameters,
+      options: Options(
+        headers: {},
+        validateStatus: (status) {
+          // ✅ قبول جميع الحالات لنتمكن من معالجتها
+          return status != null && status < 600;
+        },
+      ),
+    );
+
+    return ApiResponse.fromResponse(response);
+  } catch (e) {
+    print('❌ API Error: $e');
+    return ApiResponse.fromError(e);
+  }
+}
+
+  // PUT request
+  Future<ApiResponse> putRequest({
+    required String endPoint,
+    Map<String, dynamic>? data,
+    bool isFormData = true,
+    bool isAuthorized = true,
+  }) async {
     try {
-      print('🌐 Making GET request to: ${dio.options.baseUrl}$endPoint');
-      print('🔑 Authorization required: $isAuthorized');
-      print('🔑 Access token: ${LocalData.accessToken}');
-      
-      var response = await dio.get(
+      var response = await dio.put(
         endPoint,
-        queryParameters: queryParameters,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            if (isAuthorized && LocalData.accessToken != null) 
-              "Authorization": "Bearer ${LocalData.accessToken}"
-          }
-        )
+        data: isFormData ? FormData.fromMap(data ?? {}) : data,
+        options: Options(headers: {
+          if (isAuthorized) "Authorization": "Bearer ${LocalData.accessToken}"
+        }),
       );
       return ApiResponse.fromResponse(response);
     } catch (e) {
-      print('❌ GET request error: $e');
       return ApiResponse.fromError(e);
     }
   }
 
-  // post
-
-  Future<ApiResponse> postRequest(
-      {required String endPoint,
-        Map<String, dynamic>? data,
-        bool isFormData = true,
-        bool isAuthorized = true}) async {
+  // DELETE request
+  Future<ApiResponse> deleteRequest({
+    required String endPoint,
+    Map<String, dynamic>? data,
+    bool isFormData = true,
+    bool isAuthorized = true,
+  }) async {
     try {
-      var response = await dio.post(endPoint,
-          data: isFormData ? FormData.fromMap(data ?? {}) : data,
-          options: Options(headers: {
-            if (isAuthorized) "Authorization": "Bearer ${LocalData.accessToken}"
-          }));
-      return ApiResponse.fromResponse(response);
-    } catch (e) {
-      return ApiResponse.fromError(e);
-    }
-  }
-  Future<ApiResponse> putRequest(
-      {required String endPoint,
-        Map<String, dynamic>? data,
-        bool isFormData = true,
-        bool isAuthorized = true}) async {
-    try {
-      var response = await dio.put(endPoint,
-          data: isFormData ? FormData.fromMap(data ?? {}) : data,
-          options: Options(headers: {
-            if (isAuthorized) "Authorization": "Bearer ${LocalData.accessToken}"
-          }));
-      return ApiResponse.fromResponse(response);
-    } catch (e) {
-      return ApiResponse.fromError(e);
-    }
-  }
-
-  Future<ApiResponse> deleteRequest(
-      {required String endPoint,
-        Map<String, dynamic>? data,
-        bool isFormData = true,
-        bool isAuthorized = true}) async {
-    try {
-      var response = await dio.delete(endPoint,
-          data: isFormData ? FormData.fromMap(data ?? {}) : data,
-          options: Options(headers: {
-            if (isAuthorized) "Authorization": "Bearer ${LocalData.accessToken}"
-          }));
+      var response = await dio.delete(
+        endPoint,
+        data: isFormData ? FormData.fromMap(data ?? {}) : data,
+        options: Options(headers: {
+          if (isAuthorized) "Authorization": "Bearer ${LocalData.accessToken}"
+        }),
+      );
       return ApiResponse.fromResponse(response);
     } catch (e) {
       return ApiResponse.fromError(e);
     }
   }
 }
-

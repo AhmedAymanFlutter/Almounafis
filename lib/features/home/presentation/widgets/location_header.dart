@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../setting/view/setting_screen.dart';
 
 class LocationHeader extends StatelessWidget {
   const LocationHeader({super.key});
@@ -17,11 +20,18 @@ class LocationHeader extends StatelessWidget {
           ],
         ),
         Row(
-          children: const [
-            Icon(Icons.notifications_none, size: 28),
-            SizedBox(width: 12),
-            Icon(Icons.settings, size: 28),
-          ],
+          children: [   
+    GestureDetector(
+        onTap: () {
+           
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const SittingScreen()),
+          (route) => false,
+        );
+      },
+        
+      child: SvgPicture.asset('assets/icons/setting-2.svg',width:24, height: 24,fit: BoxFit.scaleDown, ))],
         )
       ],
     );
