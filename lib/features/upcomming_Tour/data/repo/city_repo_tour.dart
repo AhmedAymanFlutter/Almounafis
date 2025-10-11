@@ -100,4 +100,73 @@ class CityTourRepository {
       );
     }
   }
+   Future<ApiResponse> getCityTourDetails(String tourIdOrSlug) async {
+    try {
+      print('🌐 Fetching city tour: $tourIdOrSlug');
+      
+      final ApiResponse apiResponse = await _apiHelper.getRequest(
+        endPoint: 'city-tours',
+        resourcePath: tourIdOrSlug,
+      );
+
+      print('📥 Response Status: ${apiResponse.statusCode}');
+      print('📥 Response Data Type: ${apiResponse.data.runtimeType}');
+
+      if (apiResponse.status) {
+        if (apiResponse.data is Map<String, dynamic>) {
+          final responseData = apiResponse.data as Map<String, dynamic>;
+
+          try {
+            // التحقق من وجود data في الاستجابة
+            if (responseData.containsKey('data')) {
+              final tourData = Data.fromJson(responseData['data'] as Map<String, dynamic>);
+              
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: tourData,
+                message: 'تم تحميل تفاصيل الجولة بنجاح',
+              );
+            } else {
+              // إذا كانت البيانات مباشرة بدون data wrapper
+              final tourData = Data.fromJson(responseData);
+              
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: tourData,
+                message: 'تم تحميل تفاصيل الجولة بنجاح',
+              );
+            }
+          } catch (e) {
+            print('❌ Parsing Error: $e');
+            return ApiResponse(
+              status: false,
+              statusCode: apiResponse.statusCode,
+              message: 'خطأ في تحليل بيانات الجولة: $e',
+            );
+          }
+        } else {
+          return ApiResponse(
+            status: false,
+            statusCode: apiResponse.statusCode,
+            message: 'هيكل بيانات غير صالح',
+          );
+        }
+      } else {
+        return ApiResponse(
+          status: false,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        );
+      }
+    } catch (e) {
+      print('❌ Repository Error: $e');
+      return ApiResponse(
+        status: false,
+        statusCode: 500,
+        message: 'خطأ في المستودع: $e',
+      );
+    }
+  }
 }

@@ -1,14 +1,14 @@
 // custom_drawer.dart
 import 'package:almonafs_flutter/core/theme/app_color.dart';
-import 'package:almonafs_flutter/features/auth/presentation/views/sign_up_view.dart';
-import 'package:almonafs_flutter/features/servicepackadge/view/Service_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import '../../../../setting/widget/languang.dart';
+import '../../../../../config/router/routes.dart';
+import '../../../../localization/manager/localization_cubit.dart';
 
 class CustomDrawer extends StatelessWidget {
   final Function(int) onNavigationItemTapped;
-  
+
   const CustomDrawer({
     super.key,
     required this.onNavigationItemTapped,
@@ -16,112 +16,106 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: Container(
-       
-        width: 356,
-        height: 861,
-        color: AppColor.mainWhite,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            _buildDrawerHeader(),  
-            _buildDrawerItem(
-              context,
-              iconPath: 'assets/icons/user.svg',
-              title: 'profile',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SignUpView(),
+    return BlocBuilder<LanguageCubit, AppLanguage>(
+      builder: (context, langState) {
+        bool isArabic = langState == AppLanguage.arabic;
+
+        return Directionality(
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          child: Drawer(
+            child: Container(
+              width: 356,
+              height: 861,
+              color: AppColor.mainWhite,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildDrawerHeader(isArabic),
+                  _buildDrawerItem(
+                    context,
+                    iconPath: 'assets/icons/user.svg',
+                    title: isArabic ? 'الملف الشخصي' : 'Profile',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, Routes.signUp);
+                    },
                   ),
-                );
-              },
-            ),               
-            _buildDrawerItem(
-              context,
-              iconPath: 'assets/icons/translate.svg',
-              title: 'Language',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LanguageScreen(),
+                  _buildDrawerItem(
+                    context,
+                    iconPath: 'assets/icons/translate.svg',
+                    title: isArabic ? 'اللغة' : 'Language',
+                    onTap: () {
+                 Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.languageScreen);
+                  }, 
+
                   ),
-                );
-              },
-            ),        
-             _buildDrawerItem(
-              context,
-              iconPath: 'assets/icons/serves.svg',
-              title: 'services',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ServicesView(),
+                  _buildDrawerItem(
+                    context,
+                    iconPath: 'assets/icons/serves.svg',
+                    title: isArabic ? 'الخدمات' : 'Services',
+                   onTap: () {
+  Navigator.pop(context);
+  Navigator.pushNamed(context, Routes.servicesView);
+},
+
                   ),
-                );
-              },
-            ),        
-            _buildDrawerItem(
-              context,
-              iconPath:'assets/icons/Packages.svg',
-              title: 'Packages',
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to settings
-              },
+                  _buildDrawerItem(
+                    context,
+                    iconPath: 'assets/icons/Packages.svg',
+                    title: isArabic ? 'الباقات' : 'Packages',
+                    onTap: () {
+  Navigator.pushNamed(context, Routes.packageView);
+},
+
+                  ),
+                  Divider(color: Colors.grey.shade300, thickness: 1),
+                  _buildDrawerItem(
+                    context,
+                    iconPath: 'assets/icons/About Us.svg',
+                    title: isArabic ? 'من نحن' : 'About Us',
+                    onTap: () {
+  Navigator.pushNamed(context, Routes.aboutUsScreen);
+},
+
+                  ),
+                ],
+              ),
             ),
-          
-            Divider(color: Colors.grey.shade300, thickness: 1),
-            _buildDrawerItem(
-              context,
-              iconPath: 'assets/icons/About Us.svg',
-              title: 'About',
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to about
-              },
-            ),
-            
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildDrawerHeader() {
+  Widget _buildDrawerHeader(bool isArabic) {
     return DrawerHeader(
-      decoration: BoxDecoration(
-        color: const Color(0xff0e2e4f),
+      decoration: const BoxDecoration(
+        color: Color(0xff0e2e4f),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircleAvatar(
             radius: 40,
             backgroundColor: Colors.white,
-            child: Image.asset('assets/splash/main_logo.png',
-            width:48 ,
-            height: 48,
-            )
+            child: Image.asset(
+              'assets/splash/main_logo.png',
+              width: 48,
+              height: 48,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
-            'Welcome User',
-            style: TextStyle(
+            isArabic ? 'مرحبًا بك' : 'Welcome User',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-       
         ],
       ),
     );
@@ -136,9 +130,9 @@ class CustomDrawer extends StatelessWidget {
   }) {
     return ListTile(
       leading: SvgPicture.asset(
+        iconPath,
         width: 24,
         height: 24,
-       iconPath ,
         color: textColor ?? const Color(0xff0e2e4f),
       ),
       title: Text(
@@ -152,5 +146,4 @@ class CustomDrawer extends StatelessWidget {
       hoverColor: Colors.grey.shade100,
     );
   }
- 
 }

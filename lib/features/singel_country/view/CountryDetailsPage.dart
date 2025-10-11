@@ -6,13 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
+
 import '../../home/manager/country_cubit.dart';
+import '../../localization/manager/localization_cubit.dart';
 import 'widget/build_Booking_Button.dart';
 import 'widget/build_Info_Card.dart';
 import 'widget/build_Styled_Cover_Image.dart';
 import 'widget/shimmer_widget.dart';
 
-class CountryDetailsPage extends StatelessWidget {
+class CountryDetailsPage extends StatefulWidget {
   final String countryIdOrSlug;
   final String? countryName;
 
@@ -23,8 +25,20 @@ class CountryDetailsPage extends StatelessWidget {
   });
 
   @override
+  State<CountryDetailsPage> createState() => _CountryDetailsPageState();
+}
+
+class _CountryDetailsPageState extends State<CountryDetailsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<CountryCubit>().fetchCountryDetails(widget.countryIdOrSlug);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    context.read<CountryCubit>().fetchCountryDetails(countryIdOrSlug);
+    // نجيب اللغة الحالية
+    final isArabic = context.watch<LanguageCubit>().isArabic;
 
     return Scaffold(
       body: BlocBuilder<CountryCubit, CountryState>(
@@ -33,25 +47,23 @@ class CountryDetailsPage extends StatelessWidget {
             return buildLoadingShimmer();
           } else if (state is SingleCountryLoaded) {
             final country = state.country;
+
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Enhanced Cover Image with overlay
                   buildStyledCoverImage(context, country),
-
                   Padding(
                     padding: EdgeInsets.all(16.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Info Cards
                         Row(
                           children: [
                             Expanded(
                               child: buildInfoCard(
                                 icon: Icons.flag,
-                                label: 'Code',
+                                label: isArabic ? 'الرمز' : 'Code',
                                 value: country.code ?? 'N/A',
                               ),
                             ),
@@ -59,21 +71,20 @@ class CountryDetailsPage extends StatelessWidget {
                             Expanded(
                               child: buildInfoCard(
                                 icon: Icons.public,
-                                label: 'Continent',
+                                label: isArabic ? 'القارة' : 'Continent',
+                                // نتأكد إنها موجودة، أو fallback
                                 value: country.continent ?? 'N/A',
                               ),
                             ),
                           ],
                         ),
-
                         SizedBox(height: 12.h),
-
                         Row(
                           children: [
                             Expanded(
                               child: buildInfoCard(
                                 icon: Icons.attach_money,
-                                label: 'Currency',
+                                label: isArabic ? 'العملة' : 'Currency',
                                 value: country.currency ?? 'N/A',
                               ),
                             ),
@@ -81,40 +92,47 @@ class CountryDetailsPage extends StatelessWidget {
                             Expanded(
                               child: buildInfoCard(
                                 icon: Icons.language,
-                                label: 'Language',
+                                label: isArabic ? 'اللغة' : 'Language',
                                 value: country.language ?? 'N/A',
                               ),
                             ),
                           ],
                         ),
                         SizedBox(height: 24.h),
-                        // booking button
-                        buildBookButton(country),
-                        SizedBox(height: 24.h),
-                        // Description
-                        Text(
-                          'About',
-                  style: AppTextStyle.setPoppinsTextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: AppColor.mainBlack)
 
+                        buildBookButton(country),
+
+                        SizedBox(height: 24.h),
+                        Text(
+                          isArabic ? 'نبذة عن البلد' : 'About',
+                          style: AppTextStyle.setPoppinsTextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.mainBlack,
+                          ),
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          country.descriptionFlutter ??
-                              country.description ??
-                              'No description available',
-                          style: AppTextStyle.setPoppinsTextStyle(fontSize: 10, fontWeight: FontWeight.w300, color: AppColor.mainBlack)
+                          isArabic
+                              ? (country.descriptionArFlutter ??
+                                  country.descriptionFlutter ??
+                                  'لا توجد معلومات حالياً')
+                              : (country.descriptionFlutter ??
+                                  country.description ??
+                                  'No description available'),
+                          style: AppTextStyle.setPoppinsTextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w300,
+                            color: AppColor.mainBlack,
+                          ),
                         ),
-                        // Arabic Description
-                        if (country.descriptionArFlutter != null ||
-                            country.descriptionAr != null) ...[
-                          SizedBox(height: 16.h),                                                  
-                        ],
-                        // Image Gallery
+
+                        // جاليري الصور
                         if (country.images != null &&
                             country.images!.isNotEmpty) ...[
                           SizedBox(height: 24.h),
                           Text(
-                            'Gallery',
+                            isArabic ? 'المعرض' : 'Gallery',
                             style: TextStyle(
                               fontSize: 20.sp,
                               fontWeight: FontWeight.bold,
@@ -137,7 +155,8 @@ class CountryDetailsPage extends StatelessWidget {
                                       height: 120.h,
                                       fit: BoxFit.cover,
                                       placeholder: (context, url) => Shimmer(
-                                        duration: const Duration(seconds: 2),
+                                        duration:
+                                            const Duration(seconds: 2),
                                         color: Colors.grey.shade400,
                                         colorOpacity: 0.3,
                                         enabled: true,
@@ -147,12 +166,14 @@ class CountryDetailsPage extends StatelessWidget {
                                           color: Colors.grey[300],
                                         ),
                                       ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
+                                      errorWidget:
+                                          (context, url, error) =>
+                                              Container(
                                         width: 150.w,
                                         height: 120.h,
                                         color: Colors.grey[300],
-                                        child: const Icon(Icons.error),
+                                        child:
+                                            const Icon(Icons.error),
                                       ),
                                     ),
                                   ),
@@ -161,23 +182,24 @@ class CountryDetailsPage extends StatelessWidget {
                             ),
                           ),
                         ],
-
-                        SizedBox(height: 24.h),
                       ],
                     ),
                   ),
                 ],
               ),
             );
-          } else if (state is CountryError) {
+          } else if (state is CountryError || state is SingleCountryError) {
+            final errorMessage = state is CountryError
+                ? state.message
+                : (state as SingleCountryError).message;
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 60, color: Colors.red),
+                  const Icon(Icons.error_outline, size: 60, color: Colors.red),
                   SizedBox(height: 16.h),
                   Text(
-                    state.message,
+                    errorMessage,
                     style: TextStyle(fontSize: 16.sp),
                     textAlign: TextAlign.center,
                   ),
@@ -186,18 +208,18 @@ class CountryDetailsPage extends StatelessWidget {
                     onPressed: () {
                       context
                           .read<CountryCubit>()
-                          .fetchCountryDetails(countryIdOrSlug);
+                          .fetchCountryDetails(widget.countryIdOrSlug);
                     },
-                    child: Text('Try Again'),
+                    child: Text(isArabic ? 'أعد المحاولة' : 'Try Again'),
                   ),
                 ],
               ),
             );
           }
 
-          return Center(child: Text('Unknown state'));
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );
-  } 
+  }
 }

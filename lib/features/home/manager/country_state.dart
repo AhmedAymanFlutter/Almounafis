@@ -1,8 +1,6 @@
 
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart';
 import 'package:equatable/equatable.dart';
-
-
 abstract class CountryState extends Equatable {
   const CountryState();
 

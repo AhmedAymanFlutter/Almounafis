@@ -10,4 +10,15 @@ class Routes {
   static const String setting = '/SittingScreen';
   static const String aboutUs = '/AboutUsScreen';
   static const String cityDetailsScreen = '/CityDetailsScreen';
+  static const String packageView = '/packageView';
+  static const String countriesView = '/countriesView';
+  static const String cityTourDetails = '/cityTourDetails';
+  static const String hotelDetails = '/hotelDetails';
+ static const String packagesListView = '/packagesListView';
+static const String packageDetailsView = '/packageDetailsView';
+static const String languageScreen = '/languageScreen';
+static const String servicesView = '/servicesView';
+static const String aboutUsScreen = '/aboutUsScreen';
+
+
 }

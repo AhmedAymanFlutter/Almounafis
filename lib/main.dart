@@ -1,5 +1,10 @@
 import 'package:almonafs_flutter/almonafs_app.dart';
+import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
 import 'package:flutter/material.dart';
-void main() {
-  runApp(const AlmonafsApp());
+import 'package:flutter_bloc/flutter_bloc.dart';
+void main() async {
+   runApp(
+    BlocProvider(create: (_) => LanguageCubit(),
+    child: const AlmonafsApp()),
+  );
 }

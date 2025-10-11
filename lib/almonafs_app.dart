@@ -1,53 +1,92 @@
-import 'package:almonafs_flutter/config/router/app_router.dart';
-import 'package:almonafs_flutter/config/router/routes.dart';
-import 'package:almonafs_flutter/core/network/api_endpoiont.dart';
-import 'package:almonafs_flutter/features/upcomming_Tour/data/repo/city_repo_tour.dart' show CityTourRepository;
+import 'package:almonafs_flutter/config/router/app_router.dart' show AppRouter;
+import 'package:almonafs_flutter/features/hotels/data/repo/Hotel_repo_tour.dart';
+import 'package:almonafs_flutter/features/hotels/manager/hotel_cubit.dart';
+import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
+import 'package:almonafs_flutter/features/servicepackadge/data/repo/Service_repo.dart';
+import 'package:almonafs_flutter/features/servicepackadge/manager/country_cubit.dart';
+import 'package:almonafs_flutter/features/upcomming_Tour/manager/tour_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'config/router/routes.dart';
+import 'core/network/api_endpoiont.dart';
+import 'features/flightScreen/data/repo/AirLine_repo.dart';
+import 'features/flightScreen/manager/AirLine_cubit.dart';
 import 'features/home/data/repo/country_repo.dart';
 import 'features/home/manager/country_cubit.dart';
-import 'features/upcomming_Tour/manager/tour_cubit.dart';
-import 'features/servicepackadge/data/repo/Service_repo.dart';
-import 'features/servicepackadge/manager/country_cubit.dart';
+import 'features/upcomming_Tour/data/repo/city_repo_tour.dart';
 
 class AlmonafsApp extends StatelessWidget {
   const AlmonafsApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(430, 932),
       minTextAdapt: true,
-      child: MultiBlocProvider(
+      child: MultiRepositoryProvider(
         providers: [
-          BlocProvider(
-            create: (context) => CountryCubit(CountryRepository())..fetchAllCountries(),
-  ),   
-  BlocProvider(
-    create: (context) => CityTourCubit(
-      repository: CityTourRepository(),
-    ),
-  ),
-  BlocProvider(
-    create: (context) => ServicesCubit(
-      repository: ServicesRepository(dio: Dio(BaseOptions(baseUrl: EndPoints.baseUrl))),
-    ),
-  ),
-
+          RepositoryProvider(create: (_) => CountryRepository()),
+          RepositoryProvider(create: (_) => CityTourRepository()),
+          RepositoryProvider(
+              create: (_) => ServicesRepository(
+                  dio: Dio(BaseOptions(baseUrl: EndPoints.baseUrl)))),
+          RepositoryProvider(create: (_) => HotelRepository()),
         ],
-        child: MaterialApp(
-          onGenerateRoute: AppRouter().onGenerateRoute,
-          initialRoute: Routes.splash,
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            appBarTheme: const AppBarTheme(
-              centerTitle: true,
-              elevation: 0,
-              backgroundColor: Colors.white,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) =>
+                  CountryCubit(context.read<CountryRepository>())
+                    ..fetchAllCountries(),
             ),
+            BlocProvider(
+              create: (context) =>
+                  CityTourCubit(repository: context.read<CityTourRepository>()),
+            ),
+            BlocProvider(
+              create: (context) =>
+                  ServicesCubit(repository: context.read<ServicesRepository>()),
+            ),
+            BlocProvider(
+              create: (context) =>
+                  HotelCubit(context.read<HotelRepository>()),
+            ),
+            BlocProvider(
+              create: (_) => LanguageCubit(), // ✅ Cubit اللغة
+            ),
+         BlocProvider(create: 
+         (context)=> FilterCubit(FlightFilterRepository(),),),
+
+          ],
+          child: BlocBuilder<LanguageCubit, AppLanguage>(
+            builder: (context, langState) {
+              bool isArabic = langState == AppLanguage.arabic;
+
+              return MaterialApp(
+                onGenerateRoute: AppRouter().onGenerateRoute,
+                initialRoute: Routes.splash,
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  fontFamily: isArabic ? 'Cairo' : 'Poppins',
+                  appBarTheme: const AppBarTheme(
+                    centerTitle: true,
+                    elevation: 0,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+                builder: (context, child) {
+                  return Directionality(
+                    textDirection:
+                        isArabic ? TextDirection.rtl : TextDirection.ltr,
+                    child: child!,
+                  );
+                },
+              );
+            },
           ),
         ),
       ),

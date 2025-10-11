@@ -1,48 +1,42 @@
-import 'package:equatable/equatable.dart';
 import '../data/model/city_tour.dart';
 
-abstract class HotelState extends Equatable {
-  const HotelState();
+abstract class HotelState {}
 
-  @override
-  List<Object?> get props => [];
-}
-
+// Initial state
 class HotelInitial extends HotelState {}
 
+// States for getting all hotels
 class HotelLoading extends HotelState {}
 
 class HotelLoaded extends HotelState {
-  final GitHotelModel hotels; // This should be GitHotelModel
-  final String message;
-
-  const HotelLoaded({
-    required this.hotels,
-    required this.message,
-  });
-
-  @override
-  List<Object?> get props => [hotels, message];
-}
-
-class HotelError extends HotelState {
-  final String message;
-  final int? statusCode;
-
-  const HotelError({
-    required this.message,
-    this.statusCode,
-  });
-
-  @override
-  List<Object?> get props => [message, statusCode];
+  final GitHotelModel hotels;
+  
+  HotelLoaded(this.hotels);
 }
 
 class HotelEmpty extends HotelState {
   final String message;
+  
+  HotelEmpty(this.message);
+}
 
-  const HotelEmpty({required this.message});
+class HotelError extends HotelState {
+  final String message;
+  
+  HotelError(this.message);
+}
 
-  @override
-  List<Object?> get props => [message];
+// States for hotel details
+class HotelDetailsLoading extends HotelState {}
+
+class HotelDetailsLoaded extends HotelState {
+  final Data hotelDetails;
+  
+  HotelDetailsLoaded(this.hotelDetails);
+}
+
+class HotelDetailsError extends HotelState {
+  final String message;
+  
+  HotelDetailsError(this.message);
 }

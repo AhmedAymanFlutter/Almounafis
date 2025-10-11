@@ -35,7 +35,7 @@ class Data {
   String? name;
   String? nameAr;
   List<String>? images;
-  Null? imageCover;
+  Null imageCover;
   String? alt;
   String? altAr;
   String? description;

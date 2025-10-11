@@ -58,8 +58,13 @@ class _ServicesViewState extends State<ServicesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppColor.mainWhite,
+      appBar: AppBar(
+        title: Text('Services',style: AppTextStyle.setPoppinsTextStyle(fontSize:16 , fontWeight: FontWeight.w500, color: AppColor.mainBlack),),
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: SvgPicture.asset('assets/icons/arrowback.svg',width: 24,height: 24,fit: BoxFit.scaleDown,)),
+      ),
       body: Column(
         children: [
           CustomSearchBar(),

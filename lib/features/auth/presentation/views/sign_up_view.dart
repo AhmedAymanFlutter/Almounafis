@@ -6,92 +6,133 @@ import 'package:almonafs_flutter/features/auth/presentation/widgets/header_text.
 import 'package:almonafs_flutter/features/auth/presentation/widgets/header_of_view.dart';
 import 'package:almonafs_flutter/features/auth/presentation/widgets/photo_section.dart';
 import 'package:almonafs_flutter/features/auth/presentation/widgets/custom_button.dart';
-import 'package:almonafs_flutter/features/home/presentation/views/home_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../config/router/routes.dart';
+import '../../../localization/manager/localization_cubit.dart';
 
 class SignUpView extends StatelessWidget {
   const SignUpView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xff0e2e4f),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AccountInfoHeader(),
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      HeaderOfView(text: TextHelper.accountInfo),
-                      SizedBox(height: 28.h),
-                      PhotoSection(),
-                      SizedBox(height: 22.h),
-                      HeaderText(text: TextHelper.gender),
-                      SizedBox(height: 10.h),
-                      GenderSelector(),
-                      SizedBox(height: 22.h),
-                      HeaderText(text: TextHelper.firstName),
-                      SizedBox(height: 10.h),
-                      CustomTextFormField(
-                        label: "Enter your First Name",
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(height: 22.h),
-                      HeaderText(text: TextHelper.lastName),
-                      SizedBox(height: 10.h),
+    return BlocBuilder<LanguageCubit, AppLanguage>(
+      builder: (context, langState) {
+        bool isArabic = langState == AppLanguage.arabic;
 
-                      CustomTextFormField(
-                        label: "Enter your Last Name",
-                        keyboardType: TextInputType.emailAddress,
+        return Directionality(
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          child: Scaffold(
+            backgroundColor: const Color(0xff0e2e4f),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  const AccountInfoHeader(),
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(30)),
                       ),
-                      SizedBox(height: 22.h),
-                      HeaderText(text: TextHelper.email),
-                      SizedBox(height: 10.h),
-
-                      CustomTextFormField(
-                        label: "Enter your Email",
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(height: 22.h),
-                      HeaderText(text: TextHelper.phoneNumber),
-                      SizedBox(height: 10.h),
-
-                      CustomTextFormField(
-                        label: "Phone Number",
-                        isPhoneField: true,
-                      ),
-                      SizedBox(height: 35.h),
-                      CustomButton(
-                        text: TextHelper.save,
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomeView(),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HeaderOfView(
+                              text: isArabic
+                                  ? TextHelperAr.accountInfo
+                                  : TextHelperEn.accountInfo,
                             ),
-                            (route) => false,
-                          );
-                        },
+                            SizedBox(height: 28.h),
+                            const PhotoSection(),
+                            SizedBox(height: 22.h),
+                            HeaderText(
+                              text: isArabic
+                                  ? TextHelperAr.gender
+                                  : TextHelperEn.gender,
+                            ),
+                            SizedBox(height: 10.h),
+                            const GenderSelector(),
+                            SizedBox(height: 22.h),
+                            HeaderText(
+                              text: isArabic
+                                  ? TextHelperAr.firstName
+                                  : TextHelperEn.firstName,
+                            ),
+                            SizedBox(height: 10.h),
+                            CustomTextFormField(
+                              label: isArabic
+                                  ? "أدخل الاسم الأول"
+                                  : "Enter your First Name",
+                              keyboardType: TextInputType.text,
+                            ),
+                            SizedBox(height: 22.h),
+                            HeaderText(
+                              text: isArabic
+                                  ? TextHelperAr.lastName
+                                  : TextHelperEn.lastName,
+                            ),
+                            SizedBox(height: 10.h),
+                            CustomTextFormField(
+                              label: isArabic
+                                  ? "أدخل الاسم الأخير"
+                                  : "Enter your Last Name",
+                              keyboardType: TextInputType.text,
+                            ),
+                            SizedBox(height: 22.h),
+                            HeaderText(
+                              text: isArabic
+                                  ? TextHelperAr.email
+                                  : TextHelperEn.email,
+                            ),
+                            SizedBox(height: 10.h),
+                            CustomTextFormField(
+                              label: isArabic
+                                  ? "أدخل البريد الإلكتروني"
+                                  : "Enter your Email",
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            SizedBox(height: 22.h),
+                            HeaderText(
+                              text: isArabic
+                                  ? TextHelperAr.phoneNumber
+                                  : TextHelperEn.phoneNumber,
+                            ),
+                            SizedBox(height: 10.h),
+                            CustomTextFormField(
+                              label: isArabic
+                                  ? "رقم الهاتف"
+                                  : "Phone Number",
+                              isPhoneField: true,
+                            ),
+                            SizedBox(height: 35.h),
+                            CustomButton(
+                              text: isArabic
+                                  ? TextHelperAr.save
+                                  : TextHelperEn.save,
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  Routes.home,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

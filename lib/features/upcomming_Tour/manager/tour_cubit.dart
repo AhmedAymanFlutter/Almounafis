@@ -57,39 +57,41 @@ class CityTourCubit extends Cubit<CityTourState> {
   Future<void> refreshCities() async {
     await getAllCities();
   }
+  Future<void> getCityTourDetails(String tourIdOrSlug) async {
+    emit(SingleCityTourLoading());
+    
+    try {
+      final ApiResponse response = await _repository.getCityTourDetails(tourIdOrSlug);
+      
+      if (response.status) {
+        if (response.data is Data) {
+          final Data tourData = response.data as Data;
+          
+          emit(SingleCityTourLoaded(
+            cityTour: tourData,
+            message: response.message,
+          ));
+        } else {
+          emit(CityTourError(
+            message: 'نوع البيانات غير متوقع: ${response.data.runtimeType}',
+            statusCode: response.statusCode,
+          ));
+        }
+      } else {
+        emit(CityTourError(
+          message: response.message,
+          statusCode: response.statusCode,
+        ));
+      }
+    } catch (e) {
+      emit(CityTourError(
+        message: 'حدث خطأ أثناء تحميل تفاصيل الجولة: $e',
+        statusCode: 500,
+      ));
+    }
+  }
+
+ 
 }
 
-  // Get country by ID (when you uncomment the method in repository)
-  // Future<void> getCountry(String countryId) async {
-  //   emit(CityTourLoading());
-  //   
-  //   try {
-  //     final ApiResponse response = await _repository.getCountry(countryId);
-  //     
-  //     if (response.status) {
-  //       if (response.data is GetSingleCountry) {
-  //         final GetSingleCountry country = response.data as GetSingleCountry;
-  //         
-  //         emit(SingleCountryLoaded(
-  //           country: country,
-  //           message: response.message ?? 'تم تحميل بيانات الدولة بنجاح',
-  //         ));
-  //       } else {
-  //         emit(CityTourError(
-  //           message: 'نوع البيانات غير متوقع',
-  //           statusCode: response.statusCode,
-  //         ));
-  //       }
-  //     } else {
-  //       emit(CityTourError(
-  //         message: response.message ?? 'فشل في تحميل بيانات الدولة',
-  //         statusCode: response.statusCode,
-  //       ));
-  //     }
-  //   } catch (e) {
-  //     emit(CityTourError(
-  //       message: 'حدث خطأ أثناء تحميل بيانات الدولة: $e',
-  //       statusCode: 500,
-  //     ));
-  //   }
-  // }
+  

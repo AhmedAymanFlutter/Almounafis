@@ -38,10 +38,9 @@ Widget buildBookButton(dynamic country) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.map, color: Colors.white, size: 24.sp),
           SizedBox(width: 12.w),
           Text(
-            'View on Google Maps',
+            'Book Now',
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,

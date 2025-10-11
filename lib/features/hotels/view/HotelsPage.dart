@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../flightScreen/view/widget/filter_chip.dart';
 import '../../home/presentation/widgets/search_bar.dart';
-import '../data/repo/hotel_repo_tour.dart';
+import '../../localization/manager/localization_cubit.dart';
+import '../data/repo/Hotel_repo_tour.dart';
 import '../manager/hotel_cubit.dart';
 import '../manager/hotel_state.dart';
 import 'widget/hotel_widget.dart';
@@ -15,9 +16,7 @@ class HotelsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HotelCubit(
-        repository: HotelRepository(),
-      )..getAllHotels(),
+      create: (context) => HotelCubit(HotelRepository())..getAllHotels(),
       child: const _AllHotelsScreenContent(),
     );
   }
@@ -33,30 +32,51 @@ class _AllHotelsScreenContent extends StatefulWidget {
 class __AllHotelsScreenContentState extends State<_AllHotelsScreenContent> {
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.watch<LanguageCubit>().isArabic;
+
     return Scaffold(
-      backgroundColor: AppColor.mainWhite,    
+      backgroundColor: AppColor.mainWhite,
       body: Column(
         children: [
-          // Search Bar
-          CustomSearchBar(),
+          // ✅ Search Bar
+          const CustomSearchBar(),
           const SizedBox(height: 16),
-          // Filter Section
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text('Filters by', style: AppTextStyle.setPoppinsSecondaryBlack(fontSize: 12, fontWeight: FontWeight.w500)),
-              FilterChipWidget(label: 'Facilities', onTap: () {}),
-              FilterChipWidget(label: 'Star Rating', onTap: () {}),
-              FilterChipWidget(label: 'Range', onTap: () {}),
-            ],
+
+          // ✅ Filter Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  isArabic ? 'تصفية حسب' : 'Filters by',
+                  style: AppTextStyle.setPoppinsSecondaryBlack(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                FilterChipWidget(
+                  label: isArabic ? 'الخدمات' : 'Facilities',
+                  onTap: () {},
+                ),
+                FilterChipWidget(
+                  label: isArabic ? 'التصنيف' : 'Star Rating',
+                  onTap: () {},
+                ),
+                FilterChipWidget(
+                  label: isArabic ? 'النطاق السعري' : 'Range',
+                  onTap: () {},
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
-          
-          // Hotels List - UPDATED USAGE
+
+          // ✅ Hotels List
           Expanded(
             child: BlocBuilder<HotelCubit, HotelState>(
               builder: (context, state) {
-                return buildContent(context, state); // Pass context here
+                return buildContent(context, state);
               },
             ),
           ),

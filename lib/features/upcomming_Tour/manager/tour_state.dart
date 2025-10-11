@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../data/model/city_tour.dart';
+
 abstract class CityTourState extends Equatable {
   const CityTourState();
 
@@ -24,6 +25,22 @@ class CityTourLoaded extends CityTourState {
   List<Object?> get props => [allCityTour, message];
 }
 
+// ✅ إضافة حالة تفاصيل الجولة
+class SingleCityTourLoading extends CityTourState {}
+
+class SingleCityTourLoaded extends CityTourState {
+  final Data cityTour;
+  final String message;
+
+  const SingleCityTourLoaded({
+    required this.cityTour,
+    required this.message,
+  });
+
+  @override
+  List<Object?> get props => [cityTour, message];
+}
+
 class CityTourError extends CityTourState {
   final String message;
   final int? statusCode;
@@ -36,6 +53,7 @@ class CityTourError extends CityTourState {
   @override
   List<Object?> get props => [message, statusCode];
 }
+
 class CityTourEmpty extends CityTourState {
   final String message;
 
@@ -43,18 +61,4 @@ class CityTourEmpty extends CityTourState {
 
   @override
   List<Object?> get props => [message];
-}
-
-// If you need single country state later, you can add:
-class SingleCountryLoaded extends CityTourState {
-  // final GetSingleCountry country;
-  // final String message;
-  
-  // const SingleCountryLoaded({
-  //   required this.country,
-  //   required this.message,
-  // });
-  
-  // @override
-  // List<Object?> get props => [country, message];
 }

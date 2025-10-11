@@ -6,6 +6,7 @@ import '../model/city_tour.dart';
 class HotelRepository {
   final APIHelper _apiHelper = APIHelper();
 
+  // Get all hotels
   Future<ApiResponse> getAllHotels() async {
     try {
       final ApiResponse apiResponse = await _apiHelper.getRequest(
@@ -21,7 +22,7 @@ class HotelRepository {
           final responseData = apiResponse.data as Map<String, dynamic>;
           
           print('📊 Response Data Keys: ${responseData.keys}');
-          print('📊 Full Response: $responseData'); // Be careful with large responses
+          print('📊 Full Response: $responseData');
 
           try {
             final allHotelData = GitHotelModel.fromJson(responseData);
@@ -35,14 +36,14 @@ class HotelRepository {
                 status: true,
                 statusCode: apiResponse.statusCode,
                 data: allHotelData,
-                message: 'تم تحميل الدول بنجاح',
+                message: 'تم تحميل الفنادق بنجاح',
               );
             } else {
-              print('❌ No tours available after parsing');
+              print('❌ No hotels available after parsing');
               return ApiResponse(
                 status: false,
                 statusCode: apiResponse.statusCode,
-                message: 'لا توجد دول متاحة بعد التحليل',
+                message: 'لا توجد فنادق متاحة بعد التحليل',
               );
             }
           } catch (e) {
@@ -78,53 +79,272 @@ class HotelRepository {
       );
     }
   }
-}
-  
-  // Future<ApiResponse> getCountry(String countryId) async {
-  //   try {
-  //     final ApiResponse apiResponse = await _apiHelper.getRequest(
-  //       endPoint: '${EndPoints.getAllCountries}/$countryId',
-  //     );
 
-  //     if (apiResponse.status) {
-  //       if (apiResponse.data is Map<String, dynamic>) {
-  //         final responseData = apiResponse.data as Map<String, dynamic>;
+  // Get single hotel details by ID
+  Future<ApiResponse> getHotelDetails(String hotelId) async {
+    try {
+      print('🔍 Fetching hotel details for ID: $hotelId');
+      
+      final ApiResponse apiResponse = await _apiHelper.getRequest(
+        endPoint: EndPoints.getAllHotels,
+        resourcePath: hotelId,
+      );
 
-  //         try {
-  //           final countryData = GetSingleCountry.fromJson(responseData);
+      print('📦 Hotel Details Response Status: ${apiResponse.status}');
+      print('📦 Hotel Details Response Code: ${apiResponse.statusCode}');
+      
+      if (apiResponse.status) {
+        if (apiResponse.data is Map<String, dynamic>) {
+          final responseData = apiResponse.data as Map<String, dynamic>;
+          
+          try {
+            // Check if response has 'data' field with single hotel object
+            if (responseData.containsKey('data') && responseData['data'] != null) {
+              final hotelData = Data.fromJson(responseData['data']);
+              
+              print('✅ Successfully loaded hotel: ${hotelData.name}');
+              
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: hotelData,
+                message: 'تم تحميل تفاصيل الفندق بنجاح',
+              );
+            } else {
+              // If the response is directly the hotel object
+              final hotelData = Data.fromJson(responseData);
+              
+              print('✅ Successfully loaded hotel: ${hotelData.name}');
+              
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: hotelData,
+                message: 'تم تحميل تفاصيل الفندق بنجاح',
+              );
+            }
+          } catch (e) {
+            print('❌ Error parsing hotel details: $e');
+            return ApiResponse(
+              status: false,
+              statusCode: apiResponse.statusCode,
+              message: 'خطأ في تحليل تفاصيل الفندق: $e',
+            );
+          }
+        } else {
+          print('❌ Invalid data structure for hotel details');
+          return ApiResponse(
+            status: false,
+            statusCode: apiResponse.statusCode,
+            message: 'هيكل بيانات غير صالح لتفاصيل الفندق',
+          );
+        }
+      } else {
+        print('❌ API returned error for hotel details: ${apiResponse.message}');
+        return ApiResponse(
+          status: false,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        );
+      }
+    } catch (e) {
+      print('❌ Repository error getting hotel details: $e');
+      return ApiResponse(
+        status: false,
+        statusCode: 500,
+        message: 'خطأ في الحصول على تفاصيل الفندق: $e',
+      );
+    }
+  }
+
+  // Get featured hotels
+  Future<ApiResponse> getFeaturedHotels({int limit = 6}) async {
+    try {
+      final ApiResponse apiResponse = await _apiHelper.getRequest(
+        endPoint: '${EndPoints.getAllHotels}/featured',
+        queryParameters: {'limit': limit},
+      );
+
+      if (apiResponse.status) {
+        if (apiResponse.data is Map<String, dynamic>) {
+          final responseData = apiResponse.data as Map<String, dynamic>;
+          
+          try {
+            final allHotelData = GitHotelModel.fromJson(responseData);
             
-  //           return ApiResponse(
-  //             status: true,
-  //             statusCode: apiResponse.statusCode,
-  //             data: countryData,
-  //             message: 'تم تحميل بيانات الدولة بنجاح',
-  //           );
-  //         } catch (e) {
-  //           return ApiResponse(
-  //             status: false,
-  //             statusCode: apiResponse.statusCode,
-  //             message: 'خطأ في تحليل بيانات الدولة: $e',
-  //           );
-  //         }
-  //       } else {
-  //         return ApiResponse(
-  //           status: false,
-  //           statusCode: apiResponse.statusCode,
-  //           message: 'هيكل بيانات غير صالح تم استلامه',
-  //         );
-  //       }
-  //     } else {
-  //       return ApiResponse(
-  //         status: false,
-  //         statusCode: apiResponse.statusCode,
-  //         message: apiResponse.message,
-  //       );
-  //     }
-  //   } catch (e) {
-  //     return ApiResponse(
-  //       status: false,
-  //       statusCode: 500,
-  //       message: 'خطأ في المستودع: $e',
-  //     );
-  //   }
-  // }
+            if (allHotelData.data?.isNotEmpty == true) {
+              print('✅ Successfully loaded ${allHotelData.data!.length} featured hotels');
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: allHotelData,
+                message: 'تم تحميل الفنادق المميزة بنجاح',
+              );
+            } else {
+              return ApiResponse(
+                status: false,
+                statusCode: apiResponse.statusCode,
+                message: 'لا توجد فنادق مميزة متاحة',
+              );
+            }
+          } catch (e) {
+            return ApiResponse(
+              status: false,
+              statusCode: apiResponse.statusCode,
+              message: 'خطأ في تحليل البيانات: $e',
+            );
+          }
+        } else {
+          return ApiResponse(
+            status: false,
+            statusCode: apiResponse.statusCode,
+            message: 'هيكل بيانات غير صالح',
+          );
+        }
+      } else {
+        return ApiResponse(
+          status: false,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        );
+      }
+    } catch (e) {
+      return ApiResponse(
+        status: false,
+        statusCode: 500,
+        message: 'خطأ في المستودع: $e',
+      );
+    }
+  }
+
+  // Get hotels by city
+  Future<ApiResponse> getHotelsByCity(String cityId) async {
+    try {
+      final ApiResponse apiResponse = await _apiHelper.getRequest(
+        endPoint: '${EndPoints.getAllHotels}/city/$cityId',
+      );
+
+      if (apiResponse.status) {
+        if (apiResponse.data is Map<String, dynamic>) {
+          final responseData = apiResponse.data as Map<String, dynamic>;
+          
+          try {
+            final allHotelData = GitHotelModel.fromJson(responseData);
+            
+            if (allHotelData.data?.isNotEmpty == true) {
+              print('✅ Successfully loaded ${allHotelData.data!.length} hotels for city');
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: allHotelData,
+                message: 'تم تحميل فنادق المدينة بنجاح',
+              );
+            } else {
+              return ApiResponse(
+                status: false,
+                statusCode: apiResponse.statusCode,
+                message: 'لا توجد فنادق في هذه المدينة',
+              );
+            }
+          } catch (e) {
+            return ApiResponse(
+              status: false,
+              statusCode: apiResponse.statusCode,
+              message: 'خطأ في تحليل البيانات: $e',
+            );
+          }
+        } else {
+          return ApiResponse(
+            status: false,
+            statusCode: apiResponse.statusCode,
+            message: 'هيكل بيانات غير صالح',
+          );
+        }
+      } else {
+        return ApiResponse(
+          status: false,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        );
+      }
+    } catch (e) {
+      return ApiResponse(
+        status: false,
+        statusCode: 500,
+        message: 'خطأ في المستودع: $e',
+      );
+    }
+  }
+
+  // Search hotels with filters
+  Future<ApiResponse> searchHotels({
+    String? cityId,
+    double? minPrice,
+    double? maxPrice,
+    int? rating,
+    String? amenities,
+    String? sort,
+    int page = 1,
+    int limit = 10,
+  }) async {
+    try {
+      Map<String, dynamic> queryParams = {
+        'page': page,
+        'limit': limit,
+      };
+
+      if (cityId != null) queryParams['city'] = cityId;
+      if (minPrice != null) queryParams['minPrice'] = minPrice;
+      if (maxPrice != null) queryParams['maxPrice'] = maxPrice;
+      if (rating != null) queryParams['rating'] = rating;
+      if (amenities != null) queryParams['amenities'] = amenities;
+      if (sort != null) queryParams['sort'] = sort;
+
+      final ApiResponse apiResponse = await _apiHelper.getRequest(
+        endPoint: EndPoints.getAllHotels,
+        queryParameters: queryParams,
+      );
+
+      if (apiResponse.status) {
+        if (apiResponse.data is Map<String, dynamic>) {
+          final responseData = apiResponse.data as Map<String, dynamic>;
+          
+          try {
+            final allHotelData = GitHotelModel.fromJson(responseData);
+            
+            return ApiResponse(
+              status: true,
+              statusCode: apiResponse.statusCode,
+              data: allHotelData,
+              message: 'تم البحث بنجاح',
+            );
+          } catch (e) {
+            return ApiResponse(
+              status: false,
+              statusCode: apiResponse.statusCode,
+              message: 'خطأ في تحليل نتائج البحث: $e',
+            );
+          }
+        } else {
+          return ApiResponse(
+            status: false,
+            statusCode: apiResponse.statusCode,
+            message: 'هيكل بيانات غير صالح',
+          );
+        }
+      } else {
+        return ApiResponse(
+          status: false,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        );
+      }
+    } catch (e) {
+      return ApiResponse(
+        status: false,
+        statusCode: 500,
+        message: 'خطأ في البحث: $e',
+      );
+    }
+  }
+}

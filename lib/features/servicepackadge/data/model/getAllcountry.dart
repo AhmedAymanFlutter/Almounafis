@@ -40,7 +40,7 @@ class Data {
   String? method;
   String? methodAr;
   String? createdBy;
-  Null? updatedBy;
+  Null updatedBy;
   String? createdAt;
   String? updatedAt;
   String? slug;

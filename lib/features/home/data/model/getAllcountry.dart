@@ -42,7 +42,7 @@ class Data {
   String? imageCover;
   List<String>? images;
   String? createdBy;
-  Null? updatedBy;
+  Null updatedBy;
   String? createdAt;
   String? updatedAt;
   String? slug;
