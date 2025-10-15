@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../localization/manager/localization_cubit.dart';
 
 class CustomSearchBar extends StatelessWidget {
-  const CustomSearchBar({super.key});
+  final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
+
+  const CustomSearchBar({
+    super.key,
+    required this.controller,
+    this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // ✅ نحدد اللغة الحالية
-    bool isArabic = context.watch<LanguageCubit>().state == AppLanguage.arabic;
-
-    return Directionality(
-      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(27, 15, 36, 15),
-        child: TextField(
-          decoration: InputDecoration(
-            hintText: isArabic ? "ابحث" : "Search",
-            prefixIcon: const Icon(Icons.search),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: 'Search...',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
+        onChanged: onChanged, 
       ),
     );
   }

@@ -13,6 +13,7 @@ import '../../../localization/manager/localization_cubit.dart';
 Widget buildContent(BuildContext context, HotelState state) {
   final isArabic = context.watch<LanguageCubit>().isArabic;
 
+  // ✅ حالة التحميل
   if (state is HotelLoading) {
     return Center(
       child: ListView.separated(
@@ -41,6 +42,7 @@ Widget buildContent(BuildContext context, HotelState state) {
     );
   }
 
+  // ✅ حالة الخطأ
   if (state is HotelError) {
     return Center(
       child: Column(
@@ -49,7 +51,9 @@ Widget buildContent(BuildContext context, HotelState state) {
           Text(
             state.message,
             style: AppTextStyle.setPoppinsSecondaryBlack(
-                fontSize: 14, fontWeight: FontWeight.w400),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -62,6 +66,7 @@ Widget buildContent(BuildContext context, HotelState state) {
     );
   }
 
+  // ✅ حالة عدم وجود بيانات
   if (state is HotelEmpty) {
     return Center(
       child: Column(
@@ -70,7 +75,9 @@ Widget buildContent(BuildContext context, HotelState state) {
           Text(
             isArabic ? 'لا توجد فنادق متاحة' : state.message,
             style: AppTextStyle.setPoppinsSecondaryBlack(
-                fontSize: 14, fontWeight: FontWeight.w400),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton(
@@ -82,6 +89,32 @@ Widget buildContent(BuildContext context, HotelState state) {
     );
   }
 
+  // ✅ حالة النتائج بعد الفلترة (البحث)
+  if (state is HotelFiltered) {
+    final hotels = state.filteredHotels;
+
+    if (hotels.isEmpty) {
+      return Center(
+        child: Text(
+          isArabic ? 'لم يتم العثور على فنادق' : 'No hotels found',
+          style: AppTextStyle.setPoppinsSecondaryBlack(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: hotels.length,
+      itemBuilder: (context, index) {
+        return _buildHotelCard(context, hotels[index], isArabic);
+      },
+    );
+  }
+
+  // ✅ الحالة العادية (عرض كل الفنادق)
   if (state is HotelLoaded) {
     final hotels = state.hotels.data ?? [];
 
@@ -90,7 +123,9 @@ Widget buildContent(BuildContext context, HotelState state) {
         child: Text(
           isArabic ? 'لا توجد فنادق متاحة حالياً' : 'No hotels found',
           style: AppTextStyle.setPoppinsSecondaryBlack(
-              fontSize: 14, fontWeight: FontWeight.w400),
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       );
     }
@@ -143,20 +178,20 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-Navigator.pushNamed(
-  context,
-  Routes.hotelDetails,
-  arguments: {
-    'hotelId': hotel.id ?? hotel.sId ?? '',
-  },
-);
-
+            Navigator.pushNamed(
+              context,
+              Routes.hotelDetails,
+              arguments: {
+                'hotelId': hotel.id ?? hotel.sId ?? '',
+              },
+            );
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 11.0, top: 23.0, bottom: 24.0,right: 11),
+                padding: const EdgeInsets.only(
+                    left: 11.0, top: 23.0, bottom: 24.0, right: 11),
                 child: Container(
                   width: 81,
                   height: 77,
@@ -173,7 +208,6 @@ Navigator.pushNamed(
                   ),
                 ),
               ),
-
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -202,7 +236,8 @@ Navigator.pushNamed(
                       // العنوان
                       Row(
                         children: [
-                          Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                          Icon(Icons.location_on,
+                              size: 14, color: Colors.grey[600]),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(

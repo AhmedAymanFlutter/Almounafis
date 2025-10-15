@@ -1,11 +1,14 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
+import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
 import 'package:almonafs_flutter/features/servicepackadge/data/model/getAllcountry.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void showServiceDetails(BuildContext context, Data service) {
+  final isArabic = context.read<LanguageCubit>().isArabic;
+
   showDialog(
     context: context,
     builder: (context) => Dialog(
@@ -13,9 +16,9 @@ void showServiceDetails(BuildContext context, Data service) {
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         width: 382,
-        height: 423,
         constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8),
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
         decoration: BoxDecoration(
           color: const Color(0xFF102E4F),
           borderRadius: BorderRadius.circular(24),
@@ -28,28 +31,42 @@ void showServiceDetails(BuildContext context, Data service) {
                 padding: const EdgeInsets.all(24),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection:
+                      isArabic ? TextDirection.rtl : TextDirection.ltr,
                   children: [
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: isArabic
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
                         children: [
                           Text(
-                            service.name ?? 'Service Details',
+                            isArabic
+                                ? (service.nameAr ?? service.name ?? 'تفاصيل الخدمة')
+                                : (service.name ?? 'Service Details'),
                             style: AppTextStyle.setPoppinsTextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
                               color: AppColor.mainWhite,
                             ),
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            service.summary ??
-                                'Service description not available',
+                            isArabic
+                                ? (service.summaryAr ??
+                                    service.summary ??
+                                    'وصف الخدمة غير متاح')
+                                : (service.summary ??
+                                    'Service description not available'),
                             style: AppTextStyle.setPoppinsTextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w300,
                               color: AppColor.mainWhite.withOpacity(0.8),
                             ),
+                            textAlign:
+                                isArabic ? TextAlign.right : TextAlign.left,
                           ),
                         ],
                       ),
@@ -70,25 +87,14 @@ void showServiceDetails(BuildContext context, Data service) {
                       child: service.image != null
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: service.image!.toLowerCase().endsWith('.svg')
-                                  ? SvgPicture.network(
-                                      service.image!,
-                                      fit: BoxFit.cover,
-                                      placeholderBuilder: (context) =>
-                                          const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    )
-                                  : CachedNetworkImage(
-                                      imageUrl: service.image!,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) =>
-                                          const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                    ),
+                              child: CachedNetworkImage(
+                                imageUrl: service.image!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    const Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                              ),
                             )
                           : const Icon(
                               Icons.assignment,
@@ -99,12 +105,14 @@ void showServiceDetails(BuildContext context, Data service) {
                   ],
                 ),
               ),
-              Divider(
-                  color: Colors.white.withOpacity(0.2),
-                  thickness: 1,
-                  height: 1),
 
-              // Contact Section
+              Divider(
+                color: Colors.white.withOpacity(0.2),
+                thickness: 1,
+                height: 1,
+              ),
+
+              // 📞 Contact Section
               if (service.phoneNum != null)
                 Container(
                   margin: const EdgeInsets.fromLTRB(24, 16, 24, 24),
@@ -121,6 +129,8 @@ void showServiceDetails(BuildContext context, Data service) {
                     ],
                   ),
                   child: Row(
+                    textDirection:
+                        isArabic ? TextDirection.rtl : TextDirection.ltr,
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
@@ -137,10 +147,12 @@ void showServiceDetails(BuildContext context, Data service) {
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: isArabic
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Contact Us',
+                              isArabic ? 'تواصل معنا' : 'Contact Us',
                               style: TextStyle(
                                 color: const Color(0xFF1E3A5F).withOpacity(0.7),
                                 fontSize: 13,
@@ -181,4 +193,3 @@ void showServiceDetails(BuildContext context, Data service) {
     ),
   );
 }
-

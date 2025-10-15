@@ -40,6 +40,7 @@ class GuidedTourCard extends StatelessWidget {
         },
         child: Container(
           width: 240,
+     
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.lightGrey, width: 1),
             color: AppColor.primaryWhite,

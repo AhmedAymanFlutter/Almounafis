@@ -1,27 +1,47 @@
+
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
+import 'package:almonafs_flutter/features/flightScreen/view/utils/componant_utils.dart';
+import 'package:almonafs_flutter/features/getAilplaneState/data/model/Airplane_City_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/theme/app_color.dart';
-import '../../../core/theme/app_text_style.dart';
-import '../../home/presentation/widgets/search_bar.dart';
+import '../../getAilplaneState/manager/Airplane_citys_cubit.dart';
 import '../../localization/manager/localization_cubit.dart';
-import 'widget/date_field.dart';
-import 'widget/dropdown_field.dart';
-import 'widget/filter_chip.dart';
-import 'widget/glass_card.dart';
-import 'widget/location_field.dart';
-import 'widget/passenger_counter.dart';
-import 'widget/trip_type_button.dart';
-
+import 'utils/date_Card_utils.dart';
+import 'utils/location_card.dart';
+import 'utils/search_button.dart';
 class FlightBookingScreen extends StatefulWidget {
   const FlightBookingScreen({super.key});
 
   @override
   State<FlightBookingScreen> createState() => _FlightBookingScreenState();
 }
-
 class _FlightBookingScreenState extends State<FlightBookingScreen> {
   bool isRoundTrip = true;
   int selectedNavIndex = 0;
+
+  final _departureDateController = TextEditingController();
+  final _returnDateController = TextEditingController();
+
+  int adultsCount = 1;
+  int childrenCount = 0;
+  int infantsCount = 0;
+
+  GetCitesAirplane? selectedFromCity;
+  GetCitesAirplane? selectedToCity;
+  String? selectedAirlineId; //  غيرنا النوع من AirLineData? لـ String?
+
+  String selectedClass = 'economy';
+
+  // controllers for contact info (used in booking request)
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final whatsappController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AirPlaneCitysCubit>().getAirPlaneCitys();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,278 +51,103 @@ class _FlightBookingScreenState extends State<FlightBookingScreen> {
 
         return Directionality(
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-          child: Scaffold(
-            body: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/Component 20 (1).png'),
-                  fit: BoxFit.cover,
-                ),
+          child: SafeArea(
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                title: Text('Booking flight',style: AppTextStyle.setPoppinsSecondaryBlack(fontSize: 16, fontWeight: FontWeight.w500),),
               ),
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            CustomSearchBar(),
-                            const SizedBox(height: 20),
-                            _buildFilterSection(isArabic),
-                            const SizedBox(height: 24),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 74),
-                              child: _buildTripTypeSection(isArabic),
-                            ),
-                            const SizedBox(height: 20),
-                            _buildLocationCard(isArabic),
-                            const SizedBox(height: 20),
-                            _buildDateCard(isArabic),
-                            const SizedBox(height: 24),
-                            _buildSearchButton(isArabic),
-                          ],
-                        ),
-                      ),
+              body: Expanded(
+                child: Container(
+                  height: double.infinity,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/FlightBook.png'),
+                      fit: BoxFit.cover,
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
+                  child: SafeArea(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                      //  crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                         // CustomSearchBar(controller: , onChanged: (String value) {  },),
+                          const SizedBox(height: 20),
+                                        Padding(
+                                      padding: const EdgeInsets.only(left: 74),
+                                     child: buildTripTypeSection(
+                                       isArabic: isArabic,
+                                       isRoundTrip: isRoundTrip,
+                                       onSelectRoundTrip: () => setState(() => isRoundTrip = true),
+                                       onSelectOneWay: () => setState(() => isRoundTrip = false),
+                                     ),
+                                       ),
+                                     const SizedBox(height: 20),
+                                       LocationCard(
+                                     isArabic: isArabic,
+                                     selectedFromCity: selectedFromCity,
+                                     selectedToCity: selectedToCity,
+                                     onFromSelected: (city) => setState(() => selectedFromCity = city),
+                                     onToSelected: (city) => setState(() => selectedToCity = city),
+                                      ),
+                                       const SizedBox(height: 20),
+                                       DateCard(
+                                      isArabic: isArabic,
+                                      isRoundTrip: isRoundTrip,
+                                      departureDateController: _departureDateController,
+                                      returnDateController: _returnDateController,
+                                      onAdultsChanged: (val) => adultsCount = val,
+                                      onChildrenChanged: (val) => childrenCount = val,
+                                      onInfantsChanged: (val) => infantsCount = val,
+                                      onAirlineChanged: (value) {
+                                        setState(() => selectedAirlineId =
+                                            (value == null || value == 'Any' || value == 'أي') ? null : value);
+                                      },
+                                      onClassChanged: (value) {
+                                        if (value != null && value != 'Any' && value != 'أي') {
+                                          setState(() => selectedClass = value);
+                                        }
+                                       },
+                                      ),
+                                       const SizedBox(height: 24),
+                                                   SearchButton(
+                                           isArabic: isArabic,
+                                           contextRef: context, // parent context to use inside helper
+                                           selectedFromCity: selectedFromCity,
+                                           selectedToCity: selectedToCity,
+                                           departureDateController: _departureDateController,
+                                           returnDateController: _returnDateController,
+                                           isRoundTrip: isRoundTrip,
+                                           adultsCount: adultsCount,
+                                           childrenCount: childrenCount,
+                                           infantsCount: infantsCount,
+                                           selectedClass: selectedClass,
+                                           selectedAirlineId: selectedAirlineId,
+                                           emailController: emailController,
+                                           phoneController: phoneController,
+                                           whatsappController: whatsappController,
+                                                  ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                ),
+                                            ),
           ),
-        );
-      },
-    );
-  }
-
-  // 🔹 Filter Section
-  Widget _buildFilterSection(bool isArabic) {
-    return Row(
-      children: [
-        Text(
-          isArabic ? 'تصفية حسب' : 'Filter by',
-          style: AppTextStyle.setPoppinsTextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColor.secondaryBlack,
-          ),
-        ),
-        const SizedBox(width: 12),
-        FilterChipWidget(label: isArabic ? 'شركات الطيران' : 'Airlines', onTap: () {}),
-        const SizedBox(width: 8),
-        FilterChipWidget(label: isArabic ? 'الركاب' : 'Passengers', onTap: () {}),
-        const SizedBox(width: 8),
-        FilterChipWidget(label: isArabic ? 'الدرجة' : 'Class', onTap: () {}),
-      ],
-    );
-  }
-
-  // 🔹 Trip Type
-  Widget _buildTripTypeSection(bool isArabic) {
-    return Row(
-      children: [
-        TripTypeButton(
-          label: isArabic ? 'ذهاب وعودة' : 'Round Trip',
-          icon: Icons.sync,
-          isSelected: isRoundTrip,
-          onTap: () => setState(() => isRoundTrip = true),
-        ),
-        const SizedBox(width: 12),
-        TripTypeButton(
-          label: isArabic ? 'ذهاب فقط' : 'One Way',
-          icon: Icons.arrow_forward,
-          isSelected: !isRoundTrip,
-          onTap: () => setState(() => isRoundTrip = false),
-        ),
-      ],
-    );
-  }
-
-  // 🔹 Location
-  Widget _buildLocationCard(bool isArabic) {
-    return GlassCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            isArabic ? 'بلد المغادرة والعودة' : 'Departure and Return Country',
-            style: AppTextStyle.setPoppinsSecondaryBlack(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Stack(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: LocationField(
-                      label: isArabic ? 'من' : 'From',
-                      hint: isArabic ? 'أدخل نقطة الانطلاق' : 'Enter Departure Point',
-                      icon: Icons.location_on_outlined,
-                    ),
-                  ),
-                  const SizedBox(width: 40),
-                  Expanded(
-                    child: LocationField(
-                      label: isArabic ? 'إلى' : 'To',
-                      hint: isArabic ? 'أدخل وجهتك' : 'Enter Your Destination',
-                      icon: Icons.location_on_outlined,
-                    ),
-                  ),
-                ],
-              ),
-              Positioned.fill(
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Transform.rotate(
-                    angle: 50.38 * 3.1415926535 / 180,
-                    child: Image.asset(
-                      'assets/images/airplane.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 🔹 Date Section
-  Widget _buildDateCard(bool isArabic) {
-  return GlassCard(
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        bool isWide = constraints.maxWidth > 600; 
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isRoundTrip
-                  ? (isArabic
-                      ? 'أدخل تواريخ الذهاب والعودة'
-                      : 'Enter Departure and Return Dates')
-                  : (isArabic
-                      ? 'اختر تاريخ الرحلة'
-                      : 'Select the travel date'),
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: AppColor.secondaryblue,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ✅ Round trip or single trip date fields
-            if (isRoundTrip)
-              Row(
-                children: [
-                  Expanded(
-                    child: DateField(
-                      label: isArabic ? 'تاريخ المغادرة' : 'Departure Date',
-                      date: '01 / 11 / 2025',
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DateField(
-                      label: isArabic ? 'تاريخ العودة' : 'Return Date',
-                      date: '08 / 11 / 2025',
-                    ),
-                  ),
-                ],
-              )
-            else
-              DateField(
-                label: isArabic ? 'تاريخ المغادرة' : 'Departure Date',
-                date: '01 / 11 / 2025',
-              ),
-
-            const SizedBox(height: 16),
-
-            // ✅ Passenger & Dropdowns (responsive)
-            if (isWide)
-              Row(
-                children: [
-                  Flexible(child: PassengerCounterDropdown()),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: DropdownField(
-                      label: isArabic ? 'شركات الطيران' : 'Airlines',
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: DropdownField(
-                      label: isArabic ? 'الدرجة' : 'Class',
-                    ),
-                  ),
-                ],
-              )
-            else
-              Column(
-                children: [
-                  PassengerCounterDropdown(),
-                  const SizedBox(height: 8),
-                  DropdownField(
-                    label: isArabic ? 'شركات الطيران' : 'Airlines',
-                  ),
-                  const SizedBox(height: 8),
-                  DropdownField(
-                    label: isArabic ? 'الدرجة' : 'Class',
-                  ),
-                ],
-              ),
-          ],
-        );
-      },
-    ),
-  );
-}
-
-  // 🔹 Search Button
-  Widget _buildSearchButton(bool isArabic) {
-    return Container(
-      height: 56,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1A8EEA), Color(0xFF102E4F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(12),
-          child: Center(
-            child: Text(
-              isArabic ? 'ابحث عن رحلتك' : 'Search for your trip',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+                                        );
+                                      },
+                                    );
+                                  }                                
+                        @override
+                        void dispose() {
+                          _departureDateController.dispose();
+                          _returnDateController.dispose();
+                          emailController.dispose();
+                          phoneController.dispose();
+                          whatsappController.dispose();
+                          super.dispose();
+                        }
+                      }

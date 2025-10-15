@@ -8,7 +8,6 @@ class Routes {
   static const String tourCity = '/CityToursView';
   static const String countryDetails = '/SingleCountryView';
   static const String setting = '/SittingScreen';
-  static const String aboutUs = '/AboutUsScreen';
   static const String cityDetailsScreen = '/CityDetailsScreen';
   static const String packageView = '/packageView';
   static const String countriesView = '/countriesView';
@@ -18,7 +17,11 @@ class Routes {
 static const String packageDetailsView = '/packageDetailsView';
 static const String languageScreen = '/languageScreen';
 static const String servicesView = '/servicesView';
-static const String aboutUsScreen = '/aboutUsScreen';
-
+static const String aboutUsScreen = '/AboutUsScreen';
+static const String contactInfoView = '/ContactInfoView';
+static const String allCountriesPage = '/AllCountriesPage';
+static const String allToursPage = '/AllToursPage';
+static const String globalSettingsView = '/GlobalSettingsView';
+static const String flightBookingScreen = '/FlightBookingScreen';
 
 }

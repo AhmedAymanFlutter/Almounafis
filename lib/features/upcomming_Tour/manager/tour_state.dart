@@ -62,3 +62,10 @@ class CityTourEmpty extends CityTourState {
   @override
   List<Object?> get props => [message];
 }
+class CityTourFiltered extends CityTourState {
+  final List<Data> filteredTours;
+  const CityTourFiltered(this.filteredTours);
+
+  @override
+  List<Object?> get props => [filteredTours];
+}

@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../../core/helper/Fun_helper.dart';
 import '../../../../../core/theme/app_color.dart';
 import '../../../../../features/localization/manager/localization_cubit.dart';
+import '../../../../global_Settings/manager/global_cubit.dart';
+import '../../../../global_Settings/manager/global_stete.dart';
+
 
 Widget buildInfoChip({required IconData icon, required String label, required BuildContext context}) {
   final isArabic = context.watch<LanguageCubit>().isArabic;
@@ -146,8 +150,26 @@ Widget buildBookButton(BuildContext context) {
       ],
     ),
     child: ElevatedButton(
-      onPressed: () {
-        // Implement booking functionality
+      onPressed: () {         
+  final globalSettingsState = context.read<GlobalSettingsCubit>().state;
+
+if (globalSettingsState is GlobalSettingsLoaded) {
+  WhatsAppService.launchWhatsApp(
+    context,
+    isArabic: isArabic,
+    settings: globalSettingsState.globalSettings,
+  );
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        isArabic 
+          ? "جاري تحميل الإعدادات..." 
+          : "Loading settings..."
+      ),
+    ),
+  );
+}
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColor.mainBlack,

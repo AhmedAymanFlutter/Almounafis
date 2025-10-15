@@ -1,20 +1,24 @@
 import 'package:almonafs_flutter/config/router/router_transation.dart';
 import 'package:almonafs_flutter/config/router/routes.dart';
 import 'package:almonafs_flutter/features/auth/presentation/views/sign_up_view.dart';
+import 'package:almonafs_flutter/features/flightScreen/view/UpcomingTripsPage.dart';
 import 'package:almonafs_flutter/features/home/presentation/views/home_view.dart';
 import 'package:almonafs_flutter/features/onboarding/presentation/views/on_boarding_view.dart';
+import 'package:almonafs_flutter/features/setting/widget/About_us.dart';
 import 'package:almonafs_flutter/features/splash/splash_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/global_Settings/view/global_Setting_view.dart';
 import '../../features/home/data/repo/country_repo.dart';
 import '../../features/home/manager/country_cubit.dart';
+import '../../features/seeAllPage/view/All_commingTour.dart';
+import '../../features/seeAllPage/view/see_AllCountry_page.dart';
 import '../../features/hotelDetails/view/HotelDetailsScreen.dart';
 import '../../features/packadge/view/package_List/package_List_view.dart';
 import '../../features/packadge/view/countryView/package_country_details.dart';
 import '../../features/packadge/view/package_view.dart';
 import '../../features/packadge/view/packege_details/package_List_detail.dart';
 import '../../features/servicepackadge/view/Service_view.dart';
-import '../../features/setting/widget/About_us.dart';
 import '../../features/setting/widget/languang.dart';
 import '../../features/singel_country/view/CountryDetailsPage.dart';
 import '../../features/upcomming_Tour/view/widget/CityTour_Details.dart';
@@ -41,19 +45,20 @@ class AppRouter {
           ),
         );
         case Routes.countryDetails:
-        final args = settings.arguments as Map<String, dynamic>;
+  final args = settings.arguments as Map<String, dynamic>;
 
-        return RouterTransitions.buildHorizontal(
-          BlocProvider(
-            create: (context) => CountryCubit(
-              context.read<CountryRepository>(),
-            ),
-            child: CountryDetailsPage(
-              countryIdOrSlug: args['countryIdOrSlug'] ?? '',
-              countryName: args['countryName'] ?? '',
-            ),
-          ),
-        );
+  return RouterTransitions.buildHorizontal(
+    BlocProvider(
+      create: (context) => CountryCubit(
+        context.read<CountryRepository>(),
+      ),
+      child: CountryDetailsPage(
+        countryIdOrSlug: args['countryIdOrSlug'] ?? '',
+        countryName: args['countryName'] ?? '',
+      ),
+    ),
+  );
+
         case Routes.cityTourDetails:
   final args = settings.arguments as Map<String, dynamic>;
   return RouterTransitions.buildHorizontal(
@@ -90,9 +95,16 @@ class AppRouter {
     case Routes.servicesView:
   return RouterTransitions.buildHorizontal(const ServicesView());
 case Routes.aboutUsScreen:
-  return RouterTransitions.buildHorizontal(const AboutUsScreen());
-
-      default: return RouterTransitions.build(Scaffold(
+  return RouterTransitions.buildHorizontal(AboutUsScreen());
+case Routes.allCountriesPage:
+  return RouterTransitions.buildHorizontal( AllCountriesPage());
+case Routes.allToursPage:
+  return RouterTransitions.buildHorizontal( AllToursPage());
+      case Routes.globalSettingsView:
+      return RouterTransitions.buildHorizontal(GlobalSettingsView());
+      case Routes.flightBookingScreen:
+      return RouterTransitions.buildHorizontal(FlightBookingScreen());
+default: return RouterTransitions.build(Scaffold(
         body:Center(
           child: Text("No Route"),
         ),

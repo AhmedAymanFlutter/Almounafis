@@ -45,3 +45,10 @@ class SingleCountryError extends CountryState {
   @override
   List<Object> get props => [message];
 }
+class CountryFiltered extends CountryState {
+  final List<Data> filteredCountries;
+  const CountryFiltered(this.filteredCountries);
+
+  @override
+  List<Object> get props => [filteredCountries];
+}

@@ -4,15 +4,20 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../localization/manager/localization_cubit.dart';
 import '../../data/model/AirLine_data.dart';
 
-
 class PassengerCounterDropdown extends StatefulWidget {
   final FlightFilter? currentFilter;
   final Function(FlightFilter)? onFilterChanged;
+  final ValueChanged<int>? onAdultsChanged;
+  final ValueChanged<int>? onChildrenChanged;
+  final ValueChanged<int>? onInfantsChanged;
 
   const PassengerCounterDropdown({
     super.key,
     this.currentFilter,
     this.onFilterChanged,
+    this.onAdultsChanged,
+    this.onChildrenChanged,
+    this.onInfantsChanged,
   });
 
   @override
@@ -21,29 +26,16 @@ class PassengerCounterDropdown extends StatefulWidget {
 }
 
 class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
-  late int adults;
-  late int children;
-  late int infants;
+  int adults = 1;
+  int children = 0;
+  int infants = 0;
   bool _isExpanded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeValues();
-  }
-
-  void _initializeValues() {
-    adults = 1;
-    children = 0;
-    infants = 0;
-  }
 
   void _updateFilter() {
     final total = adults + children + infants;
     final updatedFilter = (widget.currentFilter ?? FlightFilter()).copyWith(
       passengerCount: total.toString(),
     );
-
     widget.onFilterChanged?.call(updatedFilter);
   }
 
@@ -51,6 +43,7 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
     setState(() {
       if (adults < 9) adults++;
       _updateFilter();
+      widget.onAdultsChanged?.call(adults); // ✅ أضفنا هذا
     });
   }
 
@@ -58,6 +51,7 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
     setState(() {
       if (adults > 1) adults--;
       _updateFilter();
+      widget.onAdultsChanged?.call(adults);
     });
   }
 
@@ -65,6 +59,7 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
     setState(() {
       if (children < 8) children++;
       _updateFilter();
+      widget.onChildrenChanged?.call(children); // ✅
     });
   }
 
@@ -72,6 +67,7 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
     setState(() {
       if (children > 0) children--;
       _updateFilter();
+      widget.onChildrenChanged?.call(children);
     });
   }
 
@@ -79,6 +75,7 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
     setState(() {
       if (infants < 8) infants++;
       _updateFilter();
+      widget.onInfantsChanged?.call(infants); // ✅
     });
   }
 
@@ -86,6 +83,7 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
     setState(() {
       if (infants > 0) infants--;
       _updateFilter();
+      widget.onInfantsChanged?.call(infants);
     });
   }
 
@@ -99,13 +97,8 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
           child: Column(
             children: [
-              // Header button
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isExpanded = !_isExpanded;
-                  });
-                },
+                onTap: () => setState(() => _isExpanded = !_isExpanded),
                 child: Container(
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -117,15 +110,14 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-    Text(
-  _getPassengerSummary(isArabic),
-  style: TextStyle(
-    fontSize: 14.sp,
-    fontWeight: FontWeight.w600,
-    color: Colors.black87,
-  ),
-),
-
+                      Text(
+                        _getPassengerSummary(isArabic),
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
                       Icon(
                         _isExpanded
                             ? Icons.keyboard_arrow_up
@@ -136,7 +128,6 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
                   ),
                 ),
               ),
-              // Expanded content
               if (_isExpanded)
                 Container(
                   margin: EdgeInsets.only(top: 8.h),
@@ -156,7 +147,6 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Adults
                       _buildPassengerRow(
                         label: isArabic ? 'البالغون' : 'Adults',
                         subtitle: isArabic ? '+12 سنة' : '+12 years',
@@ -166,7 +156,6 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
                         canDecrement: adults > 1,
                       ),
                       Divider(height: 24.h, color: Colors.grey[200]),
-                      // Children
                       _buildPassengerRow(
                         label: isArabic ? 'الأطفال' : 'Children',
                         subtitle: isArabic ? '2-11 سنة' : '2-11 years',
@@ -176,25 +165,21 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
                         canDecrement: children > 0,
                       ),
                       Divider(height: 24.h, color: Colors.grey[200]),
-                      // Infants
                       _buildPassengerRow(
                         label: isArabic ? 'الرضع' : 'Infants',
-                        subtitle: isArabic ? 'أقل من سنتين' : 'Less than 2 years',
+                        subtitle:
+                            isArabic ? 'أقل من سنتين' : 'Less than 2 years',
                         count: infants,
                         onIncrement: _incrementInfants,
                         onDecrement: _decrementInfants,
                         canDecrement: infants > 0,
                       ),
                       SizedBox(height: 16.h),
-                      // Apply button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _isExpanded = false;
-                            });
-                          },
+                          onPressed: () =>
+                              setState(() => _isExpanded = false),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1a2a4a),
                             padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -231,35 +216,26 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
     required bool canDecrement,
   }) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87)),
             SizedBox(height: 4.h),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-            ),
+            Text(subtitle,
+                style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600])),
           ],
         ),
         Row(
           children: [
-            // Increment button
             GestureDetector(
               onTap: onIncrement,
               child: Container(
@@ -269,30 +245,21 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
                   color: Colors.grey[200],
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.add,
-                  size: 16.sp,
-                  color: Colors.black87,
-                ),
+                child: Icon(Icons.add, size: 16.sp, color: Colors.black87),
               ),
             ),
             SizedBox(width: 12.w),
-            // Count
             SizedBox(
               width: 30.w,
               child: Center(
-                child: Text(
-                  count.toString(),
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
+                child: Text('$count',
+                    style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87)),
               ),
             ),
             SizedBox(width: 12.w),
-            // Decrement button
             GestureDetector(
               onTap: canDecrement ? onDecrement : null,
               child: Container(
@@ -302,11 +269,11 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
                   color: canDecrement ? Colors.grey[200] : Colors.grey[100],
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.remove,
-                  size: 16.sp,
-                  color: canDecrement ? Colors.black87 : Colors.grey[400],
-                ),
+                child: Icon(Icons.remove,
+                    size: 16.sp,
+                    color: canDecrement
+                        ? Colors.black87
+                        : Colors.grey[400]),
               ),
             ),
           ],
@@ -314,32 +281,32 @@ class _PassengerCounterDropdownState extends State<PassengerCounterDropdown> {
       ],
     );
   }
+
   String _getPassengerSummary(bool isArabic) {
-  List<String> parts = [];
+    List<String> parts = [];
 
-  if (adults > 0) {
-    parts.add(isArabic
-        ? '$adults ${adults == 1 ? 'بالغ' : 'بالغين'}'
-        : '$adults ${adults == 1 ? 'Adult' : 'Adults'}');
+    if (adults > 0) {
+      parts.add(isArabic
+          ? '$adults ${adults == 1 ? 'بالغ' : 'بالغين'}'
+          : '$adults ${adults == 1 ? 'Adult' : 'Adults'}');
+    }
+
+    if (children > 0) {
+      parts.add(isArabic
+          ? '$children ${children == 1 ? 'طفل' : 'أطفال'}'
+          : '$children ${children == 1 ? 'Child' : 'Children'}');
+    }
+
+    if (infants > 0) {
+      parts.add(isArabic
+          ? '$infants ${infants == 1 ? 'رضيع' : 'رضع'}'
+          : '$infants ${infants == 1 ? 'Infant' : 'Infants'}');
+    }
+
+    if (parts.isEmpty) {
+      return isArabic ? 'لم يتم اختيار ركاب' : 'No passengers selected';
+    }
+
+    return parts.join(isArabic ? '، ' : ', ');
   }
-
-  if (children > 0) {
-    parts.add(isArabic
-        ? '$children ${children == 1 ? 'طفل' : 'أطفال'}'
-        : '$children ${children == 1 ? 'Child' : 'Children'}');
-  }
-
-  if (infants > 0) {
-    parts.add(isArabic
-        ? '$infants ${infants == 1 ? 'رضيع' : 'رضع'}'
-        : '$infants ${infants == 1 ? 'Infant' : 'Infants'}');
-  }
-
-  if (parts.isEmpty) {
-    return isArabic ? 'لم يتم اختيار ركاب' : 'No passengers selected';
-  }
-
-  return parts.join(isArabic ? '، ' : ', ');
-}
-
 }

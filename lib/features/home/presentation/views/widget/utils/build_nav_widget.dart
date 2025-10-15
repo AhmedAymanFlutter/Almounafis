@@ -10,7 +10,7 @@ Widget buildNavItem({
   required String label,
   required bool isSelected,
 }) {
-  final double iconSize = label == "Home" ? 25 : 24;
+  final double iconSize = label == "Home" ? 20 : 24;
 
   return BlocBuilder<LanguageCubit, AppLanguage>(
     builder: (context, langState) {
@@ -66,10 +66,9 @@ String _translateLabel(String label, bool isArabic) {
       return 'الجولات';
     case 'hotels':
       return 'الفنادق';
-    case 'trips':
-      return 'الرحلات';
-    case 'profile':
-      return 'الملف الشخصي';
+    case 'packages':
+      return 'الباقات';
+   
     default:
       return label;
   }

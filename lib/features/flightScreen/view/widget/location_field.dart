@@ -6,12 +6,16 @@ class LocationField extends StatefulWidget {
   final String label;
   final String hint;
   final IconData icon;
+  final VoidCallback ? onTap;
+  final String? selectedValue;
 
   const LocationField({
     super.key,
     required this.label,
     required this.hint,
-    required this.icon,
+    required this.icon, 
+    this.onTap, 
+    this.selectedValue,
   });
 
   @override
@@ -55,24 +59,29 @@ class _LocationFieldState extends State<LocationField> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey[300]!),
                 ),
-                child: TextField(
-                  controller: _controller,
-                  textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-                  decoration: InputDecoration(
-                    hintText: isArabic
-                        ? _translateHint(widget.hint)
-                        : widget.hint,
-                    hintStyle: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[400],
+                child: GestureDetector(
+                  onTap: widget.onTap,
+                  child: AbsorbPointer(
+                    child: TextField(
+                      controller: _controller..text = widget.selectedValue ?? '',
+                      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+                      decoration: InputDecoration(
+                        hintText: isArabic
+                            ? _translateHint(widget.hint)
+                            : widget.hint,
+                        hintStyle: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[400],
+                        ),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[700],
+                      ),
                     ),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[700],
                   ),
                 ),
               ),

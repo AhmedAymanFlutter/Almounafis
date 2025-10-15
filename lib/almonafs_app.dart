@@ -1,4 +1,7 @@
 import 'package:almonafs_flutter/config/router/app_router.dart' show AppRouter;
+import 'package:almonafs_flutter/features/getAilplaneState/data/repo/Airplan_city_repo.dart';
+import 'package:almonafs_flutter/features/global_Settings/data/repo/global_Setting_repo.dart';
+import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
 import 'package:almonafs_flutter/features/hotels/data/repo/Hotel_repo_tour.dart';
 import 'package:almonafs_flutter/features/hotels/manager/hotel_cubit.dart';
 import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
@@ -7,14 +10,13 @@ import 'package:almonafs_flutter/features/servicepackadge/manager/country_cubit.
 import 'package:almonafs_flutter/features/upcomming_Tour/manager/tour_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'config/router/routes.dart';
 import 'core/network/api_endpoiont.dart';
 import 'features/flightScreen/data/repo/AirLine_repo.dart';
 import 'features/flightScreen/manager/AirLine_cubit.dart';
+import 'features/getAilplaneState/manager/Airplane_citys_cubit.dart';
 import 'features/home/data/repo/country_repo.dart';
 import 'features/home/manager/country_cubit.dart';
 import 'features/upcomming_Tour/data/repo/city_repo_tour.dart';
@@ -60,7 +62,9 @@ class AlmonafsApp extends StatelessWidget {
             ),
          BlocProvider(create: 
          (context)=> FilterCubit(FlightFilterRepository(),),),
-
+         BlocProvider(create: (_) => AirPlaneCitysCubit(AirplaneCitsRepository())..getAirPlaneCitys(),
+         ),
+         BlocProvider(create:(_)=> GlobalSettingsCubit(repository: GlobalSettingsRepository())..getGlobalSettings() )
           ],
           child: BlocBuilder<LanguageCubit, AppLanguage>(
             builder: (context, langState) {

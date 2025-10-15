@@ -11,12 +11,6 @@ class HotelDescriptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isArabic = context.watch<LanguageCubit>().isArabic;
-
-    // اختيار الوصف المناسب (عربي أو إنجليزي)
-    final String description = hotel.descriptionFlutter ??
-        hotel.descriptionArFlutter ??
-        (isArabic ? 'لا يوجد وصف متاح حالياً' : 'No description available');
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -34,15 +28,17 @@ class HotelDescriptionCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              description.trim(),
-              style: AppTextStyle.setPoppinsSecondaryBlack(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                 
-              ),
-              textAlign: TextAlign.start,
-            ),
+          Text(
+  isArabic
+      ? (hotel.descriptionArFlutter ?? 'لا يوجد وصف متاح حالياً')
+      : (hotel.descriptionFlutter ?? 'No description available'),
+  style: AppTextStyle.setPoppinsSecondaryBlack(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+  ),
+  textAlign: isArabic ? TextAlign.right : TextAlign.left,
+)
+
           ],
         ),
       ),

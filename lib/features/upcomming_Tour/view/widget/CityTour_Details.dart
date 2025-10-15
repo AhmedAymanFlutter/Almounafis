@@ -48,14 +48,15 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 🖼 Cover Image
-                  if (tour.coverImage != null)
-                    buildCoverImage(
-                      tour.coverImage!,
-                      context,
-                      countryName:
-                          isArabic ? tour.titleAr ?? '' : tour.title ?? '',
-                      arabicName: tour.titleAr ?? '',
-                    ),
+                  buildCoverImage(
+  (tour.coverImage?.isNotEmpty == true)
+      ? tour.coverImage!
+      : 'https://yourcdn.com/images/default_cover.jpg', // 🔁 fallback image
+  context,
+  countryName: isArabic ? tour.titleAr ?? '' : tour.title ?? '',
+  arabicName: tour.titleAr ?? '',
+),
+
 
                   Padding(
                     padding: EdgeInsets.all(16.w),

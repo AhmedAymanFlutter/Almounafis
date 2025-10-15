@@ -24,7 +24,6 @@ class FilterCubit extends Cubit<FilterState> {
         if (response.status && response.data is Map<String, dynamic>) {
           final model = AirLineModel.fromJson(response.data as Map<String, dynamic>);
           final airlines = model.data ?? [];
-          final airlineNames = airlines.map((a) => a.name ?? '').toList();
           
           emit(AirlinesLoaded(airlines.cast<AirLineData>()));
         } else {

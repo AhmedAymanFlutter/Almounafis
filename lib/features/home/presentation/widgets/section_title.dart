@@ -4,7 +4,8 @@ import '../../../localization/manager/localization_cubit.dart';
 
 class SectionTitle extends StatelessWidget {
   final String title;
-  const SectionTitle({super.key, required this.title});
+ final VoidCallback? onTap;
+  const SectionTitle({super.key, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +23,12 @@ class SectionTitle extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            isArabic ? "عرض الكل" : "See all",
-            style: TextStyle(color: Colors.blue.shade700),
+          InkWell(
+            onTap: onTap,
+            child: Text(
+              isArabic ? "عرض الكل" : "See all",
+              style: TextStyle(color: Colors.blue.shade700),
+            ),
           ),
         ],
       ),

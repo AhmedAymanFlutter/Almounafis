@@ -1,24 +1,27 @@
+import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/repo/country_repo.dart';
 import 'country_state.dart';
 
 class CountryCubit extends Cubit<CountryState> {
   final CountryRepository repository;
+  List<Data> allCountries = [];
 
   CountryCubit(this.repository) : super(CountryInitial());
 
   Future<void> fetchAllCountries() async {
-    if (isClosed) return; // ✅ prevent emits on closed cubit
+    if (isClosed) return;
     emit(CountryLoading());
 
     try {
       final response = await repository.getAllCountries();
-      if (isClosed) return; // ✅ check again after await
+      if (isClosed) return;
 
       if (response.status) {
         final allCountryData = response.data;
         if (allCountryData != null && allCountryData.data?.isNotEmpty == true) {
-          emit(CountryLoaded(allCountryData.data!));
+          allCountries = allCountryData.data!; // ✅ نحفظ الدول كلها
+          emit(CountryLoaded(allCountries));
         } else {
           emit(const CountryError("لم يتم العثور على دول في الاستجابة."));
         }
@@ -51,5 +54,22 @@ class CountryCubit extends Cubit<CountryState> {
     } catch (e) {
       if (!isClosed) emit(SingleCountryError("حدث خطأ أثناء تحميل الدولة: $e"));
     }
+  }
+
+  /// دالة البحث المحلي
+  void searchCountries(String query, bool isArabic) {
+     print("🔍 Filtering countries by '$query'");
+  print("📦 allCountries length = ${allCountries.length}");
+    if (query.isEmpty) {
+      emit(CountryLoaded(allCountries)); // رجّع كل الدول لو البحث فاضي
+      return;
+    }
+
+    final filtered = allCountries.where((country) {
+      final name = isArabic ? (country.nameAr ?? '') : (country.name ?? '');
+      return name.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    emit(CountryFiltered(filtered)); // emit حالة جديدة فيها النتائج
   }
 }

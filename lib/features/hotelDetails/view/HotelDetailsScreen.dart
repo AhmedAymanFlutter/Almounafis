@@ -1,3 +1,6 @@
+import 'package:almonafs_flutter/core/helper/Fun_helper.dart';
+import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
+import 'package:almonafs_flutter/features/global_Settings/manager/global_stete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -202,7 +205,25 @@ class _HotelDetailsScreenState extends State<HotelDetailsScreen> {
       ),
       child: ElevatedButton(
         onPressed: () {
-          // Implement booking functionality
+         final globalSettingsState = context.read<GlobalSettingsCubit>().state;
+
+if (globalSettingsState is GlobalSettingsLoaded) {
+  WhatsAppService.launchWhatsApp(
+    context,
+    isArabic: isArabic,
+    settings: globalSettingsState.globalSettings,
+  );
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        isArabic 
+          ? "جاري تحميل الإعدادات..." 
+          : "Loading settings..."
+      ),
+    ),
+  );
+}
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColor.mainBlack,

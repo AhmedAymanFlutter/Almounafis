@@ -11,7 +11,7 @@ import '../manager/hotel_state.dart';
 import 'widget/hotel_widget.dart';
 
 class HotelsPage extends StatelessWidget {
-  const HotelsPage({super.key});
+   const HotelsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +30,31 @@ class _AllHotelsScreenContent extends StatefulWidget {
 }
 
 class __AllHotelsScreenContentState extends State<_AllHotelsScreenContent> {
+  final TextEditingController searchHotelController = TextEditingController();
+
+  @override
+  void dispose() {
+    searchHotelController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isArabic = context.watch<LanguageCubit>().isArabic;
 
     return Scaffold(
+      appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                title: Text('Hotel',style: AppTextStyle.setPoppinsSecondaryBlack(fontSize: 16, fontWeight: FontWeight.w500),),
+              ),
       backgroundColor: AppColor.mainWhite,
       body: Column(
         children: [
           // ✅ Search Bar
-          const CustomSearchBar(),
+           CustomSearchBar(controller: searchHotelController, onChanged: (String value) { 
+            final isArabic = context.read<LanguageCubit>().isArabic;
+    context.read<HotelCubit>().localSearchHotels(value, isArabic);
+            },),
           const SizedBox(height: 16),
 
           // ✅ Filter Section

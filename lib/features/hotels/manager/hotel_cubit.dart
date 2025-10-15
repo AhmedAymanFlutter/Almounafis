@@ -5,19 +5,21 @@ import 'hotel_state.dart';
 
 class HotelCubit extends Cubit<HotelState> {
   final HotelRepository repo;
-  
+  List<Data> _allHotels = []; // ✅ نخزّن هنا كل الفنادق بعد التحميل
+
   HotelCubit(this.repo) : super(HotelInitial());
 
   Future<void> getAllHotels() async {
     if (isClosed) return;
     emit(HotelLoading());
-    
+
     final response = await repo.getAllHotels();
     if (isClosed) return;
 
     if (response.status) {
       final hotels = response.data as GitHotelModel;
       if (hotels.data != null && hotels.data!.isNotEmpty) {
+        _allHotels = hotels.data!; // ✅ حفظ جميع الفنادق الأصلية
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No hotels available'));
@@ -30,7 +32,7 @@ class HotelCubit extends Cubit<HotelState> {
   Future<void> getHotelDetails(String hotelId) async {
     if (isClosed) return;
     emit(HotelDetailsLoading());
-    
+
     final response = await repo.getHotelDetails(hotelId);
     if (isClosed) return;
 
@@ -45,13 +47,14 @@ class HotelCubit extends Cubit<HotelState> {
   Future<void> getFeaturedHotels({int limit = 6}) async {
     if (isClosed) return;
     emit(HotelLoading());
-    
+
     final response = await repo.getFeaturedHotels(limit: limit);
     if (isClosed) return;
 
     if (response.status) {
       final hotels = response.data as GitHotelModel;
       if (hotels.data != null && hotels.data!.isNotEmpty) {
+        _allHotels = hotels.data!;
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No featured hotels available'));
@@ -64,13 +67,14 @@ class HotelCubit extends Cubit<HotelState> {
   Future<void> getHotelsByCity(String cityId) async {
     if (isClosed) return;
     emit(HotelLoading());
-    
+
     final response = await repo.getHotelsByCity(cityId);
     if (isClosed) return;
 
     if (response.status) {
       final hotels = response.data as GitHotelModel;
       if (hotels.data != null && hotels.data!.isNotEmpty) {
+        _allHotels = hotels.data!;
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No hotels available in this city'));
@@ -80,6 +84,27 @@ class HotelCubit extends Cubit<HotelState> {
     }
   }
 
+  /// 🔍 البحث المحلي (داخل النتائج الموجودة)
+  void localSearchHotels(String query, bool isArabic) {
+    if (query.isEmpty) {
+      // رجّع الفنادق الأصلية كلها
+      emit(HotelLoaded(GitHotelModel(data: _allHotels)));
+      return;
+    }
+
+    final filtered = _allHotels.where((hotel) {
+      final name = isArabic ? (hotel.nameAr ?? '') : (hotel.name ?? '');
+      return name.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    if (filtered.isEmpty) {
+      emit(HotelEmpty(isArabic ? "لم يتم العثور على فنادق" : "No hotels found"));
+    } else {
+      emit(HotelLoaded(GitHotelModel(data: filtered)));
+    }
+  }
+
+  /// 🔎 البحث عبر API (للبحث المتقدم أو الفلاتر)
   Future<void> searchHotels({
     String? cityId,
     double? minPrice,
@@ -92,7 +117,7 @@ class HotelCubit extends Cubit<HotelState> {
   }) async {
     if (isClosed) return;
     emit(HotelLoading());
-    
+
     final response = await repo.searchHotels(
       cityId: cityId,
       minPrice: minPrice,
@@ -108,6 +133,7 @@ class HotelCubit extends Cubit<HotelState> {
     if (response.status) {
       final hotels = response.data as GitHotelModel;
       if (hotels.data != null && hotels.data!.isNotEmpty) {
+        _allHotels = hotels.data!;
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No hotels match your search criteria'));

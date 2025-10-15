@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../localization/manager/localization_cubit.dart';
-import '../../data/model/AirLine_data.dart';
 import '../../manager/AirLine_cubit.dart';
 import '../../manager/Airine_state.dart';
 
 class DropdownField extends StatefulWidget {
   final String label;
-  final FlightFilter? currentFilter;
-  final Function(FlightFilter)? onFilterChanged;
+  final Function(String?)? onChanged; // ✅ parameter واحد بس
 
   const DropdownField({
     super.key,
     required this.label,
-    this.currentFilter,
-    this.onFilterChanged,
+    this.onChanged,
   });
 
   @override
@@ -27,32 +24,8 @@ class _DropdownFieldState extends State<DropdownField> {
   @override
   void initState() {
     super.initState();
-    _updateSelectedValueFromFilter();
-
-    if (widget.label == 'Airlines') {
+    if (widget.label == 'Airlines' || widget.label == 'شركات الطيران') {
       context.read<FilterCubit>().loadFilterOptions('Airlines', false);
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant DropdownField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _updateSelectedValueFromFilter();
-  }
-
-  void _updateSelectedValueFromFilter() {
-    if (widget.currentFilter != null) {
-      switch (widget.label) {
-        case 'Passengers':
-          _selectedValue = widget.currentFilter!.passengerCount;
-          break;
-        case 'Airlines':
-          _selectedValue = widget.currentFilter!.airline;
-          break;
-        case 'Class':
-          _selectedValue = widget.currentFilter!.travelClass;
-          break;
-      }
     }
   }
 
@@ -61,38 +34,24 @@ class _DropdownFieldState extends State<DropdownField> {
       _selectedValue = newValue;
     });
 
-    if (widget.onFilterChanged != null &&
-        newValue != null &&
-        newValue != 'Any' &&
-        newValue != 'أي') {
-      final updatedFilter = widget.currentFilter?.copyWith() ?? FlightFilter();
-
-      switch (widget.label) {
-        case 'Passengers':
-          widget.onFilterChanged!(
-              updatedFilter.copyWith(passengerCount: newValue));
-          break;
-        case 'Airlines':
-          widget.onFilterChanged!(updatedFilter.copyWith(airline: newValue));
-          break;
-        case 'Class':
-          widget.onFilterChanged!(
-              updatedFilter.copyWith(travelClass: newValue));
-          break;
-      }
+    // ✅ استدعي الـ callback مباشرة
+    if (widget.onChanged != null) {
+      widget.onChanged!(newValue);
     }
   }
 
   List<String> _getStaticOptions(bool isArabic) {
     switch (widget.label) {
       case 'Passengers':
+      case 'الركاب':
         return isArabic
             ? ['أي', 'راكب واحد', 'راكبان', '3 ركاب', '4+ ركاب']
             : ['Any', '1 Passenger', '2 Passengers', '3 Passengers', '4+ Passengers'];
       case 'Class':
+      case 'الدرجة':
         return isArabic
-            ? ['أي', 'اقتصادي مميز', 'اقتصادي', 'رجال أعمال', 'الدرجة الأولى']
-            : ['Any', 'Economy Plus', 'Economy', 'Business', 'First Class'];
+            ? ['أي', 'اقتصادي', 'اقتصادي ممتاز', 'رجال الأعمال ', ' الأولى']
+            : ['Any', 'economy', 'premium-economy', 'business', 'first'];
       default:
         return isArabic
             ? ['أي', 'خيار 1', 'خيار 2', 'خيار 3']
@@ -108,7 +67,7 @@ class _DropdownFieldState extends State<DropdownField> {
 
         return Directionality(
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-          child: widget.label == 'Airlines'
+          child: (widget.label == 'Airlines' || widget.label == 'شركات الطيران')
               ? _buildAirlineDropdown(context, isArabic)
               : _buildStaticDropdown(isArabic),
         );
@@ -183,7 +142,7 @@ class _DropdownFieldState extends State<DropdownField> {
           final Map<String, String> airlineOptions = {
             'Any': isArabic ? 'أي' : 'Any',
             for (var a in airlines)
-              (a.id ?? a.name ?? ''):
+              (a.id ?? a.sId ?? ''): // ✅ استخدم id أو sId كـ value
                   isArabic ? (a.nameAr ?? a.name ?? '') : (a.name ?? ''),
           };
 
@@ -207,12 +166,12 @@ class _DropdownFieldState extends State<DropdownField> {
                 ),
                 items: airlineOptions.entries.map((entry) {
                   return DropdownMenuItem<String>(
-                    value: entry.key,
+                    value: entry.key, // ✅ الـ value هو الـ id
                     child: Text(
-                      entry.value,
+                      entry.value, // ✅ الـ display name
                       style: TextStyle(
                         fontSize: 12,
-                        color: entry.value == 'Any' || entry.value == 'أي'
+                        color: entry.key == 'Any'
                             ? Colors.grey
                             : Colors.black87,
                       ),

@@ -79,6 +79,14 @@ class CustomDrawer extends StatelessWidget {
 },
 
                   ),
+                  _buildDrawerItem(
+                    context,
+                    iconPath: 'assets/icons/setting-2.svg',
+                    title: isArabic ? 'الإعدادات' : 'Settings',
+                    onTap: () {
+                      Navigator.pushNamed(context, Routes.globalSettingsView);
+                    },
+                  ),
                 ],
               ),
             ),

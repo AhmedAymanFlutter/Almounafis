@@ -98,4 +98,30 @@ class APIHelper {
       return ApiResponse.fromError(e);
     }
   }
+  // POST request
+  Future<ApiResponse> postRequest({
+  required String endPoint,
+  Map<String, dynamic>? data, // Use consistent naming
+  bool isFormData = true,
+  bool isAuthorized = true,
+}) async {
+  try {
+    print('📤 Sending data: $data'); // Add logging
+    
+    var response = await dio.post(
+      endPoint,
+      data: isFormData && data != null ? FormData.fromMap(data) : data,
+      options: Options(
+        headers: {
+          if (isAuthorized) "Authorization": "Bearer ${LocalData.accessToken}",
+          'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
+        },
+      ),
+    );
+    return ApiResponse.fromResponse(response);
+  } catch (e) {
+    print('❌ POST Error: $e');
+    return ApiResponse.fromError(e);
+  }
+}
 }

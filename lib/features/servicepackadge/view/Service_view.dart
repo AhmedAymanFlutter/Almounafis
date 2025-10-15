@@ -1,10 +1,11 @@
-import 'package:almonafs_flutter/features/servicepackadge/data/model/getAllcountry.dart'; // Add hide Icon here
+import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
+import 'package:almonafs_flutter/features/servicepackadge/data/model/getAllcountry.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/theme/app_color.dart';
 import '../../../core/theme/app_text_style.dart';
-import '../../home/presentation/widgets/search_bar.dart';
 import '../manager/country_cubit.dart';
 import '../manager/country_state.dart';
 import 'widget/details_serves.dart';
@@ -57,30 +58,52 @@ class _ServicesViewState extends State<ServicesView> {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.watch<LanguageCubit>().isArabic;
+
     return Scaffold(
       backgroundColor: AppColor.mainWhite,
       appBar: AppBar(
-        title: Text('Services',style: AppTextStyle.setPoppinsTextStyle(fontSize:16 , fontWeight: FontWeight.w500, color: AppColor.mainBlack),),
+        title: Text(
+          isArabic ? 'الخدمات' : 'Services',
+          style: AppTextStyle.setPoppinsTextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: AppColor.mainBlack,
+          ),
+        ),
+        centerTitle: true,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: SvgPicture.asset('assets/icons/arrowback.svg',width: 24,height: 24,fit: BoxFit.scaleDown,)),
-      ),
-      body: Column(
-        children: [
-          CustomSearchBar(),
-          Expanded(
-            child: BlocBuilder<ServicesCubit, ServicesState>(
-              builder: (context, state) {
-                return _buildBody(state);
-              },
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.rotationY(isArabic ? 3.14159 : 0),
+            child: SvgPicture.asset(
+              'assets/icons/arrowback.svg',
+              width: 24,
+              height: 24,
+              fit: BoxFit.scaleDown,
             ),
           ),
-        ],
+        ),
+      ),
+      body: Directionality(
+        textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+        child: Column(
+          children: [
+            Expanded(
+              child: BlocBuilder<ServicesCubit, ServicesState>(
+                builder: (context, state) {
+                  return _buildBody(state, isArabic);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildBody(ServicesState state) {
+  Widget _buildBody(ServicesState state, bool isArabic) {
     if (state is ServicesLoading) {
       return const Center(child: CircularProgressIndicator());
     } else if (state is ServicesError) {
@@ -88,11 +111,14 @@ class _ServicesViewState extends State<ServicesView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Error: ${state.message}'),
+            Text(
+              isArabic ? 'حدث خطأ: ${state.message}' : 'Error: ${state.message}',
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadInitialServices,
-              child: const Text('Retry'),
+              child: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
             ),
           ],
         ),
@@ -100,7 +126,10 @@ class _ServicesViewState extends State<ServicesView> {
     } else if (state is ServicesLoaded) {
       final services = state.services.data ?? [];
       if (services.isEmpty) {
-        return const Center(child: Text('No services found'));
+        return Center(
+            child: Text(
+          isArabic ? 'لا توجد خدمات' : 'No services found',
+        ));
       }
 
       return RefreshIndicator(
@@ -117,135 +146,152 @@ class _ServicesViewState extends State<ServicesView> {
             }
 
             final service = services[index];
-            return _buildServiceCard(service);
+            return _buildServiceCard(service, isArabic);
           },
         ),
       );
     } else {
-      return const Center(child: Text('Pull to refresh'));
+      return Center(
+          child: Text(isArabic ? 'اسحب للتحديث' : 'Pull to refresh'));
     }
   }
 
- Widget _buildServiceCard(Data service) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 16),
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          Color(0xFFFFFFFF),
-          Colors.blue.withOpacity(0.65),
-        ],
-        begin: Alignment.topRight,
-        end: Alignment.bottomRight,
-      ),
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: const Color(0x4D1A8EEA), 
-          offset: const Offset(7, 2), 
-          blurRadius: 10, 
-          spreadRadius: 0, 
+  Widget _buildServiceCard(Data service, bool isArabic) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFFFFFFF),
+            Colors.blue.withOpacity(0.65),
+          ],
+          begin: Alignment.topRight,
+          end: Alignment.bottomRight,
         ),
-      ],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  service.name ?? 'Service',
-                  style: AppTextStyle.setPoppinsTextStyle(
-                    fontSize: 12, 
-                    fontWeight: FontWeight.w500, 
-                    color: Color(0xFF102E4F)
-                  )
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  service.summary ?? 'Service description',
-                  style: AppTextStyle.setPoppinsTextStyle(
-                    fontSize: 8, 
-                    fontWeight: FontWeight.w300, 
-                    color: Color(0xFF4A6785)
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => showServiceDetails(context, service),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.mainWhite,
-                    foregroundColor: AppColor.mainBlack,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x4D1A8EEA),
+            offset: Offset(7, 2),
+            blurRadius: 10,
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: isArabic
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isArabic
+                        ? (service.nameAr ?? service.name ?? 'الخدمة')
+                        : (service.name ?? 'Service'),
+                    style: AppTextStyle.setPoppinsTextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF102E4F),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 10,
-                    ),
-                    elevation: 0,
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Continue',
-                        style: AppTextStyle.setPoppinsTextStyle(
-                          fontSize: 12, 
-                          fontWeight: FontWeight.w400, 
-                          color: AppColor.mainBlack
+                  const SizedBox(height: 8),
+                  Text(
+                    isArabic
+                        ? (service.summaryAr ??
+                            service.summary ??
+                            'وصف الخدمة')
+                        : (service.summary ?? 'Service description'),
+                    style: AppTextStyle.setPoppinsTextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w300,
+                      color: const Color(0xFF4A6785),
+                    ),
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => showServiceDetails(context, service),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColor.mainWhite,
+                      foregroundColor: AppColor.mainBlack,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 10,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+                      children: [
+                        Text(
+                          isArabic ? 'متابعة' : 'Continue',
+                          style: AppTextStyle.setPoppinsTextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: AppColor.mainBlack,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.rotationY(isArabic ? 3.14159 : 0),
+                          child: SvgPicture.asset(
+                            'assets/icons/forrowd serves.svg',
+                            width: 26,
+                            height: 17,
+                            fit: BoxFit.scaleDown,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: service.image != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        width: 80,
+                        height: 80,
+                        imageUrl: service.image!,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Icon(
+                          Icons.broken_image,
+                          size: 40,
+                          color: Colors.white54,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      SvgPicture.asset(
-                        'assets/icons/forrowd serves.svg',
-                        width: 26,
-                        height: 17,
-                        fit: BoxFit.scaleDown,
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: service.image != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: SvgPicture.network(
-                      service.image!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Icons.broken_image, 
-                          size: 40, 
-                          color: Colors.white54
-                        );
-                      },
+                    )
+                  : const Icon(
+                      Icons.image_not_supported,
+                      size: 40,
+                      color: Colors.white54,
                     ),
-                  )
-                : Icon(
-                    Icons.image_not_supported, 
-                    size: 40, 
-                    color: Colors.white54
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

@@ -41,6 +41,7 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
     final isArabic = context.watch<LanguageCubit>().isArabic;
 
     return Scaffold(
+      bottomNavigationBar:   buildBookButton(context),
       body: BlocBuilder<CountryCubit, CountryState>(
         builder: (context, state) {
           if (state is SingleCountryLoading) {
@@ -100,7 +101,7 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                         ),
                         SizedBox(height: 24.h),
 
-                        buildBookButton(country),
+                      
 
                         SizedBox(height: 24.h),
                         Text(
