@@ -13,15 +13,16 @@ class Routes {
   static const String countriesView = '/countriesView';
   static const String cityTourDetails = '/cityTourDetails';
   static const String hotelDetails = '/hotelDetails';
- static const String packagesListView = '/packagesListView';
-static const String packageDetailsView = '/packageDetailsView';
-static const String languageScreen = '/languageScreen';
-static const String servicesView = '/servicesView';
-static const String aboutUsScreen = '/AboutUsScreen';
-static const String contactInfoView = '/ContactInfoView';
-static const String allCountriesPage = '/AllCountriesPage';
-static const String allToursPage = '/AllToursPage';
-static const String globalSettingsView = '/GlobalSettingsView';
-static const String flightBookingScreen = '/FlightBookingScreen';
-
+  static const String packagesListView = '/packagesListView';
+  static const String packageDetailsView = '/packageDetailsView';
+  static const String languageScreen = '/languageScreen';
+  static const String servicesView = '/servicesView';
+  static const String aboutUsScreen = '/AboutUsScreen';
+  static const String contactInfoView = '/ContactInfoView';
+  static const String allCountriesPage = '/AllCountriesPage';
+  static const String allToursPage = '/AllToursPage';
+  static const String globalSettingsView = '/GlobalSettingsView';
+  static const String flightBookingScreen = '/FlightBookingScreen';
+  static const String cityPage = '/CityPage';
+  static const String cityDetailsPage = '/CityDetailsPage';
 }

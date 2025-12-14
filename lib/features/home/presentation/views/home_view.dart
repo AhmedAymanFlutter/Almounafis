@@ -44,10 +44,10 @@ class _HomeViewState extends State<HomeView> {
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
           child: BlocBuilder<GlobalSettingsCubit, GlobalSettingsState>(
             builder: (context, globalSettingsState) {
-              // Extract social media list from global settings
-              List<SocialMedia>? socialMediaList;
+              // Extract social media object from global settings
+              SocialMediaSection? socialMedia;
               if (globalSettingsState is GlobalSettingsLoaded) {
-                socialMediaList =
+                socialMedia =
                     globalSettingsState.globalSettings.data?.socialMedia;
               }
 
@@ -78,8 +78,7 @@ class _HomeViewState extends State<HomeView> {
                 backgroundColor: AppColor.mainWhite,
                 drawer: CustomDrawer(
                   onNavigationItemTapped: _onItemTapped,
-                  socialMediaList:
-                      socialMediaList, // Pass social media data here
+                  socialMedia: socialMedia, // Pass social media object here
                 ),
                 body: SafeArea(
                   child: _selectedIndex == 1
@@ -88,87 +87,106 @@ class _HomeViewState extends State<HomeView> {
                 ),
 
                 // --- START: MODIFIED SECTION ---
-                bottomNavigationBar: SizedBox(
+                bottomNavigationBar: Container(
                   height: 90,
-                  child: BottomNavigationBar(
-                    currentIndex: _selectedIndex,
-                    onTap: _onItemTapped,
-                    backgroundColor: AppColor.secondaryBlack,
-                    selectedItemColor:
-                        AppColor.mainWhite, // Color for the selected label
-                    unselectedItemColor:
-                        Colors.grey[400], // Color for unselected labels
-                    type: BottomNavigationBarType.fixed, // Shows all labels
-                    items: [
-                      BottomNavigationBarItem(
-                        icon: SvgPicture.asset(
-                          "assets/icons/bag.svg",
-                          colorFilter: ColorFilter.mode(
-                            Colors.grey[400]!,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        activeIcon: SvgPicture.asset(
-                          "assets/icons/bag.svg",
-                          colorFilter: ColorFilter.mode(
-                            AppColor.mainWhite,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        label: isArabic ? "الرحلات" : "Trips",
-                      ),
-                      BottomNavigationBarItem(
-                        icon: SvgPicture.asset(
-                          "assets/icons/home.svg",
-                          colorFilter: ColorFilter.mode(
-                            Colors.grey[400]!,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        activeIcon: SvgPicture.asset(
-                          "assets/icons/home.svg",
-                          colorFilter: ColorFilter.mode(
-                            AppColor.mainWhite,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        label: isArabic ? "الرئيسية" : "Home",
-                      ),
-                      BottomNavigationBarItem(
-                        icon: SvgPicture.asset(
-                          "assets/icons/sleep.svg",
-                          colorFilter: ColorFilter.mode(
-                            Colors.grey[400]!,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        activeIcon: SvgPicture.asset(
-                          "assets/icons/sleep.svg",
-                          colorFilter: ColorFilter.mode(
-                            AppColor.mainWhite,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        label: isArabic ? "الفنادق" : "Hotels",
-                      ),
-                      BottomNavigationBarItem(
-                        icon: SvgPicture.asset(
-                          "assets/icons/Packages.svg",
-                          colorFilter: ColorFilter.mode(
-                            Colors.grey[400]!,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        activeIcon: SvgPicture.asset(
-                          "assets/icons/Packages.svg",
-                          colorFilter: ColorFilter.mode(
-                            AppColor.mainWhite,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        label: isArabic ? "الباقات" : "Packages",
+                  decoration: BoxDecoration(
+                    color: AppColor.mainBlack,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
                       ),
                     ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                    child: BottomNavigationBar(
+                      currentIndex: _selectedIndex,
+                      onTap: _onItemTapped,
+                      backgroundColor: AppColor.secondaryBlack,
+                      selectedItemColor: AppColor.mainWhite,
+                      unselectedItemColor: Colors.grey[400],
+                      type: BottomNavigationBarType.fixed,
+                      showUnselectedLabels: true,
+                      selectedLabelStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                      unselectedLabelStyle: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 11,
+                      ),
+                      items: [
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: SvgPicture.asset(
+                              "assets/icons/bag.svg",
+                              colorFilter: ColorFilter.mode(
+                                _selectedIndex == 0
+                                    ? AppColor.mainWhite
+                                    : Colors.grey[400]!,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          label: isArabic ? "الرحلات" : "Trips",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: SvgPicture.asset(
+                              "assets/icons/home.svg",
+                              colorFilter: ColorFilter.mode(
+                                _selectedIndex == 1
+                                    ? AppColor.mainWhite
+                                    : Colors.grey[400]!,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          label: isArabic ? "الرئيسية" : "Home",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: SvgPicture.asset(
+                              "assets/icons/sleep.svg",
+                              colorFilter: ColorFilter.mode(
+                                _selectedIndex == 2
+                                    ? AppColor.mainWhite
+                                    : Colors.grey[400]!,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          label: isArabic ? "الفنادق" : "Hotels",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: SvgPicture.asset(
+                              "assets/icons/Packages.svg",
+                              colorFilter: ColorFilter.mode(
+                                _selectedIndex == 3
+                                    ? AppColor.mainWhite
+                                    : Colors.grey[400]!,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          label: isArabic ? "الباقات" : "Packages",
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 // --- END: MODIFIED SECTION ---

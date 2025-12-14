@@ -27,16 +27,42 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
+            // const SizedBox(height: 10),
 
             /// ☰ Drawer button
+            /// ☰ Custom Modern Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Builder(
-                builder: (context) => IconButton(
-                  icon: Icon(Icons.menu, color: AppColor.mainBlack),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Builder(
+                    builder: (context) => IconButton(
+                      // Let's stick to the existing Icon if uncertain about assets, but style it better.
+                      // Actually, let's keep the Icon but wrap it for better touch target.
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColor.mainWhite,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.menu,
+                          color: AppColor.mainBlack,
+                          size: 24,
+                        ),
+                      ),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24),
@@ -58,16 +84,16 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
             ),
 
             const SizedBox(height: 24),
+
             /// 🗺️ Upcoming Tours Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: SectionTitle(
-                onTap: () =>
-                    Navigator.pushNamed(context, Routes.allToursPage),
+                onTap: () => Navigator.pushNamed(context, Routes.allToursPage),
                 title: isArabic ? "الجولات القادمة" : "Upcoming Tours",
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             const SizedBox(
               height: 300,
               child: SingleChildScrollView(child: UpcomingTourList()),

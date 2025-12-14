@@ -1,59 +1,28 @@
+import 'package:almonafs_flutter/features/flightScreen/data/model/AirLine_data.dart';
 
-import 'package:equatable/equatable.dart';
+abstract class AirlineState {}
 
-import '../data/model/AirLine_data.dart';
+class AirlineInitial extends AirlineState {}
 
-abstract class FilterState extends Equatable {
-  const FilterState();
+class AirlineLoading extends AirlineState {}
 
-  @override
-  List<Object?> get props => [];
-}
-
-class FilterInitial extends FilterState {
-  const FilterInitial();
-}
-
-class FilterLoading extends FilterState {
-  const FilterLoading();
-}
-
-class FilterOptionsLoaded extends FilterState {
-  final List<String> options;
-  final String filterType;
-
-  const FilterOptionsLoaded({
-    required this.options,
-    required this.filterType,
-  });
-
-  @override
-  List<Object?> get props => [options, filterType];
-}
-
-class AirlinesLoaded extends FilterState {
+class AirlineLoaded extends AirlineState {
   final List<AirLineData> airlines;
-
-  const AirlinesLoaded(this.airlines);
-
-  @override
-  List<Object?> get props => [airlines];
+  AirlineLoaded(this.airlines);
 }
 
-class FilterChanged extends FilterState {
-  final FlightFilter filter;
-
-  const FilterChanged(this.filter);
-
-  @override
-  List<Object?> get props => [filter];
+// Used when searching within the list
+class AirlineFiltered extends AirlineState {
+  final List<AirLineData> filteredAirlines;
+  AirlineFiltered(this.filteredAirlines);
 }
 
-class FilterError extends FilterState {
+class AirlineEmpty extends AirlineState {
   final String message;
+  AirlineEmpty(this.message);
+}
 
-  const FilterError(this.message);
-
-  @override
-  List<Object?> get props => [message];
+class AirlineError extends AirlineState {
+  final String message;
+  AirlineError(this.message);
 }

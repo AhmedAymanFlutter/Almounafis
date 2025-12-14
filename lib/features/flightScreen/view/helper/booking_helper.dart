@@ -1,6 +1,3 @@
-
-
-
 import 'package:almonafs_flutter/features/flightScreen/data/model/AirLine_data.dart';
 import 'package:almonafs_flutter/features/flightScreen/manager/AirLine_cubit.dart';
 import 'package:almonafs_flutter/features/flight_booking/data/repo/Flight_Booking_Repo.dart';
@@ -32,19 +29,37 @@ class BookingHelper {
   }) {
     // ✅ Validation checks
     if (selectedFromCity?.id == null) {
-      _showError(context, isArabic ? 'الرجاء اختيار مدينة المغادرة' : 'Please select departure city');
+      _showError(
+        context,
+        isArabic
+            ? 'الرجاء اختيار مدينة المغادرة'
+            : 'Please select departure city',
+      );
       return;
     }
     if (selectedToCity?.id == null) {
-      _showError(context, isArabic ? 'الرجاء اختيار مدينة الوصول' : 'Please select destination city');
+      _showError(
+        context,
+        isArabic
+            ? 'الرجاء اختيار مدينة الوصول'
+            : 'Please select destination city',
+      );
       return;
     }
     if (departureDateController.text.isEmpty) {
-      _showError(context, isArabic ? 'الرجاء اختيار تاريخ المغادرة' : 'Please select departure date');
+      _showError(
+        context,
+        isArabic
+            ? 'الرجاء اختيار تاريخ المغادرة'
+            : 'Please select departure date',
+      );
       return;
     }
     if (isRoundTrip && returnDateController.text.isEmpty) {
-      _showError(context, isArabic ? 'الرجاء اختيار تاريخ العودة' : 'Please select return date');
+      _showError(
+        context,
+        isArabic ? 'الرجاء اختيار تاريخ العودة' : 'Please select return date',
+      );
       return;
     }
 
@@ -93,10 +108,10 @@ class BookingHelper {
   static AirLineData? _getAirlineById(BuildContext context, String? airlineId) {
     if (airlineId == null) return null;
 
-    final cubit = context.read<FilterCubit>();
+    final cubit = context.read<AirlineCubit>();
     final state = cubit.state;
 
-    if (state is AirlinesLoaded) {
+    if (state is AirlineLoaded) {
       try {
         return state.airlines.firstWhere(
           (airline) => (airline.id ?? airline.sId) == airlineId,

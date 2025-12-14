@@ -6,20 +6,29 @@ class AirLineModel {
   AirLineModel({this.status, this.results, this.data});
 
   AirLineModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    results = json['results'];
+    // Some APIs return 'status' as boolean or string, handling safely is good but let's stick to existing type if known
+    // Based on log: "success":true. The model has String? status.
+    // If 'success' is the status indicator, we might want to map it, but 'status' field might be separate.
+    // Let's just fix the data parsing structure first.
+
     if (json['data'] != null) {
       data = <AirLineData>[];
-      json['data'].forEach((v) {
-        data!.add(AirLineData.fromJson(v));
-      });
+      if (json['data'] is List) {
+        json['data'].forEach((v) {
+          data!.add(AirLineData.fromJson(v));
+        });
+      } else if (json['data'] is Map && json['data']['airlines'] != null) {
+        json['data']['airlines'].forEach((v) {
+          data!.add(AirLineData.fromJson(v));
+        });
+      }
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['results'] = this.results;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    data['results'] = results;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -62,7 +71,7 @@ class AirLineData {
     sId = json['_id'];
     name = json['name'];
     nameAr = json['nameAr'];
-    createdBy = json['createdBy'];
+    createdBy = _parseStringOrMap(json['createdBy']);
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     slug = json['slug'];
@@ -70,8 +79,22 @@ class AirLineData {
     alt = json['alt'];
     altAr = json['altAr'];
     id = json['id'];
-    image = json['image'];
-    updatedBy = json['updatedBy'];
+
+    // ✅ Handle image object or string
+    if (json['image'] is Map) {
+      image = json['image']['url'];
+    } else {
+      image = json['image'];
+    }
+
+    updatedBy = _parseStringOrMap(json['updatedBy']);
+  }
+
+  String? _parseStringOrMap(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return value;
+    if (value is Map) return value['name'] ?? value['username'] ?? value['_id'];
+    return value.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -92,6 +115,7 @@ class AirLineData {
     return data;
   }
 }
+
 class FlightFilter {
   String? airline;
   String? passengerCount;

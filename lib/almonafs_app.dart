@@ -34,8 +34,10 @@ class AlmonafsApp extends StatelessWidget {
           RepositoryProvider(create: (_) => CountryRepository()),
           RepositoryProvider(create: (_) => CityTourRepository()),
           RepositoryProvider(
-              create: (_) => ServicesRepository(
-                  dio: Dio(BaseOptions(baseUrl: EndPoints.baseUrl)))),
+            create: (_) => ServicesRepository(
+              dio: Dio(BaseOptions(baseUrl: EndPoints.baseUrl)),
+            ),
+          ),
           RepositoryProvider(create: (_) => HotelRepository()),
         ],
         child: MultiBlocProvider(
@@ -54,17 +56,24 @@ class AlmonafsApp extends StatelessWidget {
                   ServicesCubit(repository: context.read<ServicesRepository>()),
             ),
             BlocProvider(
-              create: (context) =>
-                  HotelCubit(context.read<HotelRepository>()),
+              create: (context) => HotelCubit(context.read<HotelRepository>()),
             ),
             BlocProvider(
               create: (_) => LanguageCubit(), // ✅ Cubit اللغة
             ),
-         BlocProvider(create: 
-         (context)=> FilterCubit(FlightFilterRepository(),),),
-         BlocProvider(create: (_) => AirPlaneCitysCubit(AirplaneCitsRepository())..getAirPlaneCitys(),
-         ),
-         BlocProvider(create:(_)=> GlobalSettingsCubit(repository: GlobalSettingsRepository())..getGlobalSettings() )
+            BlocProvider(
+              create: (context) => AirlineCubit(AirlineRepository()),
+            ),
+            BlocProvider(
+              create: (_) =>
+                  AirPlaneCitysCubit(AirplaneCitsRepository())
+                    ..getAirPlaneCitys(),
+            ),
+            BlocProvider(
+              create: (_) =>
+                  GlobalSettingsCubit(repository: GlobalSettingsRepository())
+                    ..getGlobalSettings(),
+            ),
           ],
           child: BlocBuilder<LanguageCubit, AppLanguage>(
             builder: (context, langState) {
@@ -84,8 +93,9 @@ class AlmonafsApp extends StatelessWidget {
                 ),
                 builder: (context, child) {
                   return Directionality(
-                    textDirection:
-                        isArabic ? TextDirection.rtl : TextDirection.ltr,
+                    textDirection: isArabic
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
                     child: child!,
                   );
                 },

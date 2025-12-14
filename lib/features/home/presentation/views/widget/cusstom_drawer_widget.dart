@@ -9,12 +9,12 @@ import '../../../../localization/manager/localization_cubit.dart';
 
 class CustomDrawer extends StatelessWidget {
   final Function(int) onNavigationItemTapped;
-  final List<SocialMedia>? socialMediaList;
+  final SocialMediaSection? socialMedia;
 
   const CustomDrawer({
     super.key,
     required this.onNavigationItemTapped,
-    this.socialMediaList,
+    this.socialMedia,
   });
 
   @override
@@ -72,17 +72,28 @@ class CustomDrawer extends StatelessWidget {
                   buildDrawerItem(
                     context,
                     iconPath: 'assets/icons/setting-2.svg',
+                    title: isArabic ? 'المدن' : 'Cities',
+                    onTap: () {
+                      Navigator.pushNamed(context, Routes.cityPage);
+                    },
+                  ),
+                  buildDrawerItem(
+                    context,
+                    iconPath: 'assets/icons/setting-2.svg',
                     title: isArabic ? 'الإعدادات' : 'Settings',
                     onTap: () {
                       Navigator.pushNamed(context, Routes.globalSettingsView);
                     },
                   ),
-                  
+
                   // Social Media Section
-                  if (socialMediaList != null && socialMediaList!.isNotEmpty) ...[
+                  if (socialMedia != null) ...[
                     Divider(color: Colors.grey.shade300, thickness: 1),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       child: Text(
                         isArabic ? 'تابعنا على' : 'Follow Us',
                         style: TextStyle(
@@ -93,19 +104,64 @@ class CustomDrawer extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: Wrap(
                         spacing: 12,
                         runSpacing: 12,
-                        children: socialMediaList!.map((social) {
-                          return buildSocialMediaIcon(
-                            context,
-                            platform: social.platform ?? '',
-                            url: social.url ?? '',
-                            iconUrl: social.desktopIconUrl,
-                            
-                          );
-                        }).toList(),
+                        children: [
+                          if (socialMedia!.facebook != null)
+                            buildSocialMediaIcon(
+                              context,
+                              platform: 'Facebook',
+                              url: socialMedia!.facebook!.url ?? '',
+                              iconUrl: socialMedia!.facebook!.mobileIcon,
+                            ),
+                          if (socialMedia!.instagram != null)
+                            buildSocialMediaIcon(
+                              context,
+                              platform: 'Instagram',
+                              url: socialMedia!.instagram!.url ?? '',
+                              iconUrl: socialMedia!.instagram!.mobileIcon,
+                            ),
+                          if (socialMedia!.twitter != null)
+                            buildSocialMediaIcon(
+                              context,
+                              platform: 'Twitter',
+                              url: socialMedia!.twitter!.url ?? '',
+                              iconUrl: socialMedia!.twitter!.mobileIcon,
+                            ),
+                          if (socialMedia!.youtube != null)
+                            buildSocialMediaIcon(
+                              context,
+                              platform: 'YouTube',
+                              url: socialMedia!.youtube!.url ?? '',
+                              iconUrl: socialMedia!.youtube!.mobileIcon,
+                            ),
+                          if (socialMedia!.linkedin != null)
+                            buildSocialMediaIcon(
+                              context,
+                              platform: 'LinkedIn',
+                              url: socialMedia!.linkedin!.url ?? '',
+                              iconUrl: socialMedia!.linkedin!.mobileIcon,
+                            ),
+                          if (socialMedia!.snapchat != null)
+                            buildSocialMediaIcon(
+                              context,
+                              platform: 'Snapchat',
+                              url: socialMedia!.snapchat!.url ?? '',
+                              iconUrl: socialMedia!.snapchat!.mobileIcon,
+                            ),
+                          if (socialMedia!.tiktok != null)
+                            buildSocialMediaIcon(
+                              context,
+                              platform: 'TikTok',
+                              url: socialMedia!.tiktok!.url ?? '',
+                              iconUrl: socialMedia!.tiktok!.mobileIcon,
+                            ),
+                        ],
                       ),
                     ),
                   ],
@@ -117,5 +173,4 @@ class CustomDrawer extends StatelessWidget {
       },
     );
   }
-
 }

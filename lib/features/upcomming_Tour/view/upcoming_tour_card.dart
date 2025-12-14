@@ -50,132 +50,168 @@ class UpcomingTourCard extends StatelessWidget {
               );
             }
           },
+          borderRadius: BorderRadius.circular(24.r),
           child: Container(
-            width: 370.w,
-            height: 120.h,
+            margin: EdgeInsets.symmetric(horizontal: 4.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r),
+              borderRadius: BorderRadius.circular(24.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
+                  color: const Color(0xFFF1F5F9), // Light blue-grey shadow
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 2,
                 ),
               ],
-              border: Border.all(
-                color: AppColor.secondaryGrey.withOpacity(0.6),
-              ),
             ),
             child: Row(
               children: [
-                // Image Container
-                Container(
-                  width: 80.w,
-                  height: double.infinity,
-                  padding: EdgeInsets.all(3.w),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20.r),
-                    child: SizedBox(
-                      width: 74.w,
-                      height: 70.h,
-                      child: hasImage
-                          ? CachedNetworkImage(
-                              imageUrl: imageUrl,
-                              width: 74.w,
-                              height: 70.h,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                width: 74.w,
-                                height: 70.h,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(20.r),
-                                ),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                // 🖼️ Modern Image Section
+                Hero(
+                  tag: 'tour_image_${tour.id ?? tour.sId}',
+                  child: Container(
+                    width: 110.w,
+                    height: 130.h,
+                    margin: EdgeInsets.all(6.w),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        hasImage
+                            ? CachedNetworkImage(
+                                imageUrl: imageUrl,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[100],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              errorWidget: (context, url, error) {
-                                return _buildPlaceholder(isArabic);
-                              },
-                            )
-                          : _buildPlaceholder(isArabic),
+                                errorWidget: (context, url, error) =>
+                                    _buildPlaceholder(isArabic),
+                              )
+                            : _buildPlaceholder(isArabic),
+
+                        // subtle gradient overlay
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.0),
+                                Colors.black.withOpacity(0.1),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
 
-                // Content
+                // 📝 Content Section
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 8.h,
-                    ),
+                    padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
                     child: Column(
-                      crossAxisAlignment: isArabic
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Tag
+                        // Tag Pill
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 6.w,
-                            vertical: 2.h,
+                            horizontal: 10.w,
+                            vertical: 5.h,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(4.r),
+                            color: AppColor.lightPurple.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(30.r),
                           ),
                           child: Text(
                             tag.toUpperCase(),
                             style: TextStyle(
-                              fontSize: 8.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blue.shade700,
-                              letterSpacing: 0.5,
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColor.lightPurple,
+                              letterSpacing: 0.8,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        SizedBox(height: 12.h),
 
                         // Title
-                        Flexible(
-                          child: Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: isArabic
-                                ? TextAlign.right
-                                : TextAlign.left,
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF1E293B), // Slate 800
+                            height: 1.2,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: isArabic
+                              ? TextAlign.right
+                              : TextAlign.left,
                         ),
 
-                        // Subtitle
-                        Flexible(
-                          child: Text(
-                            subtitle,
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 10.sp,
+                        SizedBox(height: 8.h),
+
+                        // Subtitle with Icon
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on_outlined,
+                              size: 14.sp,
+                              color: Colors.grey[400],
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: isArabic
-                                ? TextAlign.right
-                                : TextAlign.left,
-                          ),
+                            SizedBox(width: 4.w),
+                            Expanded(
+                              child: Text(
+                                subtitle,
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: isArabic
+                                    ? TextAlign.right
+                                    : TextAlign.left,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
+                    ),
+                  ),
+                ),
+
+                // Arrow Action
+                Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Container(
+                    width: 32.w,
+                    height: 32.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Icon(
+                      isArabic
+                          ? Icons.arrow_back_ios_new_rounded
+                          : Icons.arrow_forward_ios_rounded,
+                      size: 14.sp,
+                      color: AppColor.mainBlack,
                     ),
                   ),
                 ),
@@ -189,20 +225,14 @@ class UpcomingTourCard extends StatelessWidget {
 
   Widget _buildPlaceholder(bool isArabic) {
     return Container(
-      width: 74.w,
-      height: 81.h,
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(20.r),
-      ),
+      color: Colors.grey[100],
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.image_not_supported, color: Colors.grey, size: 16.sp),
-          SizedBox(height: 2.h),
-          Text(
-            isArabic ? 'لا توجد صورة' : 'No Image',
-            style: TextStyle(color: Colors.grey, fontSize: 8.sp),
+          Icon(
+            Icons.image_not_supported_outlined,
+            color: Colors.grey[300],
+            size: 28.sp,
           ),
         ],
       ),

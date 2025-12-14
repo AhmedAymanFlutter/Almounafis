@@ -141,10 +141,13 @@ class CountriesSection extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 220,
+      height: 240, // Increased height to accommodate shadow
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 10,
+        ), // Added vertical padding
         itemCount: countries.length,
         itemBuilder: (_, index) {
           final country = countries[index];

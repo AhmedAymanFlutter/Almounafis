@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/model/global_Setting_model.dart';
 
-
 class GlobalSettingsView extends StatefulWidget {
   const GlobalSettingsView({super.key});
 
@@ -14,14 +13,18 @@ class GlobalSettingsView extends StatefulWidget {
   State<GlobalSettingsView> createState() => _GlobalSettingsViewState();
 }
 
-class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProviderStateMixin {
+class _GlobalSettingsViewState extends State<GlobalSettingsView>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
     _isInitialized = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GlobalSettingsCubit>().getGlobalSettings();
@@ -85,7 +88,9 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                       backgroundColor: Colors.red.shade400,
                       behavior: SnackBarBehavior.floating,
                       margin: const EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   );
                 }
@@ -127,7 +132,11 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.error_outline, size: 80, color: Colors.red.shade300),
+                          Icon(
+                            Icons.error_outline,
+                            size: 80,
+                            color: Colors.red.shade300,
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             state.message,
@@ -137,12 +146,17 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
                             onPressed: () {
-                              context.read<GlobalSettingsCubit>().getGlobalSettings();
+                              context
+                                  .read<GlobalSettingsCubit>()
+                                  .getGlobalSettings();
                             },
                             icon: const Icon(Icons.refresh),
                             label: const Text('حاول مرة أخرى'),
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 12,
+                              ),
                             ),
                           ),
                         ],
@@ -153,7 +167,9 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
 
                 return const SizedBox(
                   height: 200,
-                  child: Center(child: Text('اسحب للتحديث أو انتظر تحميل الإعدادات')),
+                  child: Center(
+                    child: Text('اسحب للتحديث أو انتظر تحميل الإعدادات'),
+                  ),
                 );
               },
             ),
@@ -198,14 +214,15 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                   _buildInfoItem(
                     icon: Icons.location_on_rounded,
                     title: 'العنوان الأساسي',
-                    value: '${data!.primaryAddress!.street ?? ''}, ${data.primaryAddress!.city ?? ''}, ${data.primaryAddress!.country ?? ''}',
+                    value:
+                        '${data!.primaryAddress!.street ?? ''}, ${data.primaryAddress!.city ?? ''}, ${data.primaryAddress!.country ?? ''}',
                     color: Colors.blue,
                   ),
-                if (data?.primaryWhatsapp != null)
+                if (data?.primaryWhatsApp != null)
                   _buildInfoItem(
                     icon: Icons.chat_rounded,
                     title: 'واتساب',
-                    value: data!.primaryWhatsapp!.number ?? 'غير محدد',
+                    value: data!.primaryWhatsApp!.number ?? 'غير محدد',
                     color: const Color(0xFF25D366),
                   ),
               ],
@@ -240,7 +257,8 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                   _buildToggleItem(
                     icon: Icons.verified_user,
                     title: 'تفعيل البريد الإلكتروني',
-                    value: data.websiteSettings!.requireEmailVerification == true,
+                    value:
+                        data.websiteSettings!.requireEmailVerification == true,
                     color: Colors.indigo,
                   ),
                 ],
@@ -260,65 +278,138 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                     value: data!.businessHours!.timezone ?? 'غير محدد',
                     color: Colors.cyan,
                   ),
-                  if (data.businessHours!.workingDays != null && data.businessHours!.workingDays!.isNotEmpty)
-                    ...data.businessHours!.workingDays!.map((day) =>
-                      _buildInfoItem(
-                        icon: Icons.calendar_today,
-                        title: 'يوم ${day.day}',
-                        value: day.isOpen == true ? '${day.openTime} - ${day.closeTime}' : 'مغلق',
-                        color: day.isOpen == true ? Colors.green : Colors.red,
-                      ),
-                    ).toList(),
+                  if (data.businessHours!.workingDays != null &&
+                      data.businessHours!.workingDays!.isNotEmpty)
+                    ...data.businessHours!.workingDays!
+                        .map(
+                          (day) => _buildInfoItem(
+                            icon: Icons.calendar_today,
+                            title: 'يوم ${day.day}',
+                            value: day.isOpen == true
+                                ? '${day.openTime} - ${day.closeTime}'
+                                : 'مغلق',
+                            color: day.isOpen == true
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        )
+                        .toList(),
                 ],
               ),
 
             const SizedBox(height: 20),
 
             // Social Media
-            if (data?.socialMedia != null && data!.socialMedia!.isNotEmpty)
+            // Social Media
+            if (data?.socialMedia != null)
               _buildSection(
                 title: 'وسائل التواصل الاجتماعي',
                 icon: Icons.share_rounded,
-                children: data.socialMedia!.map((social) =>
-                  _buildSocialMediaItem(
-                    platform: social.platform ?? 'غير محدد',
-                    url: social.url,
-                  ),
-                ).toList(),
+                children: [
+                  if (data!.socialMedia!.facebook != null)
+                    _buildSocialMediaItem(
+                      platform: 'Facebook',
+                      data: data.socialMedia!.facebook!,
+                    ),
+                  if (data.socialMedia!.instagram != null)
+                    _buildSocialMediaItem(
+                      platform: 'Instagram',
+                      data: data.socialMedia!.instagram!,
+                    ),
+                  if (data.socialMedia!.twitter != null)
+                    _buildSocialMediaItem(
+                      platform: 'Twitter',
+                      data: data.socialMedia!.twitter!,
+                    ),
+                  if (data.socialMedia!.youtube != null)
+                    _buildSocialMediaItem(
+                      platform: 'YouTube',
+                      data: data.socialMedia!.youtube!,
+                    ),
+                  if (data.socialMedia!.linkedin != null)
+                    _buildSocialMediaItem(
+                      platform: 'LinkedIn',
+                      data: data.socialMedia!.linkedin!,
+                    ),
+                  if (data.socialMedia!.snapchat != null)
+                    _buildSocialMediaItem(
+                      platform: 'Snapchat',
+                      data: data.socialMedia!.snapchat!,
+                    ),
+                  if (data.socialMedia!.tiktok != null)
+                    _buildSocialMediaItem(
+                      platform: 'TikTok',
+                      data: data.socialMedia!.tiktok!,
+                    ),
+                ],
               ),
 
             const SizedBox(height: 20),
 
             // Emergency Contacts
-            if (data?.emergencyContacts != null && data!.emergencyContacts!.isNotEmpty)
+            if (data?.emergencyContacts != null &&
+                data!.emergencyContacts!.isNotEmpty)
               _buildSection(
                 title: 'جهات الاتصال للطوارئ',
                 icon: Icons.emergency_rounded,
-                children: data.emergencyContacts!.map((contact) =>
-                  _buildInfoItem(
-                    icon: Icons.person_rounded,
-                    title: contact.name ?? 'غير محدد',
-                    value: '${contact.phone ?? ''} - ${contact.role ?? ''}',
-                    color: Colors.red,
-                  ),
-                ).toList(),
+                children: data.emergencyContacts!
+                    .map(
+                      (contact) => _buildInfoItem(
+                        icon: Icons.person_rounded,
+                        title: contact.name ?? 'غير محدد',
+                        value: '${contact.phone ?? ''} - ${contact.role ?? ''}',
+                        color: Colors.red,
+                      ),
+                    )
+                    .toList(),
               ),
 
             const SizedBox(height: 20),
 
             // Contact Info
-            if (data?.contactInfo != null && data!.contactInfo!.isNotEmpty)
+            // Contact Info
+            if (data?.contactInfo != null)
               _buildSection(
                 title: 'معلومات الاتصال',
                 icon: Icons.info_rounded,
-                children: data.contactInfo!.map((contact) =>
-                  _buildInfoItem(
-                    icon: _getContactInfoIcon(contact.type),
-                    title: contact.type ?? 'غير محدد',
-                    value: _getContactInfoValue(contact.value),
-                    color: Colors.blueAccent,
-                  ),
-                ).toList(),
+                children: [
+                  if (data!.contactInfo!.phones != null)
+                    ...data.contactInfo!.phones!.map(
+                      (phone) => _buildInfoItem(
+                        icon: Icons.phone,
+                        title: phone.label ?? 'هاتف',
+                        value: phone.number ?? '',
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  if (data.contactInfo!.emails != null)
+                    ...data.contactInfo!.emails!.map(
+                      (email) => _buildInfoItem(
+                        icon: Icons.email,
+                        title: email.label ?? 'بريد إلكتروني',
+                        value: email.email ?? '',
+                        color: Colors.orangeAccent,
+                      ),
+                    ),
+                  if (data.contactInfo!.addresses != null)
+                    ...data.contactInfo!.addresses!.map(
+                      (addr) => _buildInfoItem(
+                        icon: Icons.location_city,
+                        title: addr.label ?? 'عنوان',
+                        value: '${addr.street ?? ''}, ${addr.city ?? ''}',
+                        color: Colors.greenAccent,
+                      ),
+                    ),
+                  if (data.contactInfo!.whatsapp != null)
+                    ...data.contactInfo!.whatsapp!.map(
+                      (wa) => _buildInfoItem(
+                        icon: Icons.chat,
+                        title: wa.label ?? 'واتساب',
+                        value: wa.number ?? '',
+                        color: const Color(0xFF25D366),
+                      ),
+                    ),
+                ],
               ),
 
             const SizedBox(height: 20),
@@ -332,7 +423,8 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                   _buildInfoItem(
                     icon: Icons.attach_money_rounded,
                     title: 'العملة',
-                    value: '${data!.defaultCurrency!.code} (${data.defaultCurrency!.symbol})',
+                    value:
+                        '${data!.defaultCurrency!.code} (${data.defaultCurrency!.symbol})',
                     color: Colors.amber,
                   ),
                 ],
@@ -349,7 +441,10 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
                   _buildInfoItem(
                     icon: Icons.language,
                     title: 'اللغة',
-                    value: (data!.defaultLanguageInfo!.name ?? data.defaultLanguageInfo!.code) ?? 'غير محدد',
+                    value:
+                        (data!.defaultLanguageInfo!.name ??
+                            data.defaultLanguageInfo!.code) ??
+                        'غير محدد',
                     color: Colors.deepPurple,
                   ),
                 ],
@@ -358,33 +453,39 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
             const SizedBox(height: 20),
 
             // Supported Currencies
-            if (data?.websiteSettings?.supportedCurrencies != null && data!.websiteSettings!.supportedCurrencies!.isNotEmpty)
+            if (data?.websiteSettings?.supportedCurrencies != null &&
+                data!.websiteSettings!.supportedCurrencies!.isNotEmpty)
               _buildSection(
                 title: 'العملات المدعومة',
                 icon: Icons.attach_money_rounded,
-                children: data.websiteSettings!.supportedCurrencies!.map((currency) =>
-                  _buildInfoItem(
-                    icon: Icons.money,
-                    title: '${currency.code} (${currency.symbol})',
-                    value: 'سعر الصرف: ${currency.exchangeRate}',
-                    color: Colors.amber,
-                  ),
-                ).toList(),
+                children: data.websiteSettings!.supportedCurrencies!
+                    .map(
+                      (currency) => _buildInfoItem(
+                        icon: Icons.money,
+                        title: '${currency.code} (${currency.symbol})',
+                        value: 'سعر الصرف: ${currency.exchangeRate}',
+                        color: Colors.amber,
+                      ),
+                    )
+                    .toList(),
               ),
 
             const SizedBox(height: 20),
 
             // Supported Languages
-            if (data?.websiteSettings?.supportedLanguages != null && data!.websiteSettings!.supportedLanguages!.isNotEmpty)
+            if (data?.websiteSettings?.supportedLanguages != null &&
+                data!.websiteSettings!.supportedLanguages!.isNotEmpty)
               _buildSection(
                 title: 'اللغات المدعومة',
                 icon: Icons.public_rounded,
-                children: data.websiteSettings!.supportedLanguages!.map((language) =>
-                  _buildLanguageChip(
-                    language.name ?? language.code ?? 'غير محدد',
-                    language.isDefault == true,
-                  ),
-                ).toList(),
+                children: data.websiteSettings!.supportedLanguages!
+                    .map(
+                      (language) => _buildLanguageChip(
+                        language.name ?? language.code ?? 'غير محدد',
+                        language.isDefault == true,
+                      ),
+                    )
+                    .toList(),
               ),
 
             const SizedBox(height: 20),
@@ -484,9 +585,9 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
               const SizedBox(height: 4),
               Text(
                 value.isNotEmpty ? value : 'غير محدد',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade500,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade500),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -543,7 +644,10 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
     );
   }
 
-  Widget _buildSocialMediaItem({required String platform, required String? url}) {
+  Widget _buildSocialMediaItem({
+    required String platform,
+    required SocialPlatform data,
+  }) {
     return Row(
       children: [
         Container(
@@ -565,16 +669,16 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
             children: [
               Text(
                 platform,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
-              if (url != null && url.isNotEmpty)
+              if (data.url != null && data.url!.isNotEmpty)
                 Text(
-                  url,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey.shade500,
-                  ),
+                  data.url!,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -593,7 +697,9 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
         color: isDefault ? Colors.blue.shade700 : Colors.grey.shade700,
         fontWeight: FontWeight.w600,
       ),
-      avatar: isDefault ? Icon(Icons.check_circle, color: Colors.blue.shade700, size: 18) : null,
+      avatar: isDefault
+          ? Icon(Icons.check_circle, color: Colors.blue.shade700, size: 18)
+          : null,
     );
   }
 
@@ -611,34 +717,13 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
         return Icons.business;
       case 'whatsapp':
         return Icons.chat_bubble;
+      case 'tiktok':
+        return Icons.music_note;
+      case 'snapchat':
+        return Icons.snapchat;
       default:
         return Icons.public;
     }
-  }
-
-  IconData _getContactInfoIcon(String? type) {
-    switch (type?.toLowerCase()) {
-      case 'phone':
-        return Icons.phone;
-      case 'email':
-        return Icons.email;
-      case 'address':
-        return Icons.location_on;
-      case 'whatsapp':
-        return Icons.chat;
-      default:
-        return Icons.contact_page;
-    }
-  }
-
-  String _getContactInfoValue(Value? value) {
-    if (value == null) return 'غير محدد';
-
-    if (value.number != null) return value.number!;
-    if (value.email != null) return value.email!;
-    if (value.street != null) return '${value.street}, ${value.city}, ${value.country}';
-
-    return 'غير محدد';
   }
 
   Color _getSocialMediaColor(String platform) {
@@ -655,6 +740,10 @@ class _GlobalSettingsViewState extends State<GlobalSettingsView> with TickerProv
         return const Color(0xFF0A66C2);
       case 'whatsapp':
         return const Color(0xFF25D366);
+      case 'tiktok':
+        return Colors.black;
+      case 'snapchat':
+        return Colors.yellow.shade800;
       default:
         return Colors.grey;
     }

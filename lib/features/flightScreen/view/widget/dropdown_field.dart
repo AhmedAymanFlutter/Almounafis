@@ -8,11 +8,7 @@ class DropdownField extends StatefulWidget {
   final String label;
   final Function(String?)? onChanged; // ✅ parameter واحد بس
 
-  const DropdownField({
-    super.key,
-    required this.label,
-    this.onChanged,
-  });
+  const DropdownField({super.key, required this.label, this.onChanged});
 
   @override
   State<DropdownField> createState() => _DropdownFieldState();
@@ -25,7 +21,7 @@ class _DropdownFieldState extends State<DropdownField> {
   void initState() {
     super.initState();
     if (widget.label == 'Airlines' || widget.label == 'شركات الطيران') {
-      context.read<FilterCubit>().loadFilterOptions('Airlines', false);
+      context.read<AirlineCubit>().fetchAirlines();
     }
   }
 
@@ -46,7 +42,13 @@ class _DropdownFieldState extends State<DropdownField> {
       case 'الركاب':
         return isArabic
             ? ['أي', 'راكب واحد', 'راكبان', '3 ركاب', '4+ ركاب']
-            : ['Any', '1 Passenger', '2 Passengers', '3 Passengers', '4+ Passengers'];
+            : [
+                'Any',
+                '1 Passenger',
+                '2 Passengers',
+                '3 Passengers',
+                '4+ Passengers',
+              ];
       case 'Class':
       case 'الدرجة':
         return isArabic
@@ -92,10 +94,7 @@ class _DropdownFieldState extends State<DropdownField> {
           isDense: true,
           hint: Text(
             isArabic ? _translateLabel(widget.label) : widget.label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[700],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
           ),
           items: options.map((String value) {
             return DropdownMenuItem<String>(
@@ -112,17 +111,20 @@ class _DropdownFieldState extends State<DropdownField> {
             );
           }).toList(),
           onChanged: _onValueChanged,
-          icon: Icon(Icons.keyboard_arrow_down,
-              size: 14, color: Colors.grey[700]),
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            size: 14,
+            color: Colors.grey[700],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildAirlineDropdown(BuildContext context, bool isArabic) {
-    return BlocBuilder<FilterCubit, FilterState>(
+    return BlocBuilder<AirlineCubit, AirlineState>(
       builder: (context, state) {
-        if (state is FilterLoading) {
+        if (state is AirlineLoading) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
@@ -135,7 +137,7 @@ class _DropdownFieldState extends State<DropdownField> {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
           );
-        } else if (state is AirlinesLoaded) {
+        } else if (state is AirlineLoaded) {
           final airlines = state.airlines;
 
           // ✅ Build Map of airlineId → displayName
@@ -143,7 +145,9 @@ class _DropdownFieldState extends State<DropdownField> {
             'Any': isArabic ? 'أي' : 'Any',
             for (var a in airlines)
               (a.id ?? a.sId ?? ''): // ✅ استخدم id أو sId كـ value
-                  isArabic ? (a.nameAr ?? a.name ?? '') : (a.name ?? ''),
+              isArabic
+                  ? (a.nameAr ?? a.name ?? '')
+                  : (a.name ?? ''),
           };
 
           return Container(
@@ -179,12 +183,15 @@ class _DropdownFieldState extends State<DropdownField> {
                   );
                 }).toList(),
                 onChanged: _onValueChanged,
-                icon: Icon(Icons.keyboard_arrow_down,
-                    size: 14, color: Colors.grey[700]),
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 14,
+                  color: Colors.grey[700],
+                ),
               ),
             ),
           );
-        } else if (state is FilterError) {
+        } else if (state is AirlineError) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(

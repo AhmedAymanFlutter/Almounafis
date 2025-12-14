@@ -10,4 +10,5 @@ abstract class EndPoints {
   static const String getAllAirLines = 'airlines';
   static const String bookFlight = 'flight-bookings';
   static const String getGlobalSettings = 'global-settings';
+  static const String cities = 'cities';
 }

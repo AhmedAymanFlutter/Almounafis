@@ -1,66 +1,57 @@
-
-
+import 'package:almonafs_flutter/features/flightScreen/data/model/AirLine_data.dart';
+import 'package:almonafs_flutter/features/flightScreen/data/repo/AirLine_repo.dart';
+import 'package:almonafs_flutter/features/flightScreen/manager/Airine_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../data/model/AirLine_data.dart';
-import '../data/repo/AirLine_repo.dart';
-import 'Airine_state.dart';
+class AirlineCubit extends Cubit<AirlineState> {
+  final AirlineRepository repo;
 
+  // Cache to store all airlines for local searching
+  List<AirLineData> _allAirlines = [];
 
-class FilterCubit extends Cubit<FilterState> {
-  final FlightFilterRepository repository;
-  FlightFilter currentFilter = FlightFilter();
+  AirlineCubit(this.repo) : super(AirlineInitial());
 
-  FilterCubit(this.repository) : super(const FilterInitial());
+  /// Fetch airlines from API
+  Future<void> fetchAirlines() async {
+    if (isClosed) return;
+    emit(AirlineLoading());
 
-  Future<void> loadFilterOptions(String filterType, bool isArabic) async {
-    try {
-      emit(const FilterLoading());
-      
-      if (filterType == 'Airlines') {
-        // Load airlines from API
-        final response = await repository.getAirlines();
-        
-        if (response.status && response.data is Map<String, dynamic>) {
-          final model = AirLineModel.fromJson(response.data as Map<String, dynamic>);
-          final airlines = model.data ?? [];
-          
-          emit(AirlinesLoaded(airlines.cast<AirLineData>()));
-        } else {
-          emit(FilterError(response.message ));
-        }
+    final response = await repo.getAllAirlines();
+
+    if (isClosed) return;
+
+    if (response.status) {
+      // The repository now returns the parsed model in 'data'
+      final model = response.data as AirLineModel;
+
+      if (model.data != null && model.data!.isNotEmpty) {
+        _allAirlines = model.data!; // Save to local list
+        emit(AirlineLoaded(_allAirlines));
       } else {
-        // Load static options
-        final options = repository.getFilterOptions(filterType, isArabic);
-        emit(FilterOptionsLoaded(options: options, filterType: filterType));
+        emit(AirlineEmpty('No airlines available'));
       }
-    } catch (e) {
-      emit(FilterError('Failed to load options: $e'));
+    } else {
+      emit(AirlineError(response.message));
     }
   }
-  void updateFilterField({
-    String? airline,
-    String? passengerCount,
-    String? travelClass,
-    double? minPrice,
-    double? maxPrice,
-    String? departureTime,
-    String? arrivalTime,
-  }) {
-    currentFilter = currentFilter.copyWith(
-      airline: airline,
-      passengerCount: passengerCount,
-      travelClass: travelClass,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
-      departureTime: departureTime,
-      arrivalTime: arrivalTime,
-    );
-    emit(FilterChanged(currentFilter));
-  }
 
-  void clearAllFilters() {
-    currentFilter = FlightFilter();
-    emit(FilterChanged(currentFilter));
+  /// Local Search Logic
+  void searchAirlines(String query, bool isArabic) {
+    if (query.isEmpty) {
+      emit(AirlineLoaded(_allAirlines));
+      return;
+    }
+
+    final filtered = _allAirlines.where((airline) {
+      final name = isArabic ? (airline.nameAr ?? '') : (airline.name ?? '');
+
+      return name.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    if (filtered.isEmpty) {
+      emit(AirlineEmpty(isArabic ? 'لا توجد نتائج' : 'No results found'));
+    } else {
+      emit(AirlineFiltered(filtered));
+    }
   }
 }
