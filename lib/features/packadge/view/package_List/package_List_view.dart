@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../config/router/routes.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
@@ -28,8 +29,8 @@ class PackagesListView extends StatelessWidget {
         final isArabic = languageState == AppLanguage.arabic;
 
         return BlocProvider(
-          create: (_) => PackageCubit(PackageTypeRepo())
-            ..getPackagesForCountry(countryId),
+          create: (_) =>
+              PackageCubit(PackageTypeRepo())..getPackagesForCountry(countryId),
           child: Directionality(
             textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
             child: Scaffold(
@@ -61,7 +62,26 @@ class PackagesListView extends StatelessWidget {
               body: BlocBuilder<PackageCubit, PackageState>(
                 builder: (context, state) {
                   if (state is PackagesLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    // ✅ Skeleton loading view
+                    return ListView.separated(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16.h,
+                        horizontal: 16.w,
+                      ),
+                      itemCount: 4,
+                      separatorBuilder: (_, __) => SizedBox(height: 16.h),
+                      itemBuilder: (context, index) => Skeletonizer(
+                        enabled: true,
+                        child: PackageCard(
+                          title: "Loading...",
+                          price: "—",
+                          image:
+                              "https://via.placeholder.com/421x200?text=Loading",
+                          description: "Loading package description...",
+                          onTap: () {},
+                        ),
+                      ),
+                    );
                   } else if (state is PackagesLoaded) {
                     final packagesData = state.packagesData;
                     final packages =
@@ -70,7 +90,9 @@ class PackagesListView extends StatelessWidget {
                     if (packages.isEmpty) {
                       return Center(
                         child: Text(
-                          isArabic ? 'لا توجد باقات متاحة' : 'No packages available',
+                          isArabic
+                              ? 'لا توجد باقات متاحة'
+                              : 'No packages available',
                           style: AppTextStyle.setPoppinsTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -82,12 +104,16 @@ class PackagesListView extends StatelessWidget {
 
                     return ListView.builder(
                       padding: EdgeInsets.symmetric(
-                          vertical: 16.h, horizontal: 16.w),
+                        vertical: 16.h,
+                        horizontal: 16.w,
+                      ),
                       itemCount: packages.length,
                       itemBuilder: (context, index) {
                         final package = packages[index];
                         final packageTitle = isArabic
-                            ? (package['titleAr'] ?? package['title'] ?? 'بلا عنوان')
+                            ? (package['titleAr'] ??
+                                package['title'] ??
+                                'بلا عنوان')
                             : (package['title'] ?? 'Unknown');
                         final packageId = package['_id'] ?? '';
                         final packagePrice = package['price'] ?? 'N/A';
@@ -121,7 +147,9 @@ class PackagesListView extends StatelessWidget {
                   } else if (state is PackageError) {
                     return Center(
                       child: Text(
-                        isArabic ? 'حدث خطأ: ${state.message}' : 'Error: ${state.message}',
+                        isArabic
+                            ? 'حدث خطأ: ${state.message}'
+                            : 'Error: ${state.message}',
                         style: AppTextStyle.setPoppinsTextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,

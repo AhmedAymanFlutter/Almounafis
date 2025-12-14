@@ -78,7 +78,7 @@ ${booking.adults} بالغ
 ${booking.children} طفل
 ${booking.infants} رضيع
 
- *الدرجة:* ${_getClassType(booking.airlinePreference, true)}
+ *الدرجة:* ${_getClassType(booking.travelClass, true)}
 
 ${emailController.text.isNotEmpty ? ' *البريد الإلكتروني:* ${emailController.text}' : ''}
 ${phoneController.text.isNotEmpty ? ' *رقم الهاتف:* $selectedCountryCode${phoneController.text}' : ''}
@@ -90,7 +90,7 @@ ${phoneController.text.isNotEmpty ? ' *رقم الهاتف:* $selectedCountryCod
       return '''
 Hello ,
 
-📋 *Trip Summary*
+ *Trip Summary*
 
  *Airline:* ${airline?.name ?? airline?.nameAr ?? 'Airline'}
  *From:* $fromCityName
@@ -104,7 +104,7 @@ ${booking.adults} Adults
 ${booking.children} Children
 ${booking.infants} Infants
 
- *Class Type:* ${_getClassType(booking.airlinePreference, false)}
+ *Class Type:* ${_getClassType(booking.travelClass, false)}
 
 ${emailController.text.isNotEmpty ? ' *Email:* ${emailController.text}' : ''}
 ${phoneController.text.isNotEmpty ? ' *Phone:* $selectedCountryCode${phoneController.text}' : ''}
@@ -169,49 +169,132 @@ Thank you
           builder: (context, state) {
             final isLoading = state is FlightBookingLoading;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ContactSummaryCard(
-                      bookingRequest: widget.bookingRequest,
-                      selectedAirline: widget.selectedAirline,
-                      fromCity: widget.fromCity,
-                      toCity: widget.toCity,
-                    ),
-                    const SizedBox(height: 20),
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isDesktop = constraints.maxWidth >= 900;
 
-                    _buildWhatsAppButton(context, isArabic),
-
-                    const SizedBox(height: 28),
-                    ContactForm(
-                      formKey: formKey,
-                      emailController: emailController,
-                      phoneController: phoneController,
-                      whatsappController: whatsappController,
-                      selectedCountryCode: selectedCountryCode,
-                      onCountryCodeChanged: (code) =>
-                          setState(() => selectedCountryCode = code),
-                      isLoading: isLoading,
-                    ),
-                    const SizedBox(height: 32),
-                    ConfirmBookingButton(
-                      isLoading: isLoading,
-                      onPressed: () => ContactInfoHelper.submitBooking(
-                        context: context,
-                        formKey: formKey,
-                        bookingRequest: widget.bookingRequest,
-                        selectedAirline: widget.selectedAirline,
-                        emailController: emailController,
-                        phoneController: phoneController,
-                        whatsappController: whatsappController,
-                        countryCode: selectedCountryCode,
-                      ),
-                    ),
-                  ],
+                    if (isDesktop) {
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(32),
+                        child: Form(
+                          key: formKey,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Left Area (Summary)
+                              Expanded(
+                                flex: 4,
+                                child: Column(
+                                  children: [
+                                    ContactSummaryCard(
+                                      bookingRequest: widget.bookingRequest,
+                                      selectedAirline: widget.selectedAirline,
+                                      fromCity: widget.fromCity,
+                                      toCity: widget.toCity,
+                                    ),
+                                    const SizedBox(height: 24),
+                                    // Make sure WhatsApp button is also available or decide placement
+                                    // Putting it here for desktop might look good or below form
+                                    // Following plan: Summary on left.
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 32),
+                              // Right Area (Form & Actions)
+                              Expanded(
+                                flex: 6,
+                                child: Column(
+                                  children: [
+                                    _buildWhatsAppButton(context, isArabic),
+                                    const SizedBox(height: 24),
+                                    ContactForm(
+                                      formKey: formKey,
+                                      emailController: emailController,
+                                      phoneController: phoneController,
+                                      whatsappController: whatsappController,
+                                      selectedCountryCode: selectedCountryCode,
+                                      onCountryCodeChanged: (code) => setState(
+                                        () => selectedCountryCode = code,
+                                      ),
+                                      isLoading: isLoading,
+                                    ),
+                                    const SizedBox(height: 32),
+                                    ConfirmBookingButton(
+                                      isLoading: isLoading,
+                                      onPressed: () =>
+                                          ContactInfoHelper.submitBooking(
+                                            context: context,
+                                            formKey: formKey,
+                                            bookingRequest:
+                                                widget.bookingRequest,
+                                            selectedAirline:
+                                                widget.selectedAirline,
+                                            emailController: emailController,
+                                            phoneController: phoneController,
+                                            whatsappController:
+                                                whatsappController,
+                                            countryCode: selectedCountryCode,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else {
+                      // Mobile/Tablet Layout (Existing Column)
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ContactSummaryCard(
+                                bookingRequest: widget.bookingRequest,
+                                selectedAirline: widget.selectedAirline,
+                                fromCity: widget.fromCity,
+                                toCity: widget.toCity,
+                              ),
+                              const SizedBox(height: 20),
+                              _buildWhatsAppButton(context, isArabic),
+                              const SizedBox(height: 28),
+                              ContactForm(
+                                formKey: formKey,
+                                emailController: emailController,
+                                phoneController: phoneController,
+                                whatsappController: whatsappController,
+                                selectedCountryCode: selectedCountryCode,
+                                onCountryCodeChanged: (code) =>
+                                    setState(() => selectedCountryCode = code),
+                                isLoading: isLoading,
+                              ),
+                              const SizedBox(height: 32),
+                              ConfirmBookingButton(
+                                isLoading: isLoading,
+                                onPressed: () =>
+                                    ContactInfoHelper.submitBooking(
+                                      context: context,
+                                      formKey: formKey,
+                                      bookingRequest: widget.bookingRequest,
+                                      selectedAirline: widget.selectedAirline,
+                                      emailController: emailController,
+                                      phoneController: phoneController,
+                                      whatsappController: whatsappController,
+                                      countryCode: selectedCountryCode,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
             );
@@ -249,7 +332,6 @@ Thank you
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-               
                 Text(
                   isArabic ? 'واتساب' : 'WhatsApp',
                   style: const TextStyle(

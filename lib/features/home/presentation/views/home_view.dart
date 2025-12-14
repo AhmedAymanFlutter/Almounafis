@@ -1,8 +1,12 @@
+import 'package:almonafs_flutter/features/global_Settings/data/model/global_Setting_model.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_stete.dart';
+import 'package:almonafs_flutter/features/packadge/view/package_view.dart';
+// import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart'; // No longer needed
+// import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart'; // No longer needed
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/helper/Fun_helper.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../flightScreen/view/UpcomingTripsPage.dart';
@@ -10,7 +14,6 @@ import '../../../hotels/view/HotelsPage.dart';
 import '../../../localization/manager/localization_cubit.dart';
 import 'widget/cusstom_drawer_widget.dart';
 import 'widget/home_content.dart';
-import 'widget/utils/build_nav_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -22,6 +25,13 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _selectedIndex = 1;
 
+  @override
+  void initState() {
+    super.initState();
+    // Fetch global settings when the home view loads
+    context.read<GlobalSettingsCubit>().getGlobalSettings();
+  }
+
   void _onItemTapped(int index) => setState(() => _selectedIndex = index);
 
   @override
@@ -32,67 +42,138 @@ class _HomeViewState extends State<HomeView> {
 
         return Directionality(
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
-          child: Scaffold(
-            floatingActionButton:  FloatingActionButton(
-              onPressed: () {
-                final globalSettingsState = context.read<GlobalSettingsCubit>().state;
-                            if (globalSettingsState is GlobalSettingsLoaded) {
-                            WhatsAppService.launchWhatsApp(
-                              context,
-                              isArabic: isArabic,
-                               settings: globalSettingsState.globalSettings,
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  isArabic 
-                                    ? "جاري تحميل الإعدادات..." 
-                                    : "Loading settings..."
-                                ),
-                              ),
-                            );
-                          }
-              },
-              backgroundColor: Colors.green,
-              child: Icon(
-                Icons.call,
-                color: AppColor.mainWhite,
-              ),
-            ),
-            backgroundColor: AppColor.mainWhite,
-            drawer: CustomDrawer(onNavigationItemTapped: _onItemTapped),
-            body: SafeArea(
-              child: _selectedIndex == 1
-                  ? const HomeContent()
-                  : _buildOtherPages(),
-            ),
-            bottomNavigationBar: CurvedNavigationBar(
-              index: _selectedIndex,
-              backgroundColor: Colors.transparent,
-              color: AppColor.secondaryBlack,
-              buttonBackgroundColor: AppColor.mainWhite,
-              animationDuration: const Duration(milliseconds: 300),
-              onTap: _onItemTapped,
-              items: [
-                buildNavItem(
-                  icon: "assets/icons/bag.svg",
-                  label: isArabic ? "الرحلات" : "Trips",
-                  isSelected: _selectedIndex == 0,
+          child: BlocBuilder<GlobalSettingsCubit, GlobalSettingsState>(
+            builder: (context, globalSettingsState) {
+              // Extract social media list from global settings
+              List<SocialMedia>? socialMediaList;
+              if (globalSettingsState is GlobalSettingsLoaded) {
+                socialMediaList =
+                    globalSettingsState.globalSettings.data?.socialMedia;
+              }
+
+              return Scaffold(
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () {
+                    if (globalSettingsState is GlobalSettingsLoaded) {
+                      WhatsAppService.launchWhatsApp(
+                        context,
+                        isArabic: isArabic,
+                        settings: globalSettingsState.globalSettings,
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isArabic
+                                ? "جاري تحميل الإعدادات..."
+                                : "Loading settings...",
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  backgroundColor: Colors.green,
+                  child: SvgPicture.asset('assets/images/whatsapp.svg'),
                 ),
-                buildNavItem(
-                  icon: "assets/icons/home.svg",
-                  label: isArabic ? "الرئيسية" : "Home",
-                  isSelected: _selectedIndex == 1,
+                backgroundColor: AppColor.mainWhite,
+                drawer: CustomDrawer(
+                  onNavigationItemTapped: _onItemTapped,
+                  socialMediaList:
+                      socialMediaList, // Pass social media data here
                 ),
-                buildNavItem(
-                  icon: "assets/icons/sleep.svg",
-                  label: isArabic ? "الفنادق" : "Hotels",
-                  isSelected: _selectedIndex == 2,
+                body: SafeArea(
+                  child: _selectedIndex == 1
+                      ? const HomeContent()
+                      : _buildOtherPages(),
                 ),
-             
-              ],
-            ),
+
+                // --- START: MODIFIED SECTION ---
+                bottomNavigationBar: SizedBox(
+                  height: 90,
+                  child: BottomNavigationBar(
+                    currentIndex: _selectedIndex,
+                    onTap: _onItemTapped,
+                    backgroundColor: AppColor.secondaryBlack,
+                    selectedItemColor:
+                        AppColor.mainWhite, // Color for the selected label
+                    unselectedItemColor:
+                        Colors.grey[400], // Color for unselected labels
+                    type: BottomNavigationBarType.fixed, // Shows all labels
+                    items: [
+                      BottomNavigationBarItem(
+                        icon: SvgPicture.asset(
+                          "assets/icons/bag.svg",
+                          colorFilter: ColorFilter.mode(
+                            Colors.grey[400]!,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        activeIcon: SvgPicture.asset(
+                          "assets/icons/bag.svg",
+                          colorFilter: ColorFilter.mode(
+                            AppColor.mainWhite,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        label: isArabic ? "الرحلات" : "Trips",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: SvgPicture.asset(
+                          "assets/icons/home.svg",
+                          colorFilter: ColorFilter.mode(
+                            Colors.grey[400]!,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        activeIcon: SvgPicture.asset(
+                          "assets/icons/home.svg",
+                          colorFilter: ColorFilter.mode(
+                            AppColor.mainWhite,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        label: isArabic ? "الرئيسية" : "Home",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: SvgPicture.asset(
+                          "assets/icons/sleep.svg",
+                          colorFilter: ColorFilter.mode(
+                            Colors.grey[400]!,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        activeIcon: SvgPicture.asset(
+                          "assets/icons/sleep.svg",
+                          colorFilter: ColorFilter.mode(
+                            AppColor.mainWhite,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        label: isArabic ? "الفنادق" : "Hotels",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: SvgPicture.asset(
+                          "assets/icons/Packages.svg",
+                          colorFilter: ColorFilter.mode(
+                            Colors.grey[400]!,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        activeIcon: SvgPicture.asset(
+                          "assets/icons/Packages.svg",
+                          colorFilter: ColorFilter.mode(
+                            AppColor.mainWhite,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        label: isArabic ? "الباقات" : "Packages",
+                      ),
+                    ],
+                  ),
+                ),
+                // --- END: MODIFIED SECTION ---
+              );
+            },
           ),
         );
       },
@@ -104,7 +185,9 @@ class _HomeViewState extends State<HomeView> {
       case 0:
         return const FlightBookingScreen();
       case 2:
-        return  HotelsPage();
+        return HotelsPage();
+      case 3:
+        return PackageView();
       default:
         return const HomeContent();
     }

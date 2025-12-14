@@ -9,18 +9,22 @@ Widget buildTripTypeSection({
 }) {
   return Row(
     children: [
-      TripTypeButton(
-        label: isArabic ? 'ذهاب وعودة' : 'Round Trip',
-        icon: Icons.sync,
-        isSelected: isRoundTrip,
-        onTap: onSelectRoundTrip,
+      Expanded(
+        child: TripTypeButton(
+          label: isArabic ? 'ذهاب وعودة' : 'Round Trip',
+          icon: Icons.sync,
+          isSelected: isRoundTrip,
+          onTap: onSelectRoundTrip,
+        ),
       ),
       const SizedBox(width: 12),
-      TripTypeButton(
-        label: isArabic ? 'ذهاب فقط' : 'One Way',
-        icon: Icons.arrow_forward,
-        isSelected: !isRoundTrip,
-        onTap: onSelectOneWay,
+      Expanded(
+        child: TripTypeButton(
+          label: isArabic ? 'ذهاب فقط' : 'One Way',
+          icon: Icons.arrow_forward,
+          isSelected: !isRoundTrip,
+          onTap: onSelectOneWay,
+        ),
       ),
     ],
   );

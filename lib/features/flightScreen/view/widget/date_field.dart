@@ -6,7 +6,8 @@ import '../../../localization/manager/localization_cubit.dart';
 class DateField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
-  final ValueChanged<String>? onDateSelected; // optional callback for API format
+  final ValueChanged<String>?
+  onDateSelected; // optional callback for API format
 
   const DateField({
     super.key,
@@ -26,7 +27,6 @@ class _DateFieldState extends State<DateField> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      
     );
 
     if (picked != null) {
@@ -58,7 +58,11 @@ class _DateFieldState extends State<DateField> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.calendar_today, size: 12, color: Colors.grey),
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 12,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     widget.label,
@@ -68,7 +72,10 @@ class _DateFieldState extends State<DateField> {
               ),
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(6),
@@ -76,13 +83,20 @@ class _DateFieldState extends State<DateField> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.calendar_month, size: 14, color: Colors.grey),
+                    const Icon(
+                      Icons.calendar_month,
+                      size: 14,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(width: 6),
-                    Text(
-                      widget.controller.text.isEmpty
-                          ? (isArabic ? "اختر التاريخ" : "Select date")
-                          : widget.controller.text,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    Flexible(
+                      child: Text(
+                        widget.controller.text.isEmpty
+                            ? (isArabic ? "اختر التاريخ" : "Select date")
+                            : widget.controller.text,
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),

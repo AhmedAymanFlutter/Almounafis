@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../config/router/routes.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
@@ -26,8 +27,8 @@ class CountriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          PackageCubit(PackageTypeRepo())..getCountriesForPackageType(packageTypeId),
+      create: (_) => PackageCubit(PackageTypeRepo())
+        ..getCountriesForPackageType(packageTypeId),
       child: BlocBuilder<LanguageCubit, AppLanguage>(
         builder: (context, langState) {
           final isArabic = langState == AppLanguage.arabic;
@@ -47,7 +48,7 @@ class CountriesView extends StatelessWidget {
                   ),
                 ),
                 leading: GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, Routes.packageView),
+                  onTap: () => Navigator.pop(context, true),
                   child: SvgPicture.asset(
                     'assets/icons/arrowback.svg',
                     width: 24,
@@ -59,7 +60,25 @@ class CountriesView extends StatelessWidget {
               body: BlocBuilder<PackageCubit, PackageState>(
                 builder: (context, state) {
                   if (state is CountriesLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    // ✅ Skeleton loading
+                    return ListView.separated(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16.h,
+                        horizontal: 16.w,
+                      ),
+                      itemCount: 4,
+                      separatorBuilder: (_, __) => SizedBox(height: 16.h),
+                      itemBuilder: (context, index) => Skeletonizer(
+                        enabled: true,
+                        child: CountryCard(
+                          countryName: "Loading...",
+                          countryId: "",
+                          countryImage:
+                              "https://via.placeholder.com/421x200?text=Loading",
+                          onTap: () {},
+                        ),
+                      ),
+                    );
                   } else if (state is CountriesLoaded) {
                     final countriesData = state.countriesData;
                     final countries =

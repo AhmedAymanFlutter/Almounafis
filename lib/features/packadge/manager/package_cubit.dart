@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/network/api_response.dart'; // عدّل المسار لو مختلف
 import '../data/model/package_model.dart';
 import '../data/repo/package_repo.dart';
 import 'package_state.dart';
@@ -8,11 +7,11 @@ class PackageCubit extends Cubit<PackageState> {
   final PackageTypeRepo packageRepo;
 
   PackageCubit(this.packageRepo) : super(PackageInitial());
-// get all packages
+
   Future<void> getAllPackages() async {
     emit(PackageLoading());
-
-    final ApiResponse response = await packageRepo.getAllpackage();
+    final response = await packageRepo.getAllpackage();
+    if (isClosed) return;
 
     if (response.status) {
       emit(PackageLoaded(response.data as PackageModel));
@@ -20,12 +19,11 @@ class PackageCubit extends Cubit<PackageState> {
       emit(PackageError(response.message));
     }
   }
- // get countries for package type
+
   Future<void> getCountriesForPackageType(String packageTypeId) async {
     emit(CountriesLoading());
-
-    final ApiResponse response =
-        await packageRepo.getCountriesForPackageType(packageTypeId);
+    final response = await packageRepo.getCountriesForPackageType(packageTypeId);
+    if (isClosed) return;
 
     if (response.status) {
       emit(CountriesLoaded(response.data as Map<String, dynamic>));
@@ -33,11 +31,11 @@ class PackageCubit extends Cubit<PackageState> {
       emit(PackageError(response.message));
     }
   }
-  // get packages for country
+
   Future<void> getPackagesForCountry(String countryId) async {
     emit(PackagesLoading());
-
-    final ApiResponse response = await packageRepo.getPackagesForCountry(countryId);
+    final response = await packageRepo.getPackagesForCountry(countryId);
+    if (isClosed) return;
 
     if (response.status) {
       emit(PackagesLoaded(response.data as Map<String, dynamic>));
@@ -46,11 +44,10 @@ class PackageCubit extends Cubit<PackageState> {
     }
   }
 
-  // get package details
-   Future<void> getPackageDetails(String packageId) async {
+  Future<void> getPackageDetails(String packageId) async {
     emit(PackageDetailsLoading());
-
-    final ApiResponse response = await packageRepo.getPackageDetails(packageId);
+    final response = await packageRepo.getPackageDetails(packageId);
+    if (isClosed) return;
 
     if (response.status) {
       emit(PackageDetailsLoaded(response.data as PackageModel));
@@ -59,4 +56,5 @@ class PackageCubit extends Cubit<PackageState> {
     }
   }
 }
+
 

@@ -1,3 +1,4 @@
+import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/features/upcomming_Tour/data/model/city_tour.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -32,13 +33,13 @@ class UpcomingTourCard extends StatelessWidget {
 
             if (tourIdentifier.isNotEmpty) {
              Navigator.pushNamed(
-    context,
-    Routes.cityTourDetails,
-    arguments: {
-      'tourIdOrSlug': tourIdentifier,
-      'tourTitle': tour.title,
-    },
-  );
+                    context,
+                    Routes.cityTourDetails,
+                    arguments: {
+                      'tourIdOrSlug': tourIdentifier,
+                      'tourTitle': tour.title,
+                    },
+                  );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -60,7 +61,7 @@ class UpcomingTourCard extends StatelessWidget {
                   offset: const Offset(0, 2),
                 ),
               ],
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: AppColor.secondaryGrey.withOpacity(0.6)),
             ),
             child: Row(
               children: [

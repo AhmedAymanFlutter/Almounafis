@@ -3,28 +3,39 @@ import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
-
 import '../../../config/router/routes.dart';
 import '../data/repo/package_repo.dart';
 import '../manager/package_cubit.dart';
 import '../manager/package_state.dart';
 import 'widget/Package_widget.dart';
 
-class PackageView extends StatelessWidget {
+class PackageView extends StatefulWidget {
   const PackageView({super.key});
+
+  @override
+  State<PackageView> createState() => _PackageViewState();
+}
+
+class _PackageViewState extends State<PackageView> {
+  late PackageCubit _packageCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _packageCubit = PackageCubit(PackageTypeRepo())..getAllPackages();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isArabic = context.watch<LanguageCubit>().isArabic;
 
-    return BlocProvider(
-      create: (_) => PackageCubit(PackageTypeRepo())..getAllPackages(),
+    return BlocProvider.value(
+      value: _packageCubit,
       child: Directionality(
         textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         child: Scaffold(
-          
           appBar: AppBar(
+            leading: const SizedBox(),
             title: Text(
               isArabic ? 'أنواع الباقات' : 'Package Type',
               style: AppTextStyle.setPoppinsTextStyle(
@@ -34,19 +45,6 @@ class PackageView extends StatelessWidget {
               ),
             ),
             centerTitle: true,
-            leading: GestureDetector(
-              onTap: () => Navigator.pushNamed(context, Routes.home),
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationY(isArabic ? 3.14159 : 0),
-                child: SvgPicture.asset(
-                  'assets/icons/arrowback.svg',
-                  width: 24,
-                  height: 24,
-                  fit: BoxFit.scaleDown,
-                ),
-              ),
-            ),
           ),
           body: BlocBuilder<PackageCubit, PackageState>(
             builder: (context, state) {
@@ -58,7 +56,9 @@ class PackageView extends StatelessWidget {
                 if (packages.isEmpty) {
                   return Center(
                     child: Text(
-                      isArabic ? 'لا توجد باقات متاحة حالياً' : 'No packages found',
+                      isArabic
+                          ? 'لا توجد باقات متاحة حالياً'
+                          : 'No packages found',
                       style: AppTextStyle.setPoppinsSecondaryBlack(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -74,9 +74,10 @@ class PackageView extends StatelessWidget {
                     final pkg = packages[index];
                     return PackageCardView(
                       package: pkg,
-                      onTap: () {
-                        context.read<PackageCubit>().getCountriesForPackageType(pkg.id ?? '');
-                        Navigator.pushNamed(
+                      onTap: () async {
+                        _packageCubit.getCountriesForPackageType(pkg.id ?? '');
+
+                        await Navigator.pushNamed(
                           context,
                           Routes.countriesView,
                           arguments: {
@@ -86,6 +87,9 @@ class PackageView extends StatelessWidget {
                                 : (pkg.name ?? ''),
                           },
                         );
+
+                        // 🔁 Refresh بعد الرجوع من countries view
+                        _packageCubit.getAllPackages();
                       },
                     );
                   },
@@ -96,7 +100,9 @@ class PackageView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        isArabic ? 'حدث خطأ: ${state.message}' : 'Error: ${state.message}',
+                        isArabic
+                            ? 'حدث خطأ: ${state.message}'
+                            : 'Error: ${state.message}',
                         textAlign: TextAlign.center,
                         style: AppTextStyle.setPoppinsSecondaryBlack(
                           fontSize: 14,
@@ -105,8 +111,7 @@ class PackageView extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () =>
-                            context.read<PackageCubit>().getAllPackages(),
+                        onPressed: () => _packageCubit.getAllPackages(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColor.mainBlack,
                           foregroundColor: AppColor.mainWhite,
@@ -124,5 +129,11 @@ class PackageView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _packageCubit.close();
+    super.dispose();
   }
 }

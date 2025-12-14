@@ -11,23 +11,21 @@ class CityTourRepository {
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: EndPoints.getAllcityTours,
       );
-      
+
       if (apiResponse.status) {
         // Handle List response (API returns array of tours directly)
         if (apiResponse.data is List) {
           final List<dynamic> toursListData = apiResponse.data as List;
-          
+
           try {
             // Parse each tour from the list
             final tours = toursListData
                 .map((item) => Data.fromJson(item as Map<String, dynamic>))
                 .toList();
-            
+
             // Create AllCityTour wrapper with the tours
-            final allCityTour = AllCityTour(
-             
-            );
-            
+            final allCityTour = AllCityTour();
+
             if (tours.isNotEmpty) {
               return ApiResponse(
                 status: true,
@@ -39,7 +37,7 @@ class CityTourRepository {
               return ApiResponse(
                 status: false,
                 statusCode: apiResponse.statusCode,
-                message: 'لا توجد جولات متاحة',
+                message: apiResponse.message,
               );
             }
           } catch (e) {
@@ -53,10 +51,10 @@ class CityTourRepository {
         // Handle Map response (API returns object with nested data)
         else if (apiResponse.data is Map<String, dynamic>) {
           final responseData = apiResponse.data as Map<String, dynamic>;
-          
+
           try {
             final allCityTour = AllCityTour.fromJson(responseData);
-            
+
             if (allCityTour.data?.isNotEmpty == true) {
               return ApiResponse(
                 status: true,
@@ -82,7 +80,8 @@ class CityTourRepository {
           return ApiResponse(
             status: false,
             statusCode: apiResponse.statusCode,
-            message: 'هيكل بيانات غير صالح: نوع ${apiResponse.data.runtimeType}',
+            message:
+                'هيكل بيانات غير صالح: نوع ${apiResponse.data.runtimeType}',
           );
         }
       } else {
@@ -100,10 +99,11 @@ class CityTourRepository {
       );
     }
   }
-   Future<ApiResponse> getCityTourDetails(String tourIdOrSlug) async {
+
+  Future<ApiResponse> getCityTourDetails(String tourIdOrSlug) async {
     try {
       print('🌐 Fetching city tour: $tourIdOrSlug');
-      
+
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: 'city-tours',
         resourcePath: tourIdOrSlug,
@@ -119,8 +119,10 @@ class CityTourRepository {
           try {
             // التحقق من وجود data في الاستجابة
             if (responseData.containsKey('data')) {
-              final tourData = Data.fromJson(responseData['data'] as Map<String, dynamic>);
-              
+              final tourData = Data.fromJson(
+                responseData['data'] as Map<String, dynamic>,
+              );
+
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
@@ -130,7 +132,7 @@ class CityTourRepository {
             } else {
               // إذا كانت البيانات مباشرة بدون data wrapper
               final tourData = Data.fromJson(responseData);
-              
+
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,

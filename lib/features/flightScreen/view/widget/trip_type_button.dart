@@ -28,7 +28,7 @@ class TripTypeButton extends StatelessWidget {
           child: GestureDetector(
             onTap: onTap,
             child: Container(
-              width: 130,
+              // width: 130, // Removed fixed width
               height: 44,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
@@ -43,10 +43,7 @@ class TripTypeButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: isSelected
                     ? null
-                    : Border.all(
-                        color: Colors.grey[400]!,
-                        width: 0.5,
-                      ),
+                    : Border.all(color: Colors.grey[400]!, width: 0.5),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -57,12 +54,15 @@ class TripTypeButton extends StatelessWidget {
                     color: isSelected ? Colors.white : Colors.grey[700],
                   ),
                   const SizedBox(width: 5),
-                  Text(
-                    isArabic ? _translateLabel(label) : label,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.grey[700],
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
+                  Flexible(
+                    child: Text(
+                      isArabic ? _translateLabel(label) : label,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.grey[700],
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

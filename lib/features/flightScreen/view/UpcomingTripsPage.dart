@@ -1,4 +1,3 @@
-
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/flightScreen/view/utils/componant_utils.dart';
 import 'package:almonafs_flutter/features/getAilplaneState/data/model/Airplane_City_model.dart';
@@ -9,12 +8,14 @@ import '../../localization/manager/localization_cubit.dart';
 import 'utils/date_Card_utils.dart';
 import 'utils/location_card.dart';
 import 'utils/search_button.dart';
+
 class FlightBookingScreen extends StatefulWidget {
   const FlightBookingScreen({super.key});
 
   @override
   State<FlightBookingScreen> createState() => _FlightBookingScreenState();
 }
+
 class _FlightBookingScreenState extends State<FlightBookingScreen> {
   bool isRoundTrip = true;
   int selectedNavIndex = 0;
@@ -54,100 +55,118 @@ class _FlightBookingScreenState extends State<FlightBookingScreen> {
           child: SafeArea(
             child: Scaffold(
               appBar: AppBar(
+                leading: SizedBox(),
                 backgroundColor: Colors.transparent,
-                title: Text('Booking flight',style: AppTextStyle.setPoppinsSecondaryBlack(fontSize: 16, fontWeight: FontWeight.w500),),
+                title: Text(
+                  'Booking flight',
+                  style: AppTextStyle.setPoppinsSecondaryBlack(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
-              body: Expanded(
-                child: Container(
-                  height: double.infinity,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/FlightBook.png'),
-                      fit: BoxFit.cover,
+              body: Container(
+                height: double.infinity,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/FlightBook.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      //  crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // CustomSearchBar(controller: , onChanged: (String value) {  },),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: buildTripTypeSection(
+                            isArabic: isArabic,
+                            isRoundTrip: isRoundTrip,
+                            onSelectRoundTrip: () =>
+                                setState(() => isRoundTrip = true),
+                            onSelectOneWay: () =>
+                                setState(() => isRoundTrip = false),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        LocationCard(
+                          isArabic: isArabic,
+                          selectedFromCity: selectedFromCity,
+                          selectedToCity: selectedToCity,
+                          onFromSelected: (city) =>
+                              setState(() => selectedFromCity = city),
+                          onToSelected: (city) =>
+                              setState(() => selectedToCity = city),
+                        ),
+                        const SizedBox(height: 20),
+                        DateCard(
+                          isArabic: isArabic,
+                          isRoundTrip: isRoundTrip,
+                          departureDateController: _departureDateController,
+                          returnDateController: _returnDateController,
+                          onAdultsChanged: (val) => adultsCount = val,
+                          onChildrenChanged: (val) => childrenCount = val,
+                          onInfantsChanged: (val) => infantsCount = val,
+                          onAirlineChanged: (value) {
+                            setState(
+                              () => selectedAirlineId =
+                                  (value == null ||
+                                      value == 'Any' ||
+                                      value == 'أي')
+                                  ? null
+                                  : value,
+                            );
+                          },
+                          onClassChanged: (value) {
+                            if (value != null &&
+                                value != 'Any' &&
+                                value != 'أي') {
+                              setState(() => selectedClass = value);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        SearchButton(
+                          isArabic: isArabic,
+                          contextRef:
+                              context, // parent context to use inside helper
+                          selectedFromCity: selectedFromCity,
+                          selectedToCity: selectedToCity,
+                          departureDateController: _departureDateController,
+                          returnDateController: _returnDateController,
+                          isRoundTrip: isRoundTrip,
+                          adultsCount: adultsCount,
+                          childrenCount: childrenCount,
+                          infantsCount: infantsCount,
+                          selectedClass: selectedClass,
+                          selectedAirlineId: selectedAirlineId,
+                          emailController: emailController,
+                          phoneController: phoneController,
+                          whatsappController: whatsappController,
+                        ),
+                      ],
                     ),
                   ),
-                  child: SafeArea(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                      //  crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                         // CustomSearchBar(controller: , onChanged: (String value) {  },),
-                          const SizedBox(height: 20),
-                                        Padding(
-                                      padding: const EdgeInsets.only(left: 74),
-                                     child: buildTripTypeSection(
-                                       isArabic: isArabic,
-                                       isRoundTrip: isRoundTrip,
-                                       onSelectRoundTrip: () => setState(() => isRoundTrip = true),
-                                       onSelectOneWay: () => setState(() => isRoundTrip = false),
-                                     ),
-                                       ),
-                                     const SizedBox(height: 20),
-                                       LocationCard(
-                                     isArabic: isArabic,
-                                     selectedFromCity: selectedFromCity,
-                                     selectedToCity: selectedToCity,
-                                     onFromSelected: (city) => setState(() => selectedFromCity = city),
-                                     onToSelected: (city) => setState(() => selectedToCity = city),
-                                      ),
-                                       const SizedBox(height: 20),
-                                       DateCard(
-                                      isArabic: isArabic,
-                                      isRoundTrip: isRoundTrip,
-                                      departureDateController: _departureDateController,
-                                      returnDateController: _returnDateController,
-                                      onAdultsChanged: (val) => adultsCount = val,
-                                      onChildrenChanged: (val) => childrenCount = val,
-                                      onInfantsChanged: (val) => infantsCount = val,
-                                      onAirlineChanged: (value) {
-                                        setState(() => selectedAirlineId =
-                                            (value == null || value == 'Any' || value == 'أي') ? null : value);
-                                      },
-                                      onClassChanged: (value) {
-                                        if (value != null && value != 'Any' && value != 'أي') {
-                                          setState(() => selectedClass = value);
-                                        }
-                                       },
-                                      ),
-                                       const SizedBox(height: 24),
-                                                   SearchButton(
-                                           isArabic: isArabic,
-                                           contextRef: context, // parent context to use inside helper
-                                           selectedFromCity: selectedFromCity,
-                                           selectedToCity: selectedToCity,
-                                           departureDateController: _departureDateController,
-                                           returnDateController: _returnDateController,
-                                           isRoundTrip: isRoundTrip,
-                                           adultsCount: adultsCount,
-                                           childrenCount: childrenCount,
-                                           infantsCount: infantsCount,
-                                           selectedClass: selectedClass,
-                                           selectedAirlineId: selectedAirlineId,
-                                           emailController: emailController,
-                                           phoneController: phoneController,
-                                           whatsappController: whatsappController,
-                                                  ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                ),
-                                            ),
+                ),
+              ),
+            ),
           ),
-                                        );
-                                      },
-                                    );
-                                  }                                
-                        @override
-                        void dispose() {
-                          _departureDateController.dispose();
-                          _returnDateController.dispose();
-                          emailController.dispose();
-                          phoneController.dispose();
-                          whatsappController.dispose();
-                          super.dispose();
-                        }
-                      }
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _departureDateController.dispose();
+    _returnDateController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    whatsappController.dispose();
+    super.dispose();
+  }
+}

@@ -2,7 +2,6 @@ import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../flightScreen/view/widget/filter_chip.dart';
 import '../../home/presentation/widgets/search_bar.dart';
 import '../../localization/manager/localization_cubit.dart';
 import '../data/repo/Hotel_repo_tour.dart';
@@ -11,7 +10,7 @@ import '../manager/hotel_state.dart';
 import 'widget/hotel_widget.dart';
 
 class HotelsPage extends StatelessWidget {
-   const HotelsPage({super.key});
+  const HotelsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +25,8 @@ class _AllHotelsScreenContent extends StatefulWidget {
   const _AllHotelsScreenContent();
 
   @override
-  State<_AllHotelsScreenContent> createState() => __AllHotelsScreenContentState();
+  State<_AllHotelsScreenContent> createState() =>
+      __AllHotelsScreenContentState();
 }
 
 class __AllHotelsScreenContentState extends State<_AllHotelsScreenContent> {
@@ -44,46 +44,26 @@ class __AllHotelsScreenContentState extends State<_AllHotelsScreenContent> {
 
     return Scaffold(
       appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                title: Text('Hotel',style: AppTextStyle.setPoppinsSecondaryBlack(fontSize: 16, fontWeight: FontWeight.w500),),
-              ),
+        leading: SizedBox(),
+        backgroundColor: Colors.transparent,
+        title: Text(
+          'Hotel',
+          style: AppTextStyle.setPoppinsSecondaryBlack(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
       backgroundColor: AppColor.mainWhite,
       body: Column(
         children: [
           // ✅ Search Bar
-           CustomSearchBar(controller: searchHotelController, onChanged: (String value) { 
-            final isArabic = context.read<LanguageCubit>().isArabic;
-    context.read<HotelCubit>().localSearchHotels(value, isArabic);
-            },),
-          const SizedBox(height: 16),
-
-          // ✅ Filter Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  isArabic ? 'تصفية حسب' : 'Filters by',
-                  style: AppTextStyle.setPoppinsSecondaryBlack(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                FilterChipWidget(
-                  label: isArabic ? 'الخدمات' : 'Facilities',
-                  onTap: () {},
-                ),
-                FilterChipWidget(
-                  label: isArabic ? 'التصنيف' : 'Star Rating',
-                  onTap: () {},
-                ),
-                FilterChipWidget(
-                  label: isArabic ? 'النطاق السعري' : 'Range',
-                  onTap: () {},
-                ),
-              ],
-            ),
+          CustomSearchBar(
+            controller: searchHotelController,
+            onChanged: (String value) {
+              final isArabic = context.read<LanguageCubit>().isArabic;
+              context.read<HotelCubit>().localSearchHotels(value, isArabic);
+            },
           ),
           const SizedBox(height: 16),
 

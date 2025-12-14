@@ -137,7 +137,7 @@ class PackageDetailsView extends StatelessWidget {
                                                 : CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                details.name ?? packageTitle,
+                                               isArabic ? (details.nameAr ?? packageTitle) : (details.name ?? packageTitle),
                                                 style: AppTextStyle.setPoppinsTextStyle(
                                                   fontSize: 22,
                                                   fontWeight: FontWeight.w700,
@@ -169,7 +169,7 @@ class PackageDetailsView extends StatelessWidget {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  isArabic ? 'المدة التقديرية' : 'ESTIMATE',
+                                                  isArabic ? ' السعر' : 'price',
                                                   style: AppTextStyle.setPoppinsTextStyle(
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.w600,
@@ -178,7 +178,7 @@ class PackageDetailsView extends StatelessWidget {
                                                 ),
                                                 SizedBox(height: 4.h),
                                                 Text(
-                                                  '3D 2N',
+                                                  (details.price).toString(),
                                                   style: AppTextStyle.setPoppinsTextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w700,
@@ -200,142 +200,24 @@ class PackageDetailsView extends StatelessWidget {
                                           ),
                                           SizedBox(height: 12.h),
                                           Text(
-                                            details.description ?? (isArabic
-                                                ? 'لا يوجد وصف متاح'
-                                                : 'No description available'),
-                                            style: AppTextStyle.setPoppinsTextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColor.lightGrey,
-                                            ),
-                                            textAlign:
-                                                isArabic ? TextAlign.right : TextAlign.left,
+                                        (isArabic
+                                            ? (details.descriptionAr ?? 'لا يوجد وصف متاح')
+                                            : (details.description ?? 'No description available')),
+                                          style: AppTextStyle.setPoppinsTextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColor.lightGrey,
                                           ),
-                                          SizedBox(height: 24.h),
-                                          // 📅 اختيار التاريخ
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                isArabic ? 'اختر التاريخ' : 'Choose date',
-                                                style: AppTextStyle.setPoppinsTextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColor.mainBlack,
-                                                ),
-                                              ),
-                                              Icon(
-                                                Icons.info_outline,
-                                                size: 18.sp,
-                                                color: AppColor.lightGrey,
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 16.h),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 14.w,
-                                              vertical: 12.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Colors.grey[300]!,
-                                                width: 1,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(12.r),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  isArabic
-                                                      ? 'اختر التاريخ المناسب لك'
-                                                      : 'Select your preferred dates',
-                                                  style:
-                                                      AppTextStyle.setPoppinsTextStyle(
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: AppColor.lightGrey,
-                                                  ),
-                                                ),
-                                                Icon(
-                                                  Icons.calendar_today,
-                                                  size: 18.sp,
-                                                  color: AppColor.lightGrey,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(height: 80.h),
+                                          textAlign:
+                                              isArabic ? TextAlign.right : TextAlign.left,
+                                        ),
+                                        
                                         ],
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              // 🔘 زر الحجز
-                              Positioned(
-                                bottom: 20.h,
-                                left: 20.w,
-                                right: 20.w,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.8),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16.w,
-                                    vertical: 12.h,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(isArabic
-                                                  ? 'جارٍ فتح واتساب...'
-                                                  : 'Opening WhatsApp...'),
-                                            ));
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xFF1D8DEF),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(24.r),
-                                            ),
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 14.h),
-                                          ),
-                                          child: Text(
-                                            isArabic
-                                                ? 'احجز الآن عبر واتساب'
-                                                : 'Book Now via WhatsApp',
-                                            style: AppTextStyle
-                                                .setPoppinsTextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                              ),                             
                             ],
                           ),
                         ),

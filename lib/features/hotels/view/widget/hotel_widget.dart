@@ -2,7 +2,7 @@ import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shimmer_animation/shimmer_animation.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../config/router/routes.dart';
 import '../../../hotelDetails/view/HotelDetailsScreen.dart';
 import '../../data/model/city_tour.dart';
@@ -14,33 +14,82 @@ Widget buildContent(BuildContext context, HotelState state) {
   final isArabic = context.watch<LanguageCubit>().isArabic;
 
   // ✅ حالة التحميل
-  if (state is HotelLoading) {
-    return Center(
+if (state is HotelLoading) {
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: Skeletonizer(
+      enabled: true,
       child: ListView.separated(
-        scrollDirection: Axis.vertical,
-        itemCount: 8,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemCount: 6,
+        separatorBuilder: (_, __) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Shimmer(
-              color: Colors.grey.shade400,
-              colorOpacity: 0.3,
-              enabled: true,
-              child: Container(
-                width: 370,
-                height: 87,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(20),
+          return Container(
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
                 ),
-              ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // صورة الفندق
+                Container(
+                  width: 100,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // بيانات الفندق الوهمية
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 14,
+                          width: 120,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 12,
+                          width: 180,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 12,
+                          width: 100,
+                          color: Colors.grey[300],
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
+
+
 
   // ✅ حالة الخطأ
   if (state is HotelError) {

@@ -26,9 +26,9 @@ class OnBoardingView extends StatelessWidget {
             body: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 130.h),
+                SizedBox(height: 80.h),
                 Center(child: SvgPicture.asset(AppImages.onBoarding)),
-                SizedBox(height: 50.h),
+                SizedBox(height: 30.h),
                 // ✅ النص حسب اللغة
                 Text(
                   isArabic ? TextHelperAr.welcome : TextHelperEn.welcome,
@@ -53,8 +53,10 @@ class OnBoardingView extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.mainWhite,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 150.w, vertical: 14.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 150.w,
+                      vertical: 14.h,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.r),
                     ),

@@ -1,7 +1,6 @@
 import 'package:almonafs_flutter/features/home/presentation/views/widget/countries_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../../config/router/routes.dart';
 import '../../../../../core/theme/app_color.dart';
 import '../../../../localization/manager/localization_cubit.dart';
@@ -40,12 +39,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 ),
               ),
             ),
-
-            /// 🔍 Search bar placeholder (ممكن تضيف CustomSearchBar هنا)
-            // const Padding(
-            //   padding: EdgeInsets.symmetric(horizontal: 16),
-            //   child: CustomSearchBar(),
-            // ),
             const SizedBox(height: 24),
 
             /// 🌍 Our Countries Section
@@ -65,7 +58,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
             ),
 
             const SizedBox(height: 24),
-
             /// 🗺️ Upcoming Tours Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),

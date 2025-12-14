@@ -10,16 +10,34 @@ class AllCityTour {
     results = json['results'];
     if (json['data'] != null) {
       data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
-      });
+      if (json['data'] is List) {
+        json['data'].forEach((v) {
+          data!.add(Data.fromJson(v));
+        });
+      } else if (json['data'] is Map<String, dynamic>) {
+        if (json['data']['data'] != null && json['data']['data'] is List) {
+          json['data']['data'].forEach((v) {
+            data!.add(Data.fromJson(v));
+          });
+        } else if (json['data']['docs'] != null &&
+            json['data']['docs'] is List) {
+          json['data']['docs'].forEach((v) {
+            data!.add(new Data.fromJson(v));
+          });
+        } else if (json['data']['tours'] != null &&
+            json['data']['tours'] is List) {
+          json['data']['tours'].forEach((v) {
+            data!.add(new Data.fromJson(v));
+          });
+        }
+      }
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['results'] = this.results;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['status'] = status;
+    data['results'] = results;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -55,39 +73,40 @@ class Data {
   String? slugAr;
   String? id;
 
-  Data(
-      {this.duration,
-      this.seo,
-      this.sId,
-      this.title,
-      this.titleAr,
-      this.description,
-      this.descriptionAr,
-      this.descriptionFlutter,
-      this.descriptionArFlutter,
-      this.city,
-      this.images,
-      this.coverImage,
-      this.includes,
-      this.includesAr,
-      this.excludes,
-      this.excludesAr,
-      this.totalReviews,
-      this.tags,
-      this.tagsAr,
-      this.slug,
-      this.createdBy,
-      this.activities,
-      this.createdAt,
-      this.updatedAt,
-      this.slugAr,
-      this.id});
+  Data({
+    this.duration,
+    this.seo,
+    this.sId,
+    this.title,
+    this.titleAr,
+    this.description,
+    this.descriptionAr,
+    this.descriptionFlutter,
+    this.descriptionArFlutter,
+    this.city,
+    this.images,
+    this.coverImage,
+    this.includes,
+    this.includesAr,
+    this.excludes,
+    this.excludesAr,
+    this.totalReviews,
+    this.tags,
+    this.tagsAr,
+    this.slug,
+    this.createdBy,
+    this.activities,
+    this.createdAt,
+    this.updatedAt,
+    this.slugAr,
+    this.id,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     duration = json['duration'] != null
-        ? new Duration.fromJson(json['duration'])
+        ? Duration.fromJson(json['duration'])
         : null;
-    seo = json['seo'] != null ? new Seo.fromJson(json['seo']) : null;
+    seo = json['seo'] != null ? Seo.fromJson(json['seo']) : null;
     sId = json['_id'];
     title = json['title'];
     titleAr = json['titleAr'];
@@ -140,47 +159,47 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.duration != null) {
-      data['duration'] = this.duration!.toJson();
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    if (duration != null) {
+      data['duration'] = duration!.toJson();
     }
-    if (this.seo != null) {
-      data['seo'] = this.seo!.toJson();
+    if (seo != null) {
+      data['seo'] = seo!.toJson();
     }
-    data['_id'] = this.sId;
-    data['title'] = this.title;
-    data['titleAr'] = this.titleAr;
-    data['description'] = this.description;
-    data['descriptionAr'] = this.descriptionAr;
-    data['descriptionFlutter'] = this.descriptionFlutter;
-    data['descriptionArFlutter'] = this.descriptionArFlutter;
-    data['city'] = this.city;
-    data['images'] = this.images;
-    data['coverImage'] = this.coverImage;
-    if (this.includes != null) {
-      data['includes'] = this.includes;
+    data['_id'] = sId;
+    data['title'] = title;
+    data['titleAr'] = titleAr;
+    data['description'] = description;
+    data['descriptionAr'] = descriptionAr;
+    data['descriptionFlutter'] = descriptionFlutter;
+    data['descriptionArFlutter'] = descriptionArFlutter;
+    data['city'] = city;
+    data['images'] = images;
+    data['coverImage'] = coverImage;
+    if (includes != null) {
+      data['includes'] = includes;
     }
-    if (this.includesAr != null) {
-      data['includesAr'] = this.includesAr;
+    if (includesAr != null) {
+      data['includesAr'] = includesAr;
     }
-    if (this.excludes != null) {
-      data['excludes'] = this.excludes;
+    if (excludes != null) {
+      data['excludes'] = excludes;
     }
-    if (this.excludesAr != null) {
-      data['excludesAr'] = this.excludesAr;
+    if (excludesAr != null) {
+      data['excludesAr'] = excludesAr;
     }
-    data['totalReviews'] = this.totalReviews;
-    data['tags'] = this.tags;
-    data['tagsAr'] = this.tagsAr;
-    data['slug'] = this.slug;
-    data['createdBy'] = this.createdBy;
-    if (this.activities != null) {
-      data['activities'] = this.activities;
+    data['totalReviews'] = totalReviews;
+    data['tags'] = tags;
+    data['tagsAr'] = tagsAr;
+    data['slug'] = slug;
+    data['createdBy'] = createdBy;
+    if (activities != null) {
+      data['activities'] = activities;
     }
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['slugAr'] = this.slugAr;
-    data['id'] = this.id;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['slugAr'] = slugAr;
+    data['id'] = id;
     return data;
   }
 }
@@ -197,9 +216,9 @@ class Duration {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['hours'] = this.hours;
-    data['type'] = this.type;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['hours'] = hours;
+    data['type'] = type;
     return data;
   }
 }
@@ -220,21 +239,22 @@ class Seo {
   String? metaDescriptionAr;
   String? canonicalUrl;
 
-  Seo(
-      {this.keywords,
-      this.keywordsAr,
-      this.priority,
-      this.changeFrequency,
-      this.noIndex,
-      this.noFollow,
-      this.noArchive,
-      this.noSnippet,
-      this.slugUrl,
-      this.metaTitle,
-      this.metaTitleAr,
-      this.metaDescription,
-      this.metaDescriptionAr,
-      this.canonicalUrl});
+  Seo({
+    this.keywords,
+    this.keywordsAr,
+    this.priority,
+    this.changeFrequency,
+    this.noIndex,
+    this.noFollow,
+    this.noArchive,
+    this.noSnippet,
+    this.slugUrl,
+    this.metaTitle,
+    this.metaTitleAr,
+    this.metaDescription,
+    this.metaDescriptionAr,
+    this.canonicalUrl,
+  });
 
   Seo.fromJson(Map<String, dynamic> json) {
     keywords = json['keywords'];
@@ -254,21 +274,21 @@ class Seo {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['keywords'] = this.keywords;
-    data['keywordsAr'] = this.keywordsAr;
-    data['priority'] = this.priority;
-    data['changeFrequency'] = this.changeFrequency;
-    data['noIndex'] = this.noIndex;
-    data['noFollow'] = this.noFollow;
-    data['noArchive'] = this.noArchive;
-    data['noSnippet'] = this.noSnippet;
-    data['slugUrl'] = this.slugUrl;
-    data['metaTitle'] = this.metaTitle;
-    data['metaTitleAr'] = this.metaTitleAr;
-    data['metaDescription'] = this.metaDescription;
-    data['metaDescriptionAr'] = this.metaDescriptionAr;
-    data['canonicalUrl'] = this.canonicalUrl;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['keywords'] = keywords;
+    data['keywordsAr'] = keywordsAr;
+    data['priority'] = priority;
+    data['changeFrequency'] = changeFrequency;
+    data['noIndex'] = noIndex;
+    data['noFollow'] = noFollow;
+    data['noArchive'] = noArchive;
+    data['noSnippet'] = noSnippet;
+    data['slugUrl'] = slugUrl;
+    data['metaTitle'] = metaTitle;
+    data['metaTitleAr'] = metaTitleAr;
+    data['metaDescription'] = metaDescription;
+    data['metaDescriptionAr'] = metaDescriptionAr;
+    data['canonicalUrl'] = canonicalUrl;
     return data;
   }
 }
