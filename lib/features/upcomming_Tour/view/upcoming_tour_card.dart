@@ -8,7 +8,7 @@ import '../../../config/router/routes.dart';
 import '../../localization/manager/localization_cubit.dart';
 
 class UpcomingTourCard extends StatelessWidget {
-  final Data tour; 
+  final CityTourData tour;
   final String title, subtitle, imageUrl, tag;
 
   const UpcomingTourCard({
@@ -26,24 +26,26 @@ class UpcomingTourCard extends StatelessWidget {
       builder: (context, languageState) {
         final isArabic = languageState == AppLanguage.arabic;
         final bool hasImage = imageUrl.isNotEmpty;
-        
+
         return InkWell(
           onTap: () {
             final tourIdentifier = tour.id ?? tour.sId ?? '';
 
             if (tourIdentifier.isNotEmpty) {
-             Navigator.pushNamed(
-                    context,
-                    Routes.cityTourDetails,
-                    arguments: {
-                      'tourIdOrSlug': tourIdentifier,
-                      'tourTitle': tour.title,
-                    },
-                  );
+              Navigator.pushNamed(
+                context,
+                Routes.cityTourDetails,
+                arguments: {
+                  'tourIdOrSlug': tourIdentifier,
+                  'tourTitle': tour.title,
+                },
+              );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(isArabic ? 'معرف الجولة غير متاح' : 'Tour ID not available'),
+                  content: Text(
+                    isArabic ? 'معرف الجولة غير متاح' : 'Tour ID not available',
+                  ),
                 ),
               );
             }
@@ -61,7 +63,9 @@ class UpcomingTourCard extends StatelessWidget {
                   offset: const Offset(0, 2),
                 ),
               ],
-              border: Border.all(color: AppColor.secondaryGrey.withOpacity(0.6)),
+              border: Border.all(
+                color: AppColor.secondaryGrey.withOpacity(0.6),
+              ),
             ),
             child: Row(
               children: [
@@ -102,18 +106,26 @@ class UpcomingTourCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 // Content
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 8.h,
+                    ),
                     child: Column(
-                      crossAxisAlignment: isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      crossAxisAlignment: isArabic
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Tag
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 2.h,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.blue.shade50,
                             borderRadius: BorderRadius.circular(4.r),
@@ -130,7 +142,7 @@ class UpcomingTourCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        
+
                         // Title
                         Flexible(
                           child: Text(
@@ -142,10 +154,12 @@ class UpcomingTourCard extends StatelessWidget {
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                            textAlign: isArabic
+                                ? TextAlign.right
+                                : TextAlign.left,
                           ),
                         ),
-                        
+
                         // Subtitle
                         Flexible(
                           child: Text(
@@ -156,7 +170,9 @@ class UpcomingTourCard extends StatelessWidget {
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                            textAlign: isArabic
+                                ? TextAlign.right
+                                : TextAlign.left,
                           ),
                         ),
                       ],
@@ -186,10 +202,7 @@ class UpcomingTourCard extends StatelessWidget {
           SizedBox(height: 2.h),
           Text(
             isArabic ? 'لا توجد صورة' : 'No Image',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 8.sp,
-            ),
+            style: TextStyle(color: Colors.grey, fontSize: 8.sp),
           ),
         ],
       ),

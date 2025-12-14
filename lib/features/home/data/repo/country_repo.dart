@@ -2,7 +2,7 @@ import 'package:almonafs_flutter/core/network/api_response.dart';
 import 'package:almonafs_flutter/core/network/api_endpoiont.dart';
 import 'package:almonafs_flutter/core/network/api_helper.dart';
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart'
-    show GetAllCountry;
+    show GetAllCountriesModel;
 import '../../../singel_country/data/model/get_Singel_city.dart';
 
 class CountryRepository {
@@ -17,12 +17,13 @@ class CountryRepository {
 
       if (apiResponse.status) {
         if (apiResponse.data is Map<String, dynamic>) {
-          final responseData = apiResponse.data as Map<String, dynamic>;
-
+          final countryResponse = GetAllCountriesModel.fromJson(
+            apiResponse.data,
+          );
           try {
-            final allCountryData = GetAllCountry.fromJson(responseData);
+            final allCountryData = countryResponse;
 
-            if (allCountryData.data?.isNotEmpty == true) {
+            if (allCountryData.countries!.isNotEmpty) {
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,

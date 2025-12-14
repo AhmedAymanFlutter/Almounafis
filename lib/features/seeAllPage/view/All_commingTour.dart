@@ -13,7 +13,8 @@ import '../../localization/manager/localization_cubit.dart';
 
 class AllToursPage extends StatelessWidget {
   AllToursPage({super.key});
-  final TextEditingController searchAllToursController = TextEditingController();
+  final TextEditingController searchAllToursController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +34,17 @@ class AllToursPage extends StatelessWidget {
         body: BlocBuilder<CityTourCubit, CityTourState>(
           builder: (context, state) {
             final isLoading = state is CityTourLoading;
-            List<Data> tours = [];
+            List<CityTourData> tours = [];
 
             if (state is CityTourLoaded) {
               tours = state.allCityTour.data ?? [];
             } else if (state is CityTourFiltered) {
-              tours = state.filteredTours;
+              tours = state.filteredTours.cast<CityTourData>();
             }
 
             // ✅ نستخدم كائنات Data فاضية بدلاً من Map
             if (isLoading) {
-              tours = List.generate(5, (index) => Data());
+              tours = List.generate(5, (index) => CityTourData());
             }
 
             return Column(
@@ -69,7 +70,11 @@ class AllToursPage extends StatelessWidget {
     );
   }
 
-  Widget _buildToursList(List<Data> tours, bool isArabic, bool isLoading) {
+  Widget _buildToursList(
+    List<CityTourData> tours,
+    bool isArabic,
+    bool isLoading,
+  ) {
     if (!isLoading && tours.isEmpty) {
       return Center(
         child: Text(isArabic ? "لا توجد جولات مطابقة" : "No matching tours"),
@@ -89,11 +94,11 @@ class AllToursPage extends StatelessWidget {
         final subtitle = isLoading
             ? (isArabic ? "..." : "...")
             : (isArabic
-                ? tour.descriptionArFlutter ?? ''
-                : tour.descriptionFlutter ?? '');
+                  ? tour.descriptionArFlutter ?? ''
+                  : tour.descriptionFlutter ?? '');
 
-        final imageUrl = isLoading ? "" : (tour.coverImage ?? '');
-        final tag = isLoading ? "" : (tour.tags?.join(", ") ?? '');
+        final imageUrl = isLoading ? "" : (tour.coverImageUrl ?? '');
+        final tag = isLoading ? "" : (tour.cityName ?? '');
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 10),

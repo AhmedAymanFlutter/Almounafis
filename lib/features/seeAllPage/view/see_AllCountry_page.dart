@@ -25,7 +25,7 @@ class AllCountriesPage extends StatelessWidget {
       create: (_) => CountryCubit(CountryRepository())..fetchAllCountries(),
       child: BlocBuilder<CountryCubit, CountryState>(
         builder: (context, state) {
-          List<Data> countries = [];
+          List<CountryData> countries = [];
 
           if (state is CountryLoaded) {
             countries = state.countries;
@@ -152,7 +152,7 @@ class AllCountriesPage extends StatelessWidget {
   // 🟢 بعد التحميل، عرض الدول
   Widget _buildCountryList(
     BuildContext context,
-    List<Data> countries,
+    List<CountryData> countries,
     bool isArabic,
   ) {
     if (countries.isEmpty) {
@@ -182,7 +182,7 @@ class AllCountriesPage extends StatelessWidget {
             location: isArabic
                 ? (country.nameAr ?? "بدون موقع")
                 : (country.name ?? "Unknown"),
-            countryId: country.slug ?? country.sId ?? "",
+            countryId: country.sId ?? "",
           ),
         );
       },

@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../config/router/routes.dart';
 import '../../../hotelDetails/view/HotelDetailsScreen.dart';
-import '../../data/model/city_tour.dart';
+import '../../data/model/hotel_model.dart';
 import '../../manager/hotel_cubit.dart';
 import '../../manager/hotel_state.dart';
 import '../../../localization/manager/localization_cubit.dart';
@@ -14,82 +14,79 @@ Widget buildContent(BuildContext context, HotelState state) {
   final isArabic = context.watch<LanguageCubit>().isArabic;
 
   // ✅ حالة التحميل
-if (state is HotelLoading) {
-  return Padding(
-    padding: const EdgeInsets.all(16),
-    child: Skeletonizer(
-      enabled: true,
-      child: ListView.separated(
-        itemCount: 6,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
-        itemBuilder: (context, index) {
-          return Container(
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                // صورة الفندق
-                Container(
-                  width: 100,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      bottomLeft: Radius.circular(16),
+  if (state is HotelLoading) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Skeletonizer(
+        enabled: true,
+        child: ListView.separated(
+          itemCount: 6,
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            return Container(
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // صورة الفندق
+                  Container(
+                    width: 100,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        bottomLeft: Radius.circular(16),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                // بيانات الفندق الوهمية
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 14,
-                          width: 120,
-                          color: Colors.grey[300],
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          height: 12,
-                          width: 180,
-                          color: Colors.grey[300],
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          height: 12,
-                          width: 100,
-                          color: Colors.grey[300],
-                        ),
-
-                      ],
+                  const SizedBox(width: 12),
+                  // بيانات الفندق الوهمية
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 14,
+                            width: 120,
+                            color: Colors.grey[300],
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 12,
+                            width: 180,
+                            color: Colors.grey[300],
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 12,
+                            width: 100,
+                            color: Colors.grey[300],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 
   // ✅ حالة الخطأ
   if (state is HotelError) {
@@ -200,9 +197,8 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => HotelDetailsScreen(
-            hotelId: hotel.id ?? hotel.sId ?? '',
-          ),
+          builder: (context) =>
+              HotelDetailsScreen(hotelId: hotel.id ?? hotel.sId ?? ''),
         ),
       );
     },
@@ -230,9 +226,7 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
             Navigator.pushNamed(
               context,
               Routes.hotelDetails,
-              arguments: {
-                'hotelId': hotel.id ?? hotel.sId ?? '',
-              },
+              arguments: {'hotelId': hotel.id ?? hotel.sId ?? ''},
             );
           },
           child: Row(
@@ -240,7 +234,11 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
             children: [
               Padding(
                 padding: const EdgeInsets.only(
-                    left: 11.0, top: 23.0, bottom: 24.0, right: 11),
+                  left: 11.0,
+                  top: 23.0,
+                  bottom: 24.0,
+                  right: 11,
+                ),
                 child: Container(
                   width: 81,
                   height: 77,
@@ -273,7 +271,9 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
                                   ? (hotel.nameAr ?? hotel.name ?? 'اسم الفندق')
                                   : (hotel.name ?? 'Hotel Name'),
                               style: AppTextStyle.setPoppinsSecondaryBlack(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -285,8 +285,11 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
                       // العنوان
                       Row(
                         children: [
-                          Icon(Icons.location_on,
-                              size: 14, color: Colors.grey[600]),
+                          Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: Colors.grey[600],
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
@@ -296,7 +299,9 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
                                       ? 'العنوان غير متاح'
                                       : 'Address not available'),
                               style: AppTextStyle.setPoppinsSecondlightGrey(
-                                  fontSize: 12, fontWeight: FontWeight.w400),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -315,14 +320,16 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
                                 TextSpan(
                                   text: '\$${hotel.priceRange?.min ?? 0}',
                                   style: AppTextStyle.setPoppinsDeepPurple(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 TextSpan(
                                   text: isArabic ? ' /الليلة' : ' /night',
                                   style: AppTextStyle.setPoppinsSecondlightGrey(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ],
                             ),
@@ -330,8 +337,11 @@ Widget _buildHotelCard(BuildContext context, Data hotel, bool isArabic) {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.star,
-                                  color: Colors.amber[700], size: 14),
+                              Icon(
+                                Icons.star,
+                                color: Colors.amber[700],
+                                size: 14,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 '${hotel.starRating ?? 0}',

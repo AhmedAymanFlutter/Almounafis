@@ -18,9 +18,9 @@ Widget buildStyledCoverImage(BuildContext context, dynamic country) {
       child: Stack(
         children: [
           // ✅ Cover Image
-          if (country.imageCover != null)
+          if (country.images?.isNotEmpty == true)
             CachedNetworkImage(
-              imageUrl: country.imageCover!,
+              imageUrl: country.images![0],
               height: 650.h,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -29,10 +29,7 @@ Widget buildStyledCoverImage(BuildContext context, dynamic country) {
                 color: Colors.grey.shade400,
                 colorOpacity: 0.3,
                 enabled: true,
-                child: Container(
-                  height: 400.h,
-                  color: Colors.grey[300],
-                ),
+                child: Container(height: 400.h, color: Colors.grey[300]),
               ),
               errorWidget: (context, url, error) => Container(
                 height: 650.h,
@@ -51,10 +48,7 @@ Widget buildStyledCoverImage(BuildContext context, dynamic country) {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withOpacity(0.7),
-                ],
+                colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
                 stops: const [0.5, 1.0],
               ),
             ),

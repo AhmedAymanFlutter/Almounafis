@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../data/model/city_tour.dart';
+import '../data/model/hotel_model.dart'; // تأكد أن هذا هو المسار الصحيح للموديل الجديد
 import '../data/repo/Hotel_repo_tour.dart';
 import 'hotel_state.dart';
 
 class HotelCubit extends Cubit<HotelState> {
   final HotelRepository repo;
-  List<Data> _allHotels = []; // ✅ نخزّن هنا كل الفنادق بعد التحميل
+  List<Data> _allHotels = []; // القائمة الرئيسية
 
   HotelCubit(this.repo) : super(HotelInitial());
 
@@ -18,8 +18,9 @@ class HotelCubit extends Cubit<HotelState> {
 
     if (response.status) {
       final hotels = response.data as GitHotelModel;
+      // الموديل الجديد يضع القائمة داخل data، وهذا الكود متوافق معه
       if (hotels.data != null && hotels.data!.isNotEmpty) {
-        _allHotels = hotels.data!; // ✅ حفظ جميع الفنادق الأصلية
+        _allHotels = hotels.data!;
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No hotels available'));
@@ -54,7 +55,7 @@ class HotelCubit extends Cubit<HotelState> {
     if (response.status) {
       final hotels = response.data as GitHotelModel;
       if (hotels.data != null && hotels.data!.isNotEmpty) {
-        _allHotels = hotels.data!;
+        // لا نقوم بتحديث _allHotels هنا حتى لا نفقد القائمة الرئيسية عند العودة
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No featured hotels available'));
@@ -74,7 +75,6 @@ class HotelCubit extends Cubit<HotelState> {
     if (response.status) {
       final hotels = response.data as GitHotelModel;
       if (hotels.data != null && hotels.data!.isNotEmpty) {
-        _allHotels = hotels.data!;
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No hotels available in this city'));
@@ -87,7 +87,7 @@ class HotelCubit extends Cubit<HotelState> {
   /// 🔍 البحث المحلي (داخل النتائج الموجودة)
   void localSearchHotels(String query, bool isArabic) {
     if (query.isEmpty) {
-      // رجّع الفنادق الأصلية كلها
+      // إعادة عرض القائمة الأصلية
       emit(HotelLoaded(GitHotelModel(data: _allHotels)));
       return;
     }
@@ -98,13 +98,16 @@ class HotelCubit extends Cubit<HotelState> {
     }).toList();
 
     if (filtered.isEmpty) {
-      emit(HotelEmpty(isArabic ? "لم يتم العثور على فنادق" : "No hotels found"));
+      emit(
+        HotelEmpty(isArabic ? "لم يتم العثور على فنادق" : "No hotels found"),
+      );
     } else {
-      emit(HotelLoaded(GitHotelModel(data: filtered)));
+      // ✅ نستخدم HotelFiltered لتمييز حالة البحث
+      emit(HotelFiltered(filtered));
     }
   }
 
-  /// 🔎 البحث عبر API (للبحث المتقدم أو الفلاتر)
+  /// 🔎 البحث عبر API
   Future<void> searchHotels({
     String? cityId,
     double? minPrice,
@@ -133,7 +136,6 @@ class HotelCubit extends Cubit<HotelState> {
     if (response.status) {
       final hotels = response.data as GitHotelModel;
       if (hotels.data != null && hotels.data!.isNotEmpty) {
-        _allHotels = hotels.data!;
         emit(HotelLoaded(hotels));
       } else {
         emit(HotelEmpty('No hotels match your search criteria'));

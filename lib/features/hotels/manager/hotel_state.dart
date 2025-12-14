@@ -1,4 +1,4 @@
-import '../data/model/city_tour.dart';
+import '../data/model/hotel_model.dart';
 
 abstract class HotelState {}
 

@@ -49,14 +49,15 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
                 children: [
                   // 🖼 Cover Image
                   buildCoverImage(
-  (tour.coverImage?.isNotEmpty == true)
-      ? tour.coverImage!
-      : 'https://yourcdn.com/images/default_cover.jpg', // 🔁 fallback image
-  context,
-  countryName: isArabic ? tour.titleAr ?? '' : tour.title ?? '',
-  arabicName: tour.titleAr ?? '',
-),
-
+                    (tour.coverImage?.isNotEmpty == true)
+                        ? tour.coverImage!
+                        : 'https://yourcdn.com/images/default_cover.jpg', // 🔁 fallback image
+                    context,
+                    countryName: isArabic
+                        ? tour.titleAr ?? ''
+                        : tour.title ?? '',
+                    arabicName: tour.titleAr ?? '',
+                  ),
 
                   Padding(
                     padding: EdgeInsets.all(16.w),
@@ -68,29 +69,25 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
                           title: isArabic ? 'الوصف' : 'Description',
                           content: isArabic
                               ? (tour.descriptionArFlutter ??
-                                  tour.descriptionAr ??
-                                  'لا يوجد وصف متاح')
+                                    tour.descriptionAr ??
+                                    'لا يوجد وصف متاح')
                               : (tour.descriptionFlutter ??
-                                  tour.description ??
-                                  'No description available'),
+                                    tour.description ??
+                                    'No description available'),
                           context: context,
                         ),
 
                         // ✅ Includes
-                        if ((isArabic
-                                ? tour.includesAr
-                                : tour.includes) !=
-                            null &&
+                        if ((isArabic ? tour.includesAr : tour.includes) !=
+                                null &&
                             (isArabic
-                                    ? tour.includesAr!.isNotEmpty
-                                    : tour.includes!.isNotEmpty))
+                                ? tour.includesAr!.isNotEmpty
+                                : tour.includes!.isNotEmpty))
                           buildListSection(
                             title: isArabic
                                 ? 'ما هو المشمول'
                                 : 'What\'s Included',
-                            items: (isArabic
-                                    ? tour.includesAr
-                                    : tour.includes)!
+                            items: (isArabic ? tour.includesAr : tour.includes)!
                                 .cast<String>(),
                             icon: Icons.check_circle,
                             iconColor: Colors.green,
@@ -98,20 +95,16 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
                           ),
 
                         // ❌ Excludes
-                        if ((isArabic
-                                ? tour.excludesAr
-                                : tour.excludes) !=
-                            null &&
+                        if ((isArabic ? tour.excludesAr : tour.excludes) !=
+                                null &&
                             (isArabic
-                                    ? tour.excludesAr!.isNotEmpty
-                                    : tour.excludes!.isNotEmpty))
+                                ? tour.excludesAr!.isNotEmpty
+                                : tour.excludes!.isNotEmpty))
                           buildListSection(
                             title: isArabic
                                 ? 'ما هو غير المشمول'
                                 : 'What\'s Excluded',
-                            items: (isArabic
-                                    ? tour.excludesAr
-                                    : tour.excludes)!
+                            items: (isArabic ? tour.excludesAr : tour.excludes)!
                                 .cast<String>(),
                             icon: Icons.cancel,
                             iconColor: Colors.red,
@@ -121,10 +114,12 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
                         // 🏷 Tags
                         if ((isArabic ? tour.tagsAr : tour.tags) != null &&
                             (isArabic
-                                    ? tour.tagsAr!.isNotEmpty
-                                    : tour.tags!.isNotEmpty))
+                                ? tour.tagsAr!.isNotEmpty
+                                : tour.tags!.isNotEmpty))
                           buildTagsSection(
-                              (isArabic ? tour.tagsAr! : tour.tags!), context),
+                            (isArabic ? tour.tagsAr! : tour.tags!),
+                            context,
+                          ),
 
                         // 📸 Image Gallery
                         if (tour.images != null && tour.images!.isNotEmpty)
@@ -142,7 +137,8 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
           }
 
           return Center(
-              child: Text(isArabic ? 'حالة غير معروفة' : 'Unknown state'));
+            child: Text(isArabic ? 'حالة غير معروفة' : 'Unknown state'),
+          );
         },
       ),
       bottomNavigationBar: buildBookButton(context),
@@ -150,8 +146,7 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
   }
 
   /// ⚠️ Error State UI
-  Widget _buildErrorState(
-      BuildContext context, String message, bool isArabic) {
+  Widget _buildErrorState(BuildContext context, String message, bool isArabic) {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(24.w),
@@ -168,9 +163,9 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
             SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () {
-                context
-                    .read<CityTourCubit>()
-                    .getCityTourDetails(widget.tourIdOrSlug);
+                context.read<CityTourCubit>().getCityTourDetails(
+                  widget.tourIdOrSlug,
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColor.mainBlack,
@@ -193,10 +188,7 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
             color: Colors.grey.shade400,
             colorOpacity: 0.3,
             enabled: true,
-            child: Container(
-              height: 250.h,
-              color: Colors.grey[300],
-            ),
+            child: Container(height: 250.h, color: Colors.grey[300]),
           ),
           Padding(
             padding: EdgeInsets.all(16.w),

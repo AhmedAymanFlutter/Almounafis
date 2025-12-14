@@ -19,7 +19,7 @@ class PackageTypeRepo {
 
           try {
             final allPackageData = PackageModel.fromJson(responseData);
-            
+
             if (allPackageData.data?.isNotEmpty == true) {
               return ApiResponse(
                 status: true,
@@ -70,9 +70,10 @@ class PackageTypeRepo {
   Future<ApiResponse> getCountriesForPackageType(String packageTypeId) async {
     try {
       print('🌐 Step 2 - API Call: /package-types/$packageTypeId/countries');
-      
+
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: 'package-types/$packageTypeId/countries',
+        isProtected: true,
       );
 
       print('📥 Response Status: ${apiResponse.statusCode}');
@@ -113,7 +114,7 @@ class PackageTypeRepo {
   Future<ApiResponse> getPackagesForCountry(String countryId) async {
     try {
       print('🌐 Step 3 - API Call: /packages/country/$countryId');
-      
+
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: 'packages/country/$countryId',
       );
@@ -156,7 +157,7 @@ class PackageTypeRepo {
   Future<ApiResponse> getPackageDetails(String packageId) async {
     try {
       print('🔍 Step 4 - API Call: /packages/$packageId');
-      
+
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: 'packages/$packageId',
       );
@@ -173,13 +174,13 @@ class PackageTypeRepo {
             Map<String, dynamic> wrappedData = {
               'status': responseData['status'],
               'results': responseData['results'],
-              'data': responseData['data'] is List 
-                  ? responseData['data'] 
-                  : [responseData['data']]
+              'data': responseData['data'] is List
+                  ? responseData['data']
+                  : [responseData['data']],
             };
 
             final packageData = PackageModel.fromJson(wrappedData);
-            
+
             return ApiResponse(
               status: true,
               statusCode: apiResponse.statusCode,

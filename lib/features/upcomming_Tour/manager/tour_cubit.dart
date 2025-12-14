@@ -1,3 +1,4 @@
+// // import 'package:almonafs_flutter/features/hotels/data/model/hotel_model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:almonafs_flutter/core/network/api_response.dart';
 import '../data/model/city_tour.dart';
@@ -6,11 +7,11 @@ import 'tour_state.dart';
 
 class CityTourCubit extends Cubit<CityTourState> {
   final CityTourRepository _repository;
-  List<Data> _allTours = [];
+  List<CityTourData> _allTours = [];
 
   CityTourCubit({required CityTourRepository repository})
-      : _repository = repository,
-        super(CityTourInitial());
+    : _repository = repository,
+      super(CityTourInitial());
 
   Future<void> getAllCities() async {
     if (isClosed) return;
@@ -28,34 +29,42 @@ class CityTourCubit extends Cubit<CityTourState> {
           if (tours.isNotEmpty) {
             _allTours = tours; // ✅ خزّن الجولات الأصلية
             if (isClosed) return;
-            emit(CityTourLoaded(
-              allCityTour: allCityTour,
-              message: response.message,
-            ));
+            emit(
+              CityTourLoaded(
+                allCityTour: allCityTour,
+                message: response.message,
+              ),
+            );
           } else {
             if (isClosed) return;
             emit(CityTourEmpty(message: 'لا توجد جولات متاحة حالياً'));
           }
         } else {
           if (isClosed) return;
-          emit(CityTourError(
-            message: 'نوع البيانات غير متوقع: ${response.data.runtimeType}',
-            statusCode: response.statusCode,
-          ));
+          emit(
+            CityTourError(
+              message: 'نوع البيانات غير متوقع: ${response.data.runtimeType}',
+              statusCode: response.statusCode,
+            ),
+          );
         }
       } else {
         if (isClosed) return;
-        emit(CityTourError(
-          message: response.message,
-          statusCode: response.statusCode,
-        ));
+        emit(
+          CityTourError(
+            message: response.message,
+            statusCode: response.statusCode,
+          ),
+        );
       }
     } catch (e) {
       if (isClosed) return;
-      emit(CityTourError(
-        message: 'حدث خطأ أثناء تحميل المدن: $e',
-        statusCode: 500,
-      ));
+      emit(
+        CityTourError(
+          message: 'حدث خطأ أثناء تحميل المدن: $e',
+          statusCode: 500,
+        ),
+      );
     }
   }
 
@@ -68,38 +77,44 @@ class CityTourCubit extends Cubit<CityTourState> {
     emit(SingleCityTourLoading());
 
     try {
-      final ApiResponse response =
-          await _repository.getCityTourDetails(tourIdOrSlug);
+      final ApiResponse response = await _repository.getCityTourDetails(
+        tourIdOrSlug,
+      );
       if (isClosed) return;
 
       if (response.status) {
-        if (response.data is Data) {
-          final Data tourData = response.data as Data;
+        if (response.data is CityTourData) {
+          final CityTourData tourData = response.data as CityTourData;
           if (isClosed) return;
-          emit(SingleCityTourLoaded(
-            cityTour: tourData,
-            message: response.message,
-          ));
+          emit(
+            SingleCityTourLoaded(cityTour: tourData, message: response.message),
+          );
         } else {
           if (isClosed) return;
-          emit(CityTourError(
-            message: 'نوع البيانات غير متوقع: ${response.data.runtimeType}',
-            statusCode: response.statusCode,
-          ));
+          emit(
+            CityTourError(
+              message: 'نوع البيانات غير متوقع: ${response.data.runtimeType}',
+              statusCode: response.statusCode,
+            ),
+          );
         }
       } else {
         if (isClosed) return;
-        emit(CityTourError(
-          message: response.message,
-          statusCode: response.statusCode,
-        ));
+        emit(
+          CityTourError(
+            message: response.message,
+            statusCode: response.statusCode,
+          ),
+        );
       }
     } catch (e) {
       if (isClosed) return;
-      emit(CityTourError(
-        message: 'حدث خطأ أثناء تحميل تفاصيل الجولة: $e',
-        statusCode: 500,
-      ));
+      emit(
+        CityTourError(
+          message: 'حدث خطأ أثناء تحميل تفاصيل الجولة: $e',
+          statusCode: 500,
+        ),
+      );
     }
   }
 
@@ -107,10 +122,12 @@ class CityTourCubit extends Cubit<CityTourState> {
     if (isClosed) return;
 
     if (query.isEmpty) {
-      emit(CityTourLoaded(
-        allCityTour: AllCityTour(data: _allTours),
-        message: 'عرض جميع الجولات',
-      ));
+      emit(
+        CityTourLoaded(
+          allCityTour: AllCityTour(data: _allTours),
+          message: 'عرض جميع الجولات',
+        ),
+      );
       return;
     }
 

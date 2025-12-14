@@ -8,30 +8,27 @@ class PackageModel {
   PackageModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     results = json['results'];
-    
-    // Fixed: Handle both array and single object responses
+
     if (json['data'] != null) {
       data = <Data>[];
-      
-      // If data is a list
+
+      // معالجة البيانات سواء كانت قائمة أو كائن مفرد
       if (json['data'] is List) {
         (json['data'] as List).forEach((v) {
           if (v != null) {
             data!.add(Data.fromJson(v as Map<String, dynamic>));
           }
         });
-      } 
-      // If data is a single object
-      else if (json['data'] is Map<String, dynamic>) {
+      } else if (json['data'] is Map<String, dynamic>) {
         data!.add(Data.fromJson(json['data'] as Map<String, dynamic>));
       }
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['results'] = this.results;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    data['results'] = results;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -56,68 +53,89 @@ class Data {
   String? slug;
   String? slugAr;
   String? id;
-  dynamic price; // Added price field
+  dynamic price;
 
-  Data(
-      {this.seo,
-      this.sId,
-      this.name,
-      this.nameAr,
-      this.description,
-      this.descriptionAr,
-      this.imageCover,
-      this.alt,
-      this.altAr,
-      this.createdBy,
-      this.updatedBy,
-      this.createdAt,
-      this.updatedAt,
-      this.slug,
-      this.slugAr,
-      this.id,
-      this.price});
+  Data({
+    this.seo,
+    this.sId,
+    this.name,
+    this.nameAr,
+    this.description,
+    this.descriptionAr,
+    this.imageCover,
+    this.alt,
+    this.altAr,
+    this.createdBy,
+    this.updatedBy,
+    this.createdAt,
+    this.updatedAt,
+    this.slug,
+    this.slugAr,
+    this.id,
+    this.price,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
-    seo = json['seo'] != null ? Seo.fromJson(json['seo'] as Map<String, dynamic>) : null;
+    seo = json['seo'] != null ? Seo.fromJson(json['seo']) : null;
     sId = json['_id'];
     name = json['name'];
     nameAr = json['nameAr'];
     description = json['description'];
     descriptionAr = json['descriptionAr'];
-    imageCover = json['imageCover'];
+
+    // معالجة الصور (قد تأتي ككائن في بعض الأحيان)
+    if (json['imageCover'] is Map) {
+      imageCover = json['imageCover']['url'];
+    } else {
+      imageCover = json['imageCover'];
+    }
+
     alt = json['alt'];
     altAr = json['altAr'];
-    createdBy = json['createdBy'];
-    updatedBy = json['updatedBy'];
+
+    // ✅✅ الحل الجذري لمشكلة Map is not String
+    createdBy = _parseNameFromObject(json['createdBy']);
+    updatedBy = _parseNameFromObject(json['updatedBy']);
+
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     slug = json['slug'];
     slugAr = json['slugAr'];
     id = json['id'];
-    price = json['price']; // Added price field
+    price = json['price'];
+  }
+
+  // دالة مساعدة لاستخراج الاسم سواء كان نصاً أو كائناً
+  String? _parseNameFromObject(dynamic val) {
+    if (val == null) return null;
+    if (val is String) return val;
+    if (val is Map) {
+      return val['name'] ?? val['username'] ?? val['email'];
+    }
+    return val.toString();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.seo != null) {
-      data['seo'] = this.seo!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (seo != null) {
+      data['seo'] = seo!.toJson();
     }
-    data['_id'] = this.sId;
-    data['name'] = this.name;
-    data['nameAr'] = this.nameAr;
-    data['description'] = this.description;
-    data['descriptionAr'] = this.descriptionAr;
-    data['imageCover'] = this.imageCover;
-    data['alt'] = this.alt;
-    data['altAr'] = this.altAr;
-    data['createdBy'] = this.createdBy;
-    data['updatedBy'] = this.updatedBy;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['slug'] = this.slug;
-    data['slugAr'] = this.slugAr;
-    data['id'] = this.id;
-    data['price'] = this.price;
+    data['_id'] = sId;
+    data['name'] = name;
+    data['nameAr'] = nameAr;
+    data['description'] = description;
+    data['descriptionAr'] = descriptionAr;
+    data['imageCover'] = imageCover;
+    data['alt'] = alt;
+    data['altAr'] = altAr;
+    data['createdBy'] = createdBy;
+    data['updatedBy'] = updatedBy;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['slug'] = slug;
+    data['slugAr'] = slugAr;
+    data['id'] = id;
+    data['price'] = price;
     return data;
   }
 }
@@ -141,32 +159,36 @@ class Seo {
   String? canonicalUrl;
   String? ogImage;
 
-  Seo(
-      {this.metaTitle,
-      this.metaTitleAr,
-      this.metaDescription,
-      this.metaDescriptionAr,
-      this.keywords,
-      this.keywordsAr,
-      this.slugUrl,
-      this.priority,
-      this.changeFrequency,
-      this.noIndex,
-      this.noFollow,
-      this.noArchive,
-      this.noSnippet,
-      this.ogTitle,
-      this.ogDescription,
-      this.canonicalUrl,
-      this.ogImage});
+  Seo({
+    this.metaTitle,
+    this.metaTitleAr,
+    this.metaDescription,
+    this.metaDescriptionAr,
+    this.keywords,
+    this.keywordsAr,
+    this.slugUrl,
+    this.priority,
+    this.changeFrequency,
+    this.noIndex,
+    this.noFollow,
+    this.noArchive,
+    this.noSnippet,
+    this.ogTitle,
+    this.ogDescription,
+    this.canonicalUrl,
+    this.ogImage,
+  });
 
   Seo.fromJson(Map<String, dynamic> json) {
     metaTitle = json['metaTitle'];
     metaTitleAr = json['metaTitleAr'];
     metaDescription = json['metaDescription'];
     metaDescriptionAr = json['metaDescriptionAr'];
-    keywords = json['keywords'];
-    keywordsAr = json['keywordsAr'];
+
+    // ✅✅ معالجة الكلمات المفتاحية لتجنب خطأ القائمة
+    keywords = _parseList(json['keywords']);
+    keywordsAr = _parseList(json['keywordsAr']);
+
     slugUrl = json['slugUrl'];
     priority = json['priority'];
     changeFrequency = json['changeFrequency'];
@@ -180,25 +202,34 @@ class Seo {
     ogImage = json['ogImage'];
   }
 
+  // دالة لتحويل القوائم إلى نصوص بأمان
+  String? _parseList(dynamic value) {
+    if (value == null) return null;
+    if (value is List) {
+      return value.join(', ');
+    }
+    return value.toString();
+  }
+
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['metaTitle'] = this.metaTitle;
-    data['metaTitleAr'] = this.metaTitleAr;
-    data['metaDescription'] = this.metaDescription;
-    data['metaDescriptionAr'] = this.metaDescriptionAr;
-    data['keywords'] = this.keywords;
-    data['keywordsAr'] = this.keywordsAr;
-    data['slugUrl'] = this.slugUrl;
-    data['priority'] = this.priority;
-    data['changeFrequency'] = this.changeFrequency;
-    data['noIndex'] = this.noIndex;
-    data['noFollow'] = this.noFollow;
-    data['noArchive'] = this.noArchive;
-    data['noSnippet'] = this.noSnippet;
-    data['ogTitle'] = this.ogTitle;
-    data['ogDescription'] = this.ogDescription;
-    data['canonicalUrl'] = this.canonicalUrl;
-    data['ogImage'] = this.ogImage;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['metaTitle'] = metaTitle;
+    data['metaTitleAr'] = metaTitleAr;
+    data['metaDescription'] = metaDescription;
+    data['metaDescriptionAr'] = metaDescriptionAr;
+    data['keywords'] = keywords;
+    data['keywordsAr'] = keywordsAr;
+    data['slugUrl'] = slugUrl;
+    data['priority'] = priority;
+    data['changeFrequency'] = changeFrequency;
+    data['noIndex'] = noIndex;
+    data['noFollow'] = noFollow;
+    data['noArchive'] = noArchive;
+    data['noSnippet'] = noSnippet;
+    data['ogTitle'] = ogTitle;
+    data['ogDescription'] = ogDescription;
+    data['canonicalUrl'] = canonicalUrl;
+    data['ogImage'] = ogImage;
     return data;
   }
 }

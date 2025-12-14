@@ -49,13 +49,13 @@ class HotelAmenitiesCard extends StatelessWidget {
               spacing: 10,
               runSpacing: 10,
               children: amenities.map<Widget>((amenity) {
-                final amenityName = isArabic
-                    ? (amenity.nameAr ?? amenity.name ?? '')
-                    : (amenity.name ?? '');
+                final amenityName = amenity.name ?? '';
 
                 return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColor.lightPurple.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(20),
@@ -67,7 +67,7 @@ class HotelAmenitiesCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _getAmenityIcon(amenity.key ?? ''),
+                        _getAmenityIcon(amenity.name ?? ''),
                         size: 18,
                         color: AppColor.lightPurple,
                       ),

@@ -5,7 +5,7 @@ import 'country_state.dart';
 
 class CountryCubit extends Cubit<CountryState> {
   final CountryRepository repository;
-  List<Data> allCountries = [];
+  List<CountryData> allCountries = [];
 
   CountryCubit(this.repository) : super(CountryInitial());
 
@@ -18,14 +18,16 @@ class CountryCubit extends Cubit<CountryState> {
       if (isClosed) return;
 
       if (response.status) {
-        final allCountryData = response.data;
-        if (allCountryData != null && allCountryData.data?.isNotEmpty == true) {
-          allCountries = allCountryData.data!; // ✅ نحفظ الدول كلها
+        final GetAllCountriesModel? model = response.data;
+        if (model != null && model.countries?.isNotEmpty == true) {
+          allCountries = model.countries!; // ✅ نحفظ الدول كلها
           emit(CountryLoaded(allCountries));
         } else {
-          emit(const CountryError("لم يتم العثور على دول في الاستجابة."));
+          print("${response.message}");
+          emit(CountryError(response.message));
         }
       } else {
+        print("${response.message}");
         emit(CountryError(response.message));
       }
     } catch (e) {
@@ -58,8 +60,8 @@ class CountryCubit extends Cubit<CountryState> {
 
   /// دالة البحث المحلي
   void searchCountries(String query, bool isArabic) {
-     print("🔍 Filtering countries by '$query'");
-  print("📦 allCountries length = ${allCountries.length}");
+    print("🔍 Filtering countries by '$query'");
+    print("📦 allCountries length = ${allCountries.length}");
     if (query.isEmpty) {
       emit(CountryLoaded(allCountries)); // رجّع كل الدول لو البحث فاضي
       return;

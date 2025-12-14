@@ -20,7 +20,9 @@ class CityTourRepository {
           try {
             // Parse each tour from the list
             final tours = toursListData
-                .map((item) => Data.fromJson(item as Map<String, dynamic>))
+                .map(
+                  (item) => CityTourData.fromJson(item as Map<String, dynamic>),
+                )
                 .toList();
 
             // Create AllCityTour wrapper with the tours
@@ -119,7 +121,7 @@ class CityTourRepository {
           try {
             // التحقق من وجود data في الاستجابة
             if (responseData.containsKey('data')) {
-              final tourData = Data.fromJson(
+              final tourData = CityTourData.fromJson(
                 responseData['data'] as Map<String, dynamic>,
               );
 
@@ -131,7 +133,7 @@ class CityTourRepository {
               );
             } else {
               // إذا كانت البيانات مباشرة بدون data wrapper
-              final tourData = Data.fromJson(responseData);
+              final tourData = CityTourData.fromJson(responseData);
 
               return ApiResponse(
                 status: true,

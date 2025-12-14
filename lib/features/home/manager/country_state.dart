@@ -1,6 +1,6 @@
-
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart';
 import 'package:equatable/equatable.dart';
+
 abstract class CountryState extends Equatable {
   const CountryState();
 
@@ -13,7 +13,7 @@ class CountryInitial extends CountryState {}
 class CountryLoading extends CountryState {}
 
 class CountryLoaded extends CountryState {
-  final List<Data> countries;
+  final List<CountryData> countries;
   const CountryLoaded(this.countries);
 
   @override
@@ -27,11 +27,12 @@ class CountryError extends CountryState {
   @override
   List<Object> get props => [message];
 }
+
 // ✅ Add this new state
 class SingleCountryLoading extends CountryState {}
 
 class SingleCountryLoaded extends CountryState {
-  final Data country;
+  final CountryData country;
   const SingleCountryLoaded(this.country);
 
   @override
@@ -45,8 +46,9 @@ class SingleCountryError extends CountryState {
   @override
   List<Object> get props => [message];
 }
+
 class CountryFiltered extends CountryState {
-  final List<Data> filteredCountries;
+  final List<CountryData> filteredCountries;
   const CountryFiltered(this.filteredCountries);
 
   @override

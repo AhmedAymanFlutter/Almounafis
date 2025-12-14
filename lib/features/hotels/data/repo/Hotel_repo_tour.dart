@@ -1,7 +1,7 @@
 import 'package:almonafs_flutter/core/network/api_response.dart';
 import 'package:almonafs_flutter/core/network/api_endpoiont.dart';
 import 'package:almonafs_flutter/core/network/api_helper.dart';
-import '../model/city_tour.dart';
+import '../model/hotel_model.dart';
 
 class HotelRepository {
   final APIHelper _apiHelper = APIHelper();
@@ -12,26 +12,12 @@ class HotelRepository {
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: EndPoints.getAllHotels,
       );
-
-      print('📦 API Response Status: ${apiResponse.status}');
-      print('📦 API Response Code: ${apiResponse.statusCode}');
-      print('📦 API Response Message: ${apiResponse.message}');
-      
       if (apiResponse.status) {
         if (apiResponse.data is Map<String, dynamic>) {
           final responseData = apiResponse.data as Map<String, dynamic>;
-          
-          print('📊 Response Data Keys: ${responseData.keys}');
-          print('📊 Full Response: $responseData');
-
           try {
             final allHotelData = GitHotelModel.fromJson(responseData);
-            
-            print('🏗️ Parsed Data: ${allHotelData.data}');
-            print('🏛️ Hotels Count: ${allHotelData.data?.length ?? 0}');
-
             if (allHotelData.data?.isNotEmpty == true) {
-              print('✅ Successfully loaded ${allHotelData.data!.length} hotels');
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
@@ -39,7 +25,6 @@ class HotelRepository {
                 message: 'تم تحميل الفنادق بنجاح',
               );
             } else {
-              print('❌ No hotels available after parsing');
               return ApiResponse(
                 status: false,
                 statusCode: apiResponse.statusCode,
@@ -47,7 +32,6 @@ class HotelRepository {
               );
             }
           } catch (e) {
-            print('❌ Error parsing data: $e');
             return ApiResponse(
               status: false,
               statusCode: apiResponse.statusCode,
@@ -55,7 +39,6 @@ class HotelRepository {
             );
           }
         } else {
-          print('❌ Invalid data structure received: ${apiResponse.data.runtimeType}');
           return ApiResponse(
             status: false,
             statusCode: apiResponse.statusCode,
@@ -63,7 +46,6 @@ class HotelRepository {
           );
         }
       } else {
-        print('❌ API returned error: ${apiResponse.message}');
         return ApiResponse(
           status: false,
           statusCode: apiResponse.statusCode,
@@ -71,7 +53,6 @@ class HotelRepository {
         );
       }
     } catch (e) {
-      print('❌ Repository error: $e');
       return ApiResponse(
         status: false,
         statusCode: 500,
@@ -84,7 +65,7 @@ class HotelRepository {
   Future<ApiResponse> getHotelDetails(String hotelId) async {
     try {
       print('🔍 Fetching hotel details for ID: $hotelId');
-      
+
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: EndPoints.getAllHotels,
         resourcePath: hotelId,
@@ -92,18 +73,19 @@ class HotelRepository {
 
       print('📦 Hotel Details Response Status: ${apiResponse.status}');
       print('📦 Hotel Details Response Code: ${apiResponse.statusCode}');
-      
+
       if (apiResponse.status) {
         if (apiResponse.data is Map<String, dynamic>) {
           final responseData = apiResponse.data as Map<String, dynamic>;
-          
+
           try {
             // Check if response has 'data' field with single hotel object
-            if (responseData.containsKey('data') && responseData['data'] != null) {
+            if (responseData.containsKey('data') &&
+                responseData['data'] != null) {
               final hotelData = Data.fromJson(responseData['data']);
-              
+
               print('✅ Successfully loaded hotel: ${hotelData.name}');
-              
+
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
@@ -113,9 +95,9 @@ class HotelRepository {
             } else {
               // If the response is directly the hotel object
               final hotelData = Data.fromJson(responseData);
-              
+
               print('✅ Successfully loaded hotel: ${hotelData.name}');
-              
+
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
@@ -168,12 +150,14 @@ class HotelRepository {
       if (apiResponse.status) {
         if (apiResponse.data is Map<String, dynamic>) {
           final responseData = apiResponse.data as Map<String, dynamic>;
-          
+
           try {
             final allHotelData = GitHotelModel.fromJson(responseData);
-            
+
             if (allHotelData.data?.isNotEmpty == true) {
-              print('✅ Successfully loaded ${allHotelData.data!.length} featured hotels');
+              print(
+                '✅ Successfully loaded ${allHotelData.data!.length} featured hotels',
+              );
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
@@ -227,12 +211,14 @@ class HotelRepository {
       if (apiResponse.status) {
         if (apiResponse.data is Map<String, dynamic>) {
           final responseData = apiResponse.data as Map<String, dynamic>;
-          
+
           try {
             final allHotelData = GitHotelModel.fromJson(responseData);
-            
+
             if (allHotelData.data?.isNotEmpty == true) {
-              print('✅ Successfully loaded ${allHotelData.data!.length} hotels for city');
+              print(
+                '✅ Successfully loaded ${allHotelData.data!.length} hotels for city',
+              );
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
@@ -288,10 +274,7 @@ class HotelRepository {
     int limit = 10,
   }) async {
     try {
-      Map<String, dynamic> queryParams = {
-        'page': page,
-        'limit': limit,
-      };
+      Map<String, dynamic> queryParams = {'page': page, 'limit': limit};
 
       if (cityId != null) queryParams['city'] = cityId;
       if (minPrice != null) queryParams['minPrice'] = minPrice;
@@ -308,10 +291,10 @@ class HotelRepository {
       if (apiResponse.status) {
         if (apiResponse.data is Map<String, dynamic>) {
           final responseData = apiResponse.data as Map<String, dynamic>;
-          
+
           try {
             final allHotelData = GitHotelModel.fromJson(responseData);
-            
+
             return ApiResponse(
               status: true,
               statusCode: apiResponse.statusCode,

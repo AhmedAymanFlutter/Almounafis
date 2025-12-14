@@ -19,109 +19,112 @@ class CountriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state is CountryLoading) return _buildLoading();
-    if (state is CountryError) return _buildError(context, state as CountryError);
+    if (state is CountryError)
+      return _buildError(context, state as CountryError);
     if (state is CountryLoaded) return _buildCountries(state as CountryLoaded);
     return const Center(child: CircularProgressIndicator());
   }
 
- Widget _buildLoading() => SizedBox(
-      height: 220,
-      child: Skeletonizer(
-        enabled: true,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: 3,
-          separatorBuilder: (_, __) => const SizedBox(width: 12),
-          itemBuilder: (_, __) => Container(
-            width: 300,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // صورة الدولة
-                Container(
-                  height: 140,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
+  Widget _buildLoading() => SizedBox(
+    height: 220,
+    child: Skeletonizer(
+      enabled: true,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 3,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (_, __) => Container(
+          width: 300,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // صورة الدولة
+              Container(
+                height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
                 ),
-                const SizedBox(height: 8),
+              ),
+              const SizedBox(height: 8),
 
-                // اسم الدولة
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  child: Container(
-                    height: 14,
-                    width: 100,
-                    color: Colors.grey[300],
-                  ),
+              // اسم الدولة
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
                 ),
-
-                // وصف الدولة
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Container(
-                    height: 10,
-                    width: 180,
-                    color: Colors.grey[300],
-                  ),
+                child: Container(
+                  height: 14,
+                  width: 100,
+                  color: Colors.grey[300],
                 ),
+              ),
 
-                const Spacer(),
-
-                // العملة أو الموقع
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Container(
-                    height: 12,
-                    width: 80,
-                    color: Colors.grey[300],
-                  ),
+              // وصف الدولة
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Container(
+                  height: 10,
+                  width: 180,
+                  color: Colors.grey[300],
                 ),
-              ],
-            ),
+              ),
+
+              const Spacer(),
+
+              // العملة أو الموقع
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Container(
+                  height: 12,
+                  width: 80,
+                  color: Colors.grey[300],
+                ),
+              ),
+            ],
           ),
         ),
       ),
-    );
-
+    ),
+  );
 
   Widget _buildError(BuildContext context, CountryError state) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error, color: Colors.red, size: 50),
-          const SizedBox(height: 8),
-          Text(
-            isArabic ? "حدث خطأ في التحميل" : state.message,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: ElevatedButton(
-              onPressed: () => context.read<CountryCubit>().fetchAllCountries(),
-              child: Text(isArabic ? "إعادة المحاولة" : "Retry"),
-            ),
-          ),
-        ],
-      );
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      const Icon(Icons.error, color: Colors.red, size: 50),
+      const SizedBox(height: 8),
+      Text(
+        isArabic ? "حدث خطأ في التحميل" : state.message,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+      ),
+      const SizedBox(height: 16),
+      Center(
+        child: ElevatedButton(
+          onPressed: () => context.read<CountryCubit>().fetchAllCountries(),
+          child: Text(isArabic ? "إعادة المحاولة" : "Retry"),
+        ),
+      ),
+    ],
+  );
 
   Widget _buildCountries(CountryLoaded state) {
-    final countries = state.countries ;
+    final countries = state.countries;
 
     if (countries.isEmpty) {
       return Center(
@@ -146,7 +149,9 @@ class CountriesSection extends StatelessWidget {
         itemBuilder: (_, index) {
           final country = countries[index];
           return Padding(
-            padding: EdgeInsets.only(right: index == countries.length - 1 ? 0 : 12.0),
+            padding: EdgeInsets.only(
+              right: index == countries.length - 1 ? 0 : 12.0,
+            ),
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 400),
               opacity: 1,
@@ -159,12 +164,15 @@ class CountriesSection extends StatelessWidget {
                   imageUrl: getCountryImageUrl(country),
                   description: isArabic
                       ? (country.descriptionArFlutter ?? "لا يوجد وصف متاح")
-                      : (country.descriptionFlutter ?? "No description available"),
-                  currency: country.currency ?? (isArabic ? "غير محدد" : "Not specified"),
+                      : (country.descriptionFlutter ??
+                            "No description available"),
+                  currency:
+                      country.currency ??
+                      (isArabic ? "غير محدد" : "Not specified"),
                   location: isArabic
                       ? (country.nameAr ?? "بدون موقع")
                       : (country.name ?? "Unknown"),
-                  countryId: country.slug ?? country.sId ?? "",
+                  countryId: country.id ?? "",
                 ),
               ),
             ),

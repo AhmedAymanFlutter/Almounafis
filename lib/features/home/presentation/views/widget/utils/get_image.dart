@@ -1,8 +1,7 @@
-
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart';
 
 /// Extract the image URL from country data
-String getCountryImageUrl(Data country) {
+String getCountryImageUrl(CountryData country) {
   try {
     // Helper function to fix malformed URLs
     String fixUrl(String? url) {
@@ -18,8 +17,8 @@ String getCountryImageUrl(Data country) {
     }
 
     // 1. أولاً جرب imageCover (الخاصية الأساسية في موديل Data)
-    if (country.imageCover != null && country.imageCover!.isNotEmpty) {
-      final fixedUrl = fixUrl(country.imageCover);
+    if (country.images != null && country.images!.isNotEmpty) {
+      final fixedUrl = fixUrl(country.images!.first);
       if (fixedUrl.isNotEmpty) return fixedUrl;
     }
 
@@ -35,13 +34,13 @@ String getCountryImageUrl(Data country) {
 
     // 3. إذا مفيش صور متاحة، رجع الصورة الافتراضية
     return 'assets/images/download.png';
-    
   } catch (e) {
     print('Error getting country image: $e');
     return 'assets/images/download.png';
   }
 }
-String getTourImageUrl( tour) {
+
+String getTourImageUrl(tour) {
   try {
     final images = tour["images"] as List? ?? [];
 
@@ -50,10 +49,12 @@ String getTourImageUrl( tour) {
       final firstImage = images.first;
 
       // ممكن يكون فيها fullUrl أو url
-      if (firstImage["fullUrl"] != null && firstImage["fullUrl"].toString().isNotEmpty) {
+      if (firstImage["fullUrl"] != null &&
+          firstImage["fullUrl"].toString().isNotEmpty) {
         return firstImage["fullUrl"];
       }
-      if (firstImage["url"] != null && firstImage["url"].toString().isNotEmpty) {
+      if (firstImage["url"] != null &&
+          firstImage["url"].toString().isNotEmpty) {
         return firstImage["url"];
       }
     }
@@ -64,4 +65,3 @@ String getTourImageUrl( tour) {
     return "https://via.placeholder.com/150x150.png?text=No+Image";
   }
 }
-
