@@ -12,7 +12,7 @@ class PackageModel {
     if (json['data'] != null) {
       data = <Data>[];
 
-      // معالجة البيانات سواء كانت قائمة أو كائن مفرد
+      // Handle data whether it is a List (List View) or a Map (Details View)
       if (json['data'] is List) {
         (json['data'] as List).forEach((v) {
           if (v != null) {
@@ -44,6 +44,7 @@ class Data {
   String? description;
   String? descriptionAr;
   String? imageCover;
+  List<Destination>? destinations; // List of destinations
   String? alt;
   String? altAr;
   String? createdBy;
@@ -63,6 +64,7 @@ class Data {
     this.description,
     this.descriptionAr,
     this.imageCover,
+    this.destinations,
     this.alt,
     this.altAr,
     this.createdBy,
@@ -83,17 +85,25 @@ class Data {
     description = json['description'];
     descriptionAr = json['descriptionAr'];
 
-    // معالجة الصور (قد تأتي ككائن في بعض الأحيان)
+    // Handle Image Cover
     if (json['imageCover'] is Map) {
       imageCover = json['imageCover']['url'];
     } else {
       imageCover = json['imageCover'];
     }
 
+    // ✅✅ Parse Destinations List
+    if (json['destinations'] != null) {
+      destinations = <Destination>[];
+      json['destinations'].forEach((v) {
+        destinations!.add(Destination.fromJson(v));
+      });
+    }
+
     alt = json['alt'];
     altAr = json['altAr'];
 
-    // ✅✅ الحل الجذري لمشكلة Map is not String
+    // Helper to parse creator names
     createdBy = _parseNameFromObject(json['createdBy']);
     updatedBy = _parseNameFromObject(json['updatedBy']);
 
@@ -105,7 +115,7 @@ class Data {
     price = json['price'];
   }
 
-  // دالة مساعدة لاستخراج الاسم سواء كان نصاً أو كائناً
+  // Helper function to extract name from object or string
   String? _parseNameFromObject(dynamic val) {
     if (val == null) return null;
     if (val is String) return val;
@@ -126,6 +136,12 @@ class Data {
     data['description'] = description;
     data['descriptionAr'] = descriptionAr;
     data['imageCover'] = imageCover;
+
+    // ✅✅ Convert Destinations List to JSON
+    if (destinations != null) {
+      data['destinations'] = destinations!.map((v) => v.toJson()).toList();
+    }
+
     data['alt'] = alt;
     data['altAr'] = altAr;
     data['createdBy'] = createdBy;
@@ -185,7 +201,7 @@ class Seo {
     metaDescription = json['metaDescription'];
     metaDescriptionAr = json['metaDescriptionAr'];
 
-    // ✅✅ معالجة الكلمات المفتاحية لتجنب خطأ القائمة
+    // Handle Keywords list or string
     keywords = _parseList(json['keywords']);
     keywordsAr = _parseList(json['keywordsAr']);
 
@@ -202,7 +218,7 @@ class Seo {
     ogImage = json['ogImage'];
   }
 
-  // دالة لتحويل القوائم إلى نصوص بأمان
+  // Helper to safely convert lists to string
   String? _parseList(dynamic value) {
     if (value == null) return null;
     if (value is List) {
@@ -230,6 +246,31 @@ class Seo {
     data['ogDescription'] = ogDescription;
     data['canonicalUrl'] = canonicalUrl;
     data['ogImage'] = ogImage;
+    return data;
+  }
+}
+
+class Destination {
+  String? sId;
+  String? name;
+  String? nameAr;
+  String? coverImage;
+
+  Destination({this.sId, this.name, this.nameAr, this.coverImage});
+
+  Destination.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    name = json['name'];
+    nameAr = json['nameAr'];
+    coverImage = json['coverImage'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['name'] = name;
+    data['nameAr'] = nameAr;
+    data['coverImage'] = coverImage;
     return data;
   }
 }

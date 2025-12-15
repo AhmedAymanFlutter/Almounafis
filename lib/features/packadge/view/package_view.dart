@@ -51,6 +51,7 @@ class _PackageViewState extends State<PackageView> {
               if (state is PackageLoading) {
                 return const Center(child: CircularProgressIndicator());
               } else if (state is PackageLoaded) {
+                // ✅ Access data from the Model
                 final packages = state.packageModel.data ?? [];
 
                 if (packages.isEmpty) {
@@ -74,22 +75,20 @@ class _PackageViewState extends State<PackageView> {
                     final pkg = packages[index];
                     return PackageCardView(
                       package: pkg,
-                      onTap: () async {
-                        _packageCubit.getCountriesForPackageType(pkg.id ?? '');
-
-                        await Navigator.pushNamed(
+                      onTap: () {
+                        // ✅ Pass the Slug and Name to the next screen
+                        // We do NOT call the API here. The next screen will call it.
+                        Navigator.pushNamed(
                           context,
                           Routes.countriesView,
                           arguments: {
-                            'packageTypeId': pkg.sId ?? '',
+                            'packageTypeSlug': pkg.slug ?? '',
                             'packageTypeName': isArabic
                                 ? (pkg.nameAr ?? pkg.name ?? '')
                                 : (pkg.name ?? ''),
+                            'packageTypeNameAr': pkg.nameAr,
                           },
                         );
-
-                        // 🔁 Refresh بعد الرجوع من countries view
-                        _packageCubit.getAllPackages();
                       },
                     );
                   },
@@ -99,23 +98,10 @@ class _PackageViewState extends State<PackageView> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        isArabic
-                            ? 'حدث خطأ: ${state.message}'
-                            : 'Error: ${state.message}',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyle.setPoppinsSecondaryBlack(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      Text(state.message),
+                      const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () => _packageCubit.getAllPackages(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColor.mainBlack,
-                          foregroundColor: AppColor.mainWhite,
-                        ),
                         child: Text(isArabic ? 'إعادة المحاولة' : 'Retry'),
                       ),
                     ],

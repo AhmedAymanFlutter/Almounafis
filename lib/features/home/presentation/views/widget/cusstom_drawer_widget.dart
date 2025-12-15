@@ -71,7 +71,7 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   buildDrawerItem(
                     context,
-                    iconPath: 'assets/icons/setting-2.svg',
+                    iconPath: 'assets/icons/sleep.svg',
                     title: isArabic ? 'المدن' : 'Cities',
                     onTap: () {
                       Navigator.pushNamed(context, Routes.cityPage);

@@ -7,14 +7,14 @@ import '../../../../localization/manager/localization_cubit.dart';
 
 class CountryCard extends StatelessWidget {
   final String countryName;
-  final String countryId;
+  final String countrySlug;
   final String countryImage;
   final VoidCallback onTap;
 
   const CountryCard({
     super.key,
     required this.countryName,
-    required this.countryId,
+    required this.countrySlug,
     required this.countryImage,
     required this.onTap,
   });
@@ -31,10 +31,7 @@ class CountryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColor.mainWhite,
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: AppColor.secondaryGrey,
-            width: 1,
-          ),
+          border: Border.all(color: AppColor.secondaryGrey, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -45,8 +42,9 @@ class CountryCard extends StatelessWidget {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment:
-              isArabic ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isArabic
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             /// 🖼️ Image
             Container(
@@ -108,15 +106,18 @@ class CountryCard extends StatelessWidget {
                       right: isArabic ? 10 : null,
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 10.w, vertical: 4.h),
+                          horizontal: 10.w,
+                          vertical: 4.h,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(30.r),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          textDirection:
-                              isArabic ? TextDirection.rtl : TextDirection.ltr,
+                          textDirection: isArabic
+                              ? TextDirection.rtl
+                              : TextDirection.ltr,
                           children: [
                             Icon(
                               Icons.location_on,
@@ -144,15 +145,20 @@ class CountryCard extends StatelessWidget {
                       left: isArabic ? 10 : null,
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.h),
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.star,
-                                color: Colors.amber, size: 14),
+                            const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 14,
+                            ),
                             SizedBox(width: 4.w),
                             Text(
                               "4.8",
@@ -197,8 +203,9 @@ class CountryCard extends StatelessWidget {
                               fontWeight: FontWeight.w300,
                               color: AppColor.mainWhite,
                             ),
-                            textAlign:
-                                isArabic ? TextAlign.right : TextAlign.left,
+                            textAlign: isArabic
+                                ? TextAlign.right
+                                : TextAlign.left,
                           ),
                         ],
                       ),
@@ -216,8 +223,10 @@ class CountryCard extends StatelessWidget {
                   onPressed: onTap,
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size(114.w, 28.h),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 6.h,
+                    ),
                     side: const BorderSide(
                       color: Color(0XFF1D8DEF),
                       width: 0.5,

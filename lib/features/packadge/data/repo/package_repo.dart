@@ -24,7 +24,7 @@ class PackageTypeRepo {
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
-                data: allPackageData,
+                data: allPackageData.data,
                 message: 'تم تحميل الباقات بنجاح',
               );
             } else {
@@ -67,12 +67,12 @@ class PackageTypeRepo {
   }
 
   // Step 2: Get countries for a specific package type
-  Future<ApiResponse> getCountriesForPackageType(String packageTypeId) async {
+  Future<ApiResponse> getCountriesForPackageType(String slug) async {
     try {
-      print('🌐 Step 2 - API Call: /package-types/$packageTypeId/countries');
+      print('🌐 Step 2 - API Call: /package-types/$slug/countries');
 
       final ApiResponse apiResponse = await _apiHelper.getRequest(
-        endPoint: 'package-types/$packageTypeId/countries',
+        endPoint: '/countries?hasPackages=true&packageType=$slug',
         isProtected: true,
       );
 
@@ -111,12 +111,19 @@ class PackageTypeRepo {
   }
 
   // Step 3: Get packages for a specific country
-  Future<ApiResponse> getPackagesForCountry(String countryId) async {
+  Future<ApiResponse> getPackagesForCountry(
+    String countrySlug,
+    String packageTypeSlug,
+  ) async {
     try {
-      print('🌐 Step 3 - API Call: /packages/country/$countryId');
+      print(
+        '🌐 Step 3 - API Call: /countries/$countrySlug/packages?packageType=$packageTypeSlug',
+      );
 
       final ApiResponse apiResponse = await _apiHelper.getRequest(
-        endPoint: 'packages/country/$countryId',
+        endPoint:
+            '/countries/$countrySlug/packages?packageType=$packageTypeSlug',
+        isProtected: true,
       );
 
       print('📥 Response Status: ${apiResponse.statusCode}');
@@ -154,12 +161,13 @@ class PackageTypeRepo {
   }
 
   // Step 4: Get package details by ID
-  Future<ApiResponse> getPackageDetails(String packageId) async {
+  Future<ApiResponse> getPackageDetails(String slug) async {
     try {
-      print('🔍 Step 4 - API Call: /packages/$packageId');
+      print('🔍 Step 4 - API Call: /packages/$slug');
 
       final ApiResponse apiResponse = await _apiHelper.getRequest(
-        endPoint: 'packages/$packageId',
+        endPoint: '/packages/$slug',
+        isProtected: true,
       );
 
       print('📥 Response Status: ${apiResponse.statusCode}');

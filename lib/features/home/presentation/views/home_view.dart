@@ -1,9 +1,8 @@
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/global_Settings/data/model/global_Setting_model.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_stete.dart';
 import 'package:almonafs_flutter/features/packadge/view/package_view.dart';
-// import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart'; // No longer needed
-// import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart'; // No longer needed
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,7 +27,6 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    // Fetch global settings when the home view loads
     context.read<GlobalSettingsCubit>().getGlobalSettings();
   }
 
@@ -44,7 +42,6 @@ class _HomeViewState extends State<HomeView> {
           textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
           child: BlocBuilder<GlobalSettingsCubit, GlobalSettingsState>(
             builder: (context, globalSettingsState) {
-              // Extract social media object from global settings
               SocialMediaSection? socialMedia;
               if (globalSettingsState is GlobalSettingsLoaded) {
                 socialMedia =
@@ -72,13 +69,13 @@ class _HomeViewState extends State<HomeView> {
                       );
                     }
                   },
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColor.secondaryblue,
                   child: SvgPicture.asset('assets/images/whatsapp.svg'),
                 ),
                 backgroundColor: AppColor.mainWhite,
                 drawer: CustomDrawer(
                   onNavigationItemTapped: _onItemTapped,
-                  socialMedia: socialMedia, // Pass social media object here
+                  socialMedia: socialMedia,
                 ),
                 body: SafeArea(
                   child: _selectedIndex == 1
@@ -86,11 +83,10 @@ class _HomeViewState extends State<HomeView> {
                       : _buildOtherPages(),
                 ),
 
-                // --- START: MODIFIED SECTION ---
                 bottomNavigationBar: Container(
                   height: 90,
                   decoration: BoxDecoration(
-                    color: AppColor.mainBlack,
+                    color: AppColor.secondaryblue,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
@@ -111,18 +107,18 @@ class _HomeViewState extends State<HomeView> {
                     child: BottomNavigationBar(
                       currentIndex: _selectedIndex,
                       onTap: _onItemTapped,
-                      backgroundColor: AppColor.secondaryBlack,
+                      backgroundColor: AppColor.secondaryblue,
                       selectedItemColor: AppColor.mainWhite,
                       unselectedItemColor: Colors.grey[400],
                       type: BottomNavigationBarType.fixed,
                       showUnselectedLabels: true,
-                      selectedLabelStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                      selectedLabelStyle: AppTextStyle.setPoppinsWhite(
                         fontSize: 12,
+                        fontWeight: FontWeight.w400,
                       ),
-                      unselectedLabelStyle: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 11,
+                      unselectedLabelStyle: AppTextStyle.setPoppinsWhite(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
                       ),
                       items: [
                         BottomNavigationBarItem(

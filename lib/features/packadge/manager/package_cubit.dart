@@ -20,9 +20,9 @@ class PackageCubit extends Cubit<PackageState> {
     }
   }
 
-  Future<void> getCountriesForPackageType(String packageTypeId) async {
+  Future<void> getCountriesForPackageType(String slug) async {
     emit(CountriesLoading());
-    final response = await packageRepo.getCountriesForPackageType(packageTypeId);
+    final response = await packageRepo.getCountriesForPackageType(slug);
     if (isClosed) return;
 
     if (response.status) {
@@ -32,9 +32,15 @@ class PackageCubit extends Cubit<PackageState> {
     }
   }
 
-  Future<void> getPackagesForCountry(String countryId) async {
+  Future<void> getPackagesForCountry(
+    String countrySlug,
+    String packageTypeSlug,
+  ) async {
     emit(PackagesLoading());
-    final response = await packageRepo.getPackagesForCountry(countryId);
+    final response = await packageRepo.getPackagesForCountry(
+      countrySlug,
+      packageTypeSlug,
+    );
     if (isClosed) return;
 
     if (response.status) {
@@ -44,9 +50,9 @@ class PackageCubit extends Cubit<PackageState> {
     }
   }
 
-  Future<void> getPackageDetails(String packageId) async {
+  Future<void> getPackageDetails(String slug) async {
     emit(PackageDetailsLoading());
-    final response = await packageRepo.getPackageDetails(packageId);
+    final response = await packageRepo.getPackageDetails(slug);
     if (isClosed) return;
 
     if (response.status) {
@@ -56,5 +62,3 @@ class PackageCubit extends Cubit<PackageState> {
     }
   }
 }
-
-

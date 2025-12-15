@@ -1,3 +1,4 @@
+import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/features/auth/presentation/widgets/account_info_header.dart';
 import 'package:flutter/material.dart';
 
@@ -7,14 +8,13 @@ import '../widget/About_us.dart';
 import '../widget/card_sitting.dart';
 import '../widget/languang.dart';
 
-
 class SittingScreen extends StatelessWidget {
   const SittingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff0e2e4f),
+      backgroundColor: AppColor.secondaryblue,
       body: SafeArea(
         child: Column(
           children: [
@@ -31,58 +31,65 @@ class SittingScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                     MenuItemWidget(
-                      title: 'Account',
-                      onTap: () {
-                         Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const SignUpView()),
-          (route) => false,
-        );
-                      }, 
-                      iconPath: 'assets/icons/user.svg',
-                     ),
-                     SizedBox(height: 10),
+                      MenuItemWidget(
+                        title: 'Account',
+                        onTap: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpView(),
+                            ),
+                            (route) => false,
+                          );
+                        },
+                        iconPath: 'assets/icons/user.svg',
+                      ),
+                      SizedBox(height: 10),
                       MenuItemWidget(
                         title: 'Languange',
                         onTap: () {
                           Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const LanguageScreen()),
-          (route) => false,
-        );
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LanguageScreen(),
+                            ),
+                            (route) => false,
+                          );
                         },
-                         iconPath: 'assets/icons/translate.svg',
+                        iconPath: 'assets/icons/translate.svg',
                       ),
                       SizedBox(height: 10),
                       MenuItemWidget(
                         title: 'Services',
                         onTap: () {
-                            Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const ServicesView()),
-          (route) => false,
-        );
-                        }, 
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ServicesView(),
+                            ),
+                            (route) => false,
+                          );
+                        },
                         iconPath: 'assets/icons/serves.svg',
                       ),
                       SizedBox(height: 10),
                       MenuItemWidget(
                         title: 'Packages',
-                        onTap: () {}, 
+                        onTap: () {},
                         iconPath: 'assets/icons/packdg.svg',
                       ),
                       SizedBox(height: 10),
                       MenuItemWidget(
                         title: 'About Us',
                         onTap: () {
-                            Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const AboutUsScreen()),
-          (route) => false,
-        );
-
-                        }, 
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AboutUsScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        },
                         iconPath: 'assets/icons/About Us.svg',
                       ),
                     ],

@@ -10,19 +10,19 @@ import '../../manager/package_state.dart';
 import 'widget/build_book_btn.dart';
 
 class PackageDetailsView extends StatelessWidget {
-  final String packageId;
+  final String slug;
   final String packageTitle;
 
   const PackageDetailsView({
     super.key,
-    required this.packageId,
+    required this.slug,
     required this.packageTitle,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PackageCubit(PackageTypeRepo())..getPackageDetails(packageId),
+      create: (_) => PackageCubit(PackageTypeRepo())..getPackageDetails(slug),
       child: BlocBuilder<LanguageCubit, AppLanguage>(
         builder: (context, langState) {
           final isArabic = langState == AppLanguage.arabic;
@@ -41,13 +41,21 @@ class PackageDetailsView extends StatelessWidget {
 
                     if (details == null) {
                       return Center(
-                          child: Text(
-                              isArabic ? 'لا توجد تفاصيل متاحة' : 'No details available'));
+                        child: Text(
+                          isArabic
+                              ? 'لا توجد تفاصيل متاحة'
+                              : 'No details available',
+                        ),
+                      );
                     }
 
                     return Scaffold(
                       body: Padding(
-                        padding: const EdgeInsets.only(left: 15, right: 15, top: 56),
+                        padding: const EdgeInsets.only(
+                          left: 15,
+                          right: 15,
+                          top: 56,
+                        ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(30),
                           child: Stack(
@@ -60,19 +68,25 @@ class PackageDetailsView extends StatelessWidget {
                                     Stack(
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(30.r),
+                                          borderRadius: BorderRadius.circular(
+                                            30.r,
+                                          ),
                                           child: Image.network(
                                             details.imageCover ?? '',
                                             height: 650.h,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (context, error, stackTrace) =>
-                                                Container(
-                                              height: 650.h,
-                                              color: Colors.grey[300],
-                                              child: const Icon(Icons.broken_image,
-                                                  size: 50, color: Colors.grey),
-                                            ),
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    Container(
+                                                      height: 650.h,
+                                                      color: Colors.grey[300],
+                                                      child: const Icon(
+                                                        Icons.broken_image,
+                                                        size: 50,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
                                           ),
                                         ),
                                         // تدرج لوني
@@ -83,7 +97,9 @@ class PackageDetailsView extends StatelessWidget {
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.only(
                                               bottomLeft: Radius.circular(30.r),
-                                              bottomRight: Radius.circular(30.r),
+                                              bottomRight: Radius.circular(
+                                                30.r,
+                                              ),
                                             ),
                                             child: Container(
                                               height: 650.h,
@@ -93,7 +109,9 @@ class PackageDetailsView extends StatelessWidget {
                                                   end: Alignment.bottomCenter,
                                                   colors: [
                                                     Colors.transparent,
-                                                    Colors.black.withOpacity(0.6),
+                                                    Colors.black.withOpacity(
+                                                      0.6,
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -111,12 +129,16 @@ class PackageDetailsView extends StatelessWidget {
                                               width: 40.w,
                                               height: 40.h,
                                               decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(0.9),
+                                                color: Colors.white.withOpacity(
+                                                  0.9,
+                                                ),
                                                 shape: BoxShape.circle,
                                               ),
                                               child: Transform(
                                                 alignment: Alignment.center,
-                                                transform: Matrix4.rotationY(isArabic ? 3.14159 : 0),
+                                                transform: Matrix4.rotationY(
+                                                  isArabic ? 3.14159 : 0,
+                                                ),
                                                 child: Icon(
                                                   Icons.arrow_back_ios_new,
                                                   size: 18.sp,
@@ -137,14 +159,21 @@ class PackageDetailsView extends StatelessWidget {
                                                 : CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                               isArabic ? (details.nameAr ?? packageTitle) : (details.name ?? packageTitle),
-                                                style: AppTextStyle.setPoppinsTextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.white,
-                                                ),
-                                                textAlign:
-                                                    isArabic ? TextAlign.right : TextAlign.left,
+                                                isArabic
+                                                    ? (details.nameAr ??
+                                                          packageTitle)
+                                                    : (details.name ??
+                                                          packageTitle),
+                                                style:
+                                                    AppTextStyle.setPoppinsTextStyle(
+                                                      fontSize: 22,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Colors.white,
+                                                    ),
+                                                textAlign: isArabic
+                                                    ? TextAlign.right
+                                                    : TextAlign.left,
                                               ),
                                             ],
                                           ),
@@ -155,35 +184,46 @@ class PackageDetailsView extends StatelessWidget {
                                     Padding(
                                       padding: EdgeInsets.all(20.w),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           // ⏱️ المدة
                                           Container(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 12.w, vertical: 8.h),
+                                              horizontal: 12.w,
+                                              vertical: 8.h,
+                                            ),
                                             decoration: BoxDecoration(
                                               color: Colors.grey[100],
-                                              borderRadius: BorderRadius.circular(8.r),
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
                                             ),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   isArabic ? ' السعر' : 'price',
-                                                  style: AppTextStyle.setPoppinsTextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppColor.lightGrey,
-                                                  ),
+                                                  style:
+                                                      AppTextStyle.setPoppinsTextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            AppColor.lightGrey,
+                                                      ),
                                                 ),
                                                 SizedBox(height: 4.h),
                                                 Text(
                                                   (details.price).toString(),
-                                                  style: AppTextStyle.setPoppinsTextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: AppColor.mainBlack,
-                                                  ),
+                                                  style:
+                                                      AppTextStyle.setPoppinsTextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color:
+                                                            AppColor.mainBlack,
+                                                      ),
                                                 ),
                                               ],
                                             ),
@@ -192,32 +232,36 @@ class PackageDetailsView extends StatelessWidget {
                                           // 📖 الوصف
                                           Text(
                                             isArabic ? 'الوصف' : 'Description',
-                                            style: AppTextStyle.setPoppinsTextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.mainBlack,
-                                            ),
+                                            style:
+                                                AppTextStyle.setPoppinsTextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColor.mainBlack,
+                                                ),
                                           ),
                                           SizedBox(height: 12.h),
                                           Text(
-                                        (isArabic
-                                            ? (details.descriptionAr ?? 'لا يوجد وصف متاح')
-                                            : (details.description ?? 'No description available')),
-                                          style: AppTextStyle.setPoppinsTextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColor.lightGrey,
+                                            (isArabic
+                                                ? (details.descriptionAr ??
+                                                      'لا يوجد وصف متاح')
+                                                : (details.description ??
+                                                      'No description available')),
+                                            style:
+                                                AppTextStyle.setPoppinsTextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: AppColor.lightGrey,
+                                                ),
+                                            textAlign: isArabic
+                                                ? TextAlign.right
+                                                : TextAlign.left,
                                           ),
-                                          textAlign:
-                                              isArabic ? TextAlign.right : TextAlign.left,
-                                        ),
-                                        
                                         ],
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),                             
+                              ),
                             ],
                           ),
                         ),

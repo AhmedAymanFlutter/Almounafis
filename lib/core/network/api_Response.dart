@@ -16,21 +16,23 @@ class ApiResponse {
   // دالة لمعالجة استجابات Dio
   factory ApiResponse.fromResponse(Response response) {
     // التحقق من رمز الحالة أولاً
-    final isHttpSuccess = response.statusCode != null && 
-                         response.statusCode! >= 200 && 
-                         response.statusCode! < 300;
-    
+    final isHttpSuccess =
+        response.statusCode != null &&
+        response.statusCode! >= 200 &&
+        response.statusCode! < 300;
+
     if (response.data is Map<String, dynamic>) {
       final dataMap = response.data as Map<String, dynamic>;
-      
+
       // التصحيح: استخدام "success" بدلاً من "status"
       final bool apiSuccess = dataMap['success'] ?? isHttpSuccess;
-      final String apiMessage = dataMap['message'] ?? 
-                               (isHttpSuccess ? 'تمت العملية بنجاح' : 'فشلت العملية');
-      
+      final String apiMessage =
+          dataMap['message'] ??
+          (isHttpSuccess ? 'تمت العملية بنجاح' : 'فشلت العملية');
+
       // إرجاع الاستجابة كاملة
       final dynamic responseData = dataMap;
-   
+
       return ApiResponse(
         status: apiSuccess,
         statusCode: response.statusCode ?? 500,
@@ -54,7 +56,9 @@ class ApiResponse {
       return ApiResponse(
         status: false,
         data: error.response,
-        statusCode: error.response != null ? error.response!.statusCode ?? 500 : 500,
+        statusCode: error.response != null
+            ? error.response!.statusCode ?? 500
+            : 500,
         message: _handleDioError(error),
       );
     } else {

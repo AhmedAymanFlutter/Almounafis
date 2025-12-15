@@ -46,8 +46,8 @@ class AppRouter {
         final args = settings.arguments as Map<String, dynamic>;
         return RouterTransitions.buildHorizontal(
           CountriesView(
-            packageTypeId: args['packageTypeId'] ?? '',
             packageTypeName: args['packageTypeName'] ?? '',
+            packageTypeSlug: args['packageTypeSlug'] ?? '',
           ),
         );
       case Routes.countryDetails:
@@ -95,7 +95,8 @@ class AppRouter {
         final args = settings.arguments as Map<String, dynamic>;
         return RouterTransitions.buildHorizontal(
           PackagesListView(
-            countryId: args['countryId'],
+            countrySlug: args['countrySlug'],
+            packageTypeSlug: args['packageTypeSlug'],
             countryName: args['countryName'],
           ),
         );
@@ -103,8 +104,8 @@ class AppRouter {
         final args = settings.arguments as Map<String, dynamic>;
         return RouterTransitions.buildHorizontal(
           PackageDetailsView(
-            packageId: args['packageId'],
-            packageTitle: args['packageTitle'],
+            slug: args['slug'] ?? '',
+            packageTitle: args['packageTitle'] ?? '',
           ),
         );
       case Routes.languageScreen:

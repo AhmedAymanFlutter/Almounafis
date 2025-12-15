@@ -1,10 +1,17 @@
 import 'package:almonafs_flutter/features/cities/data/model/cities_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+// Keep your existing imports
+import 'package:almonafs_flutter/core/helper/Fun_helper.dart'; // Assuming WhatsAppService is here
+import 'package:almonafs_flutter/core/theme/app_color.dart';
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/cities/data/repo/citeies_repo.dart';
 import 'package:almonafs_flutter/features/cities/manger/city_cubit.dart';
 import 'package:almonafs_flutter/features/cities/manger/city_state.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
+import 'package:almonafs_flutter/features/global_Settings/manager/global_stete.dart';
 import '../../../../config/router/routes.dart';
+// import 'package:almonafs_flutter/features/cities/data/model/cities_model.dart'; // Ensure this model exists
 
 class CityPage extends StatelessWidget {
   const CityPage({super.key});
@@ -15,6 +22,7 @@ class CityPage extends StatelessWidget {
       create: (context) => CityCubit(CityRepository())..getCities(),
       child: Scaffold(
         backgroundColor: Colors.grey[100],
+        // You might want to localize this title
         appBar: AppBar(title: const Text("Almounafies Destinations")),
         body: const CityView(),
       ),
@@ -27,6 +35,9 @@ class CityView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Check Directionality to determine if it is Arabic
+    final isArabic = Directionality.of(context) == TextDirection.rtl;
+
     return BlocBuilder<CityCubit, CityState>(
       builder: (context, state) {
         if (state is CityLoading) {
@@ -38,7 +49,12 @@ class CityView extends StatelessWidget {
             slivers: [
               // 1. SEO Hero Section
               SliverToBoxAdapter(
-                child: _buildHeroSection(state.cityResponse.seoPage?.hero),
+                // ✅ Pass context and isArabic to the helper method
+                child: _buildHeroSection(
+                  context,
+                  state.cityResponse.seoPage?.hero,
+                  isArabic,
+                ),
               ),
 
               // 2. Header Section
@@ -46,6 +62,7 @@ class CityView extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
+                    // Handle Arabic/English title if available in your model
                     state.cityResponse.seoPage?.header?.headerTitle ?? "Cities",
                     style: const TextStyle(
                       fontSize: 22,
@@ -70,34 +87,65 @@ class CityView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroSection(HeroSection? hero) {
+  // ✅ Added Context and isArabic parameters
+  Widget _buildHeroSection(
+    BuildContext context,
+    HeroSection? hero,
+    bool isArabic,
+  ) {
     if (hero == null) return const SizedBox.shrink();
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      color: Colors.blueAccent,
+      color: AppColor.secondaryblue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             hero.heroTitle ?? "",
-            style: const TextStyle(
-              color: Colors.white,
+            style: AppTextStyle.setPoppinsWhite(
               fontSize: 24,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             hero.heroDescription ?? "",
-            style: const TextStyle(color: Colors.white70, fontSize: 16),
+            style: AppTextStyle.setPoppinsWhite(
+              fontWeight: FontWeight.w400,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              final globalSettingsState = context
+                  .read<GlobalSettingsCubit>()
+                  .state;
+
+              if (globalSettingsState is GlobalSettingsLoaded) {
+                // ✅ Now we have valid context, isArabic, and settings
+                WhatsAppService.launchWhatsApp(
+                  context,
+                  isArabic: isArabic,
+                  settings: globalSettingsState.globalSettings,
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isArabic
+                          ? "جاري تحميل الإعدادات..."
+                          : "Loading settings...",
+                    ),
+                  ),
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.blue,
+              backgroundColor: AppColor.mainWhite,
+              foregroundColor: AppColor.secondaryblue,
             ),
             child: Text(hero.heroButtonText ?? "Explore"),
           ),
@@ -113,22 +161,21 @@ class CityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine image URL safely
-    String? imageUrl =
-        city.imagesObject?.coverImage?.url ??
-        (city.imagesObject?.gallery?.isNotEmpty == true
-            ? city.imagesObject!.gallery![0].url
-            : null);
+    // ✅ Safely resolve the image URL
+    String? imageUrl;
+    if (city.imagesObject?.coverImage?.url != null) {
+      imageUrl = city.imagesObject!.coverImage!.url;
+    } else if (city.imagesObject?.gallery != null &&
+        city.imagesObject!.gallery!.isNotEmpty) {
+      imageUrl = city.imagesObject!.gallery![0].url;
+    }
 
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
           context,
           Routes.cityDetailsPage,
-          arguments: {
-            'idOrSlug': city.id ?? city.name, // Use ID or Name as slug
-            'cityName': city.name,
-          },
+          arguments: {'idOrSlug': city.id ?? city.name, 'cityName': city.name},
         );
       },
       child: Card(
@@ -139,23 +186,36 @@ class CityCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Section
-            if (imageUrl != null)
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
-                child: Image.network(
-                  imageUrl,
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: 180,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.broken_image),
-                  ),
-                ),
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
               ),
+              child: Container(
+                height: 180,
+                width: double.infinity,
+                color: Colors.grey[200], // Placeholder color
+                child: imageUrl != null
+                    ? Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
+                            ),
+                      )
+                    : const Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
+                      ),
+              ),
+            ),
 
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -165,11 +225,15 @@ class CityCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        city.name ?? "Unknown City",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          city.name ?? "Unknown City",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (city.weather?.currentTemp != null)
@@ -192,6 +256,9 @@ class CityCard extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 "${city.weather!.currentTemp!.toStringAsFixed(0)}°C",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -211,14 +278,21 @@ class CityCard extends StatelessWidget {
                     style: const TextStyle(height: 1.4),
                   ),
                   const SizedBox(height: 12),
+                  // ✅ Wrap with spacing to prevent overflow
                   Wrap(
                     spacing: 8,
+                    runSpacing: 4,
                     children: [
-                      _buildChip(
-                        Icons.calendar_today,
-                        "Best: ${city.bestTimeToVisit?.months?.take(2).join(', ')}...",
-                      ),
-                      _buildChip(Icons.air, "${city.weather?.windSpeed} km/h"),
+                      if (city.bestTimeToVisit?.months?.isNotEmpty == true)
+                        _buildChip(
+                          Icons.calendar_today,
+                          "Best: ${city.bestTimeToVisit!.months!.take(2).join(', ')}",
+                        ),
+                      if (city.weather?.windSpeed != null)
+                        _buildChip(
+                          Icons.air,
+                          "${city.weather!.windSpeed} km/h",
+                        ),
                     ],
                   ),
                 ],
@@ -236,6 +310,8 @@ class CityCard extends StatelessWidget {
       label: Text(label, style: const TextStyle(fontSize: 12)),
       backgroundColor: Colors.blueGrey[50],
       padding: EdgeInsets.zero,
+      materialTapTargetSize:
+          MaterialTapTargetSize.shrinkWrap, // Reduces vertical spacing
     );
   }
 }

@@ -13,13 +13,13 @@ import '../../manager/package_cubit.dart';
 import '../../manager/package_state.dart';
 
 class CountriesView extends StatelessWidget {
-  final String packageTypeId;
+  final String packageTypeSlug; // Changed from ID to Slug to match Repo
   final String packageTypeName;
   final String? packageTypeNameAr;
 
   const CountriesView({
     super.key,
-    required this.packageTypeId,
+    required this.packageTypeSlug,
     required this.packageTypeName,
     this.packageTypeNameAr,
   });
@@ -27,8 +27,10 @@ class CountriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PackageCubit(PackageTypeRepo())
-        ..getCountriesForPackageType(packageTypeId),
+      // ✅ Trigger Step 2 API Call immediately
+      create: (_) =>
+          PackageCubit(PackageTypeRepo())
+            ..getCountriesForPackageType(packageTypeSlug),
       child: BlocBuilder<LanguageCubit, AppLanguage>(
         builder: (context, langState) {
           final isArabic = langState == AppLanguage.arabic;
@@ -48,7 +50,7 @@ class CountriesView extends StatelessWidget {
                   ),
                 ),
                 leading: GestureDetector(
-                  onTap: () => Navigator.pop(context, true),
+                  onTap: () => Navigator.pop(context),
                   child: SvgPicture.asset(
                     'assets/icons/arrowback.svg',
                     width: 24,
@@ -59,8 +61,8 @@ class CountriesView extends StatelessWidget {
               ),
               body: BlocBuilder<PackageCubit, PackageState>(
                 builder: (context, state) {
+                  // ✅ Handle Loading State
                   if (state is CountriesLoading) {
-                    // ✅ Skeleton loading
                     return ListView.separated(
                       padding: EdgeInsets.symmetric(
                         vertical: 16.h,
@@ -72,17 +74,20 @@ class CountriesView extends StatelessWidget {
                         enabled: true,
                         child: CountryCard(
                           countryName: "Loading...",
-                          countryId: "",
-                          countryImage:
-                              "https://via.placeholder.com/421x200?text=Loading",
+                          countrySlug: "",
+                          countryImage: "",
                           onTap: () {},
                         ),
                       ),
                     );
-                  } else if (state is CountriesLoaded) {
-                    final countriesData = state.countriesData;
-                    final countries =
-                        countriesData['data']?['countries'] as List? ?? [];
+                  }
+                  // ✅ Handle Success State
+                  else if (state is CountriesLoaded) {
+                    // 🔍 Parsing the Map Data
+                    final List<dynamic> countries =
+                        state.countriesData['data'] is List
+                        ? state.countriesData['data']
+                        : (state.countriesData['data']['countries'] ?? []);
 
                     if (countries.isEmpty) {
                       return Center(
@@ -107,24 +112,34 @@ class CountriesView extends StatelessWidget {
                       itemCount: countries.length,
                       itemBuilder: (context, index) {
                         final country = countries[index];
+
                         final countryName = isArabic
                             ? (country['nameAr'] ?? country['name'] ?? 'دولة')
                             : (country['name'] ?? 'Country');
-                        final countryId = country['_id'] ?? '';
-                        final countryImage = country['image'] ??
+
+                        // Use Slug for API calls, ID for other logic if needed
+                        final countrySlug =
+                            country['slug'] ?? country['_id'] ?? '';
+
+                        final countryImage =
+                            country['image'] ??
+                            country['imageCover']?['url'] ?? // Handle object structure if needed
                             country['imageCover'] ??
-                            'https://via.placeholder.com/421x200?text=$countryName';
+                            '';
 
                         return CountryCard(
                           countryName: countryName,
-                          countryId: countryId,
+                          countrySlug: countrySlug,
                           countryImage: countryImage,
                           onTap: () {
+                            // ✅ Navigate to Step 3
                             Navigator.pushNamed(
                               context,
                               Routes.packagesListView,
                               arguments: {
-                                'countryId': countryId,
+                                'countrySlug': countrySlug, // Pass Slug
+                                'packageTypeSlug':
+                                    packageTypeSlug, // Pass Parent Slug
                                 'countryName': countryName,
                               },
                             );
@@ -133,19 +148,7 @@ class CountriesView extends StatelessWidget {
                       },
                     );
                   } else if (state is PackageError) {
-                    return Center(
-                      child: Text(
-                        isArabic
-                            ? 'حدث خطأ: ${state.message}'
-                            : 'Error: ${state.message}',
-                        style: AppTextStyle.setPoppinsTextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.red,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    );
+                    return Center(child: Text(state.message));
                   }
 
                   return const SizedBox();

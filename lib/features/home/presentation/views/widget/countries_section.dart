@@ -19,14 +19,15 @@ class CountriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state is CountryLoading) return _buildLoading();
-    if (state is CountryError)
+    if (state is CountryError) {
       return _buildError(context, state as CountryError);
+    }
     if (state is CountryLoaded) return _buildCountries(state as CountryLoaded);
     return const Center(child: CircularProgressIndicator());
   }
 
   Widget _buildLoading() => SizedBox(
-    height: 220,
+    height: 250,
     child: Skeletonizer(
       enabled: true,
       child: ListView.separated(

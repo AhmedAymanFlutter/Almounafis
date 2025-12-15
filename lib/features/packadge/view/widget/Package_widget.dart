@@ -2,6 +2,7 @@ import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
 import 'package:almonafs_flutter/features/packadge/data/model/package_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,10 +29,7 @@ class PackageCardView extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColor.mainWhite,
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: AppColor.secondaryGrey,
-            width: 1,
-          ),
+          border: Border.all(color: AppColor.secondaryGrey, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -62,20 +60,23 @@ class PackageCardView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.r),
                 child: Stack(
                   children: [
-                    Image.network(
-                      package.imageCover ?? '',
+                    CachedNetworkImage(
+                      imageUrl: package.imageCover ?? '',
                       width: 420.w,
                       height: 200.h,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                      errorWidget: (context, error, stackTrace) => Container(
                         width: 420.w,
                         height: 200.h,
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(20.r),
                         ),
-                        child: const Icon(Icons.broken_image,
-                            size: 40, color: Colors.grey),
+                        child: const Icon(
+                          Icons.broken_image,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
 
@@ -100,7 +101,9 @@ class PackageCardView extends StatelessWidget {
                       right: isArabic ? 10 : null,
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 10.w, vertical: 4.h),
+                          horizontal: 10.w,
+                          vertical: 4.h,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(30.r),
@@ -152,15 +155,16 @@ class PackageCardView extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                               color: AppColor.mainWhite,
                             ),
-                            textAlign:
-                                isArabic ? TextAlign.right : TextAlign.left,
+                            textAlign: isArabic
+                                ? TextAlign.right
+                                : TextAlign.left,
                           ),
                           SizedBox(height: 4.h),
                           Text(
                             isArabic
                                 ? (package.descriptionAr ??
-                                    package.description ??
-                                    '')
+                                      package.description ??
+                                      '')
                                 : (package.description ?? ''),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -169,8 +173,9 @@ class PackageCardView extends StatelessWidget {
                               fontWeight: FontWeight.w300,
                               color: AppColor.mainWhite,
                             ),
-                            textAlign:
-                                isArabic ? TextAlign.right : TextAlign.left,
+                            textAlign: isArabic
+                                ? TextAlign.right
+                                : TextAlign.left,
                           ),
                         ],
                       ),
@@ -188,10 +193,14 @@ class PackageCardView extends StatelessWidget {
                   onPressed: onTap,
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size(114.w, 28.h),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 6.h,
+                    ),
                     side: const BorderSide(
-                        color: Color(0XFF1D8DEF), width: 0.5),
+                      color: Color(0XFF1D8DEF),
+                      width: 0.5,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.r),
                     ),

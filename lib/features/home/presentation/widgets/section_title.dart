@@ -1,10 +1,11 @@
+import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../localization/manager/localization_cubit.dart'; 
+import '../../../localization/manager/localization_cubit.dart';
 
 class SectionTitle extends StatelessWidget {
   final String title;
- final VoidCallback? onTap;
+  final VoidCallback? onTap;
   const SectionTitle({super.key, required this.title, this.onTap});
 
   @override
@@ -18,16 +19,13 @@ class SectionTitle extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           InkWell(
             onTap: onTap,
             child: Text(
               isArabic ? "عرض الكل" : "See all",
-              style: TextStyle(color: Colors.blue.shade700),
+              style: TextStyle(color: AppColor.secondaryblue),
             ),
           ),
         ],

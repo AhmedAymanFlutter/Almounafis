@@ -27,10 +27,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const SizedBox(height: 10),
-
-            /// ☰ Drawer button
-            /// ☰ Custom Modern Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
@@ -38,12 +34,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 children: [
                   Builder(
                     builder: (context) => IconButton(
-                      // Let's stick to the existing Icon if uncertain about assets, but style it better.
-                      // Actually, let's keep the Icon but wrap it for better touch target.
                       icon: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppColor.mainWhite,
+                          color: AppColor.secondaryblue,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
@@ -55,7 +49,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                         ),
                         child: Icon(
                           Icons.menu,
-                          color: AppColor.mainBlack,
+                          color: AppColor.mainWhite,
                           size: 24,
                         ),
                       ),

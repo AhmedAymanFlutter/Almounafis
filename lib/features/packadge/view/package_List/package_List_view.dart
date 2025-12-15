@@ -13,12 +13,14 @@ import '../../manager/package_cubit.dart';
 import '../../manager/package_state.dart';
 
 class PackagesListView extends StatelessWidget {
-  final String countryId;
+  final String countrySlug;
+  final String packageTypeSlug;
   final String countryName;
 
   const PackagesListView({
     super.key,
-    required this.countryId,
+    required this.countrySlug,
+    required this.packageTypeSlug,
     required this.countryName,
   });
 
@@ -29,21 +31,22 @@ class PackagesListView extends StatelessWidget {
         final isArabic = languageState == AppLanguage.arabic;
 
         return BlocProvider(
+          // ✅ Trigger Step 3 API Call
           create: (_) =>
-              PackageCubit(PackageTypeRepo())..getPackagesForCountry(countryId),
+              PackageCubit(PackageTypeRepo())
+                ..getPackagesForCountry(countrySlug, packageTypeSlug),
           child: Directionality(
             textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
             child: Scaffold(
               backgroundColor: AppColor.mainWhite,
               appBar: AppBar(
                 title: Text(
-                  isArabic ? (countryName) : countryName,
+                  countryName,
                   style: AppTextStyle.setPoppinsTextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: AppColor.mainBlack,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 leading: GestureDetector(
                   onTap: () => Navigator.pop(context),
@@ -61,8 +64,8 @@ class PackagesListView extends StatelessWidget {
               ),
               body: BlocBuilder<PackageCubit, PackageState>(
                 builder: (context, state) {
+                  // ✅ Handle Loading
                   if (state is PackagesLoading) {
-                    // ✅ Skeleton loading view
                     return ListView.separated(
                       padding: EdgeInsets.symmetric(
                         vertical: 16.h,
@@ -75,17 +78,22 @@ class PackagesListView extends StatelessWidget {
                         child: PackageCard(
                           title: "Loading...",
                           price: "—",
-                          image:
-                              "https://via.placeholder.com/421x200?text=Loading",
-                          description: "Loading package description...",
+                          image: "",
+                          description: "Loading...",
                           onTap: () {},
                         ),
                       ),
                     );
-                  } else if (state is PackagesLoaded) {
-                    final packagesData = state.packagesData;
-                    final packages =
-                        packagesData['data']?['packages'] as List? ?? [];
+                  }
+                  // ✅ Handle Success
+                  else if (state is PackagesLoaded) {
+                    // 🔍 Parsing the Map Data
+                    // Adjust based on exact API structure.
+                    // Example: { "data": { "packages": [...] } } or just { "data": [...] }
+                    final List<dynamic> packages =
+                        state.packagesData['data'] is List
+                        ? state.packagesData['data']
+                        : (state.packagesData['data']['packages'] ?? []);
 
                     if (packages.isEmpty) {
                       return Center(
@@ -110,20 +118,25 @@ class PackagesListView extends StatelessWidget {
                       itemCount: packages.length,
                       itemBuilder: (context, index) {
                         final package = packages[index];
+
                         final packageTitle = isArabic
-                            ? (package['titleAr'] ??
-                                package['title'] ??
-                                'بلا عنوان')
-                            : (package['title'] ?? 'Unknown');
-                        final packageId = package['_id'] ?? '';
+                            ? (package['nameAr'] ??
+                                  package['name'] ??
+                                  'بلا عنوان')
+                            : (package['name'] ?? 'Unknown');
+
+                        final packageSlug =
+                            package['slug'] ?? package['_id'] ?? '';
                         final packagePrice = package['price'] ?? 'N/A';
-                        final packageImage = package['image'] ??
-                            package['imageCover'] ??
-                            'https://via.placeholder.com/421x200?text=$packageTitle';
+
+                        final packageImage = package['imageCover'] is Map
+                            ? package['imageCover']['url']
+                            : (package['imageCover'] ?? '');
+
                         final packageDescription = isArabic
                             ? (package['descriptionAr'] ??
-                                package['description'] ??
-                                '')
+                                  package['description'] ??
+                                  '')
                             : (package['description'] ?? '');
 
                         return PackageCard(
@@ -132,11 +145,12 @@ class PackagesListView extends StatelessWidget {
                           image: packageImage,
                           description: packageDescription,
                           onTap: () {
+                            // Go to Details (Step 4)
                             Navigator.pushNamed(
                               context,
                               Routes.packageDetailsView,
                               arguments: {
-                                'packageId': packageId,
+                                'slug': packageSlug,
                                 'packageTitle': packageTitle,
                               },
                             );
@@ -145,18 +159,7 @@ class PackagesListView extends StatelessWidget {
                       },
                     );
                   } else if (state is PackageError) {
-                    return Center(
-                      child: Text(
-                        isArabic
-                            ? 'حدث خطأ: ${state.message}'
-                            : 'Error: ${state.message}',
-                        style: AppTextStyle.setPoppinsTextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.red,
-                        ),
-                      ),
-                    );
+                    return Center(child: Text(state.message));
                   }
 
                   return const SizedBox();
