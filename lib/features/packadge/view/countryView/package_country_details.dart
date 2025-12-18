@@ -13,7 +13,7 @@ import '../../manager/package_cubit.dart';
 import '../../manager/package_state.dart';
 
 class CountriesView extends StatelessWidget {
-  final String packageTypeSlug; // Changed from ID to Slug to match Repo
+  final String packageTypeSlug;
   final String packageTypeName;
   final String? packageTypeNameAr;
 
@@ -27,10 +27,8 @@ class CountriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      // ✅ Trigger Step 2 API Call immediately
-      create: (_) =>
-          PackageCubit(PackageTypeRepo())
-            ..getCountriesForPackageType(packageTypeSlug),
+      create: (_) => PackageCubit(PackageTypeRepo())
+        ..getCountriesForPackageType(packageTypeSlug),
       child: BlocBuilder<LanguageCubit, AppLanguage>(
         builder: (context, langState) {
           final isArabic = langState == AppLanguage.arabic;
@@ -61,7 +59,6 @@ class CountriesView extends StatelessWidget {
               ),
               body: BlocBuilder<PackageCubit, PackageState>(
                 builder: (context, state) {
-                  // ✅ Handle Loading State
                   if (state is CountriesLoading) {
                     return ListView.separated(
                       padding: EdgeInsets.symmetric(
@@ -80,21 +77,16 @@ class CountriesView extends StatelessWidget {
                         ),
                       ),
                     );
-                  }
-                  // ✅ Handle Success State
-                  else if (state is CountriesLoaded) {
-                    // 🔍 Parsing the Map Data
+                  } else if (state is CountriesLoaded) {
                     final List<dynamic> countries =
                         state.countriesData['data'] is List
-                        ? state.countriesData['data']
-                        : (state.countriesData['data']['countries'] ?? []);
+                            ? state.countriesData['data']
+                            : (state.countriesData['data']['countries'] ?? []);
 
                     if (countries.isEmpty) {
                       return Center(
                         child: Text(
-                          isArabic
-                              ? 'لا توجد دول متاحة'
-                              : 'No countries available',
+                          isArabic ? 'لا توجد دول متاحة' : 'No countries available',
                           style: AppTextStyle.setPoppinsTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -117,29 +109,35 @@ class CountriesView extends StatelessWidget {
                             ? (country['nameAr'] ?? country['name'] ?? 'دولة')
                             : (country['name'] ?? 'Country');
 
-                        // Use Slug for API calls, ID for other logic if needed
                         final countrySlug =
                             country['slug'] ?? country['_id'] ?? '';
 
-                        final countryImage =
-                            country['image'] ??
-                            country['imageCover']?['url'] ?? // Handle object structure if needed
-                            country['imageCover'] ??
-                            '';
+                        // ✅✅ FIXED IMAGE PARSING BASED ON YOUR LOGS ✅✅
+                        // Log shows: "images": { "coverImage": { "url": "..." } }
+                        String countryImage = '';
+
+                        if (country['images'] != null &&
+                            country['images']['coverImage'] != null) {
+                          countryImage =
+                              country['images']['coverImage']['url'] ?? '';
+                        } else if (country['image'] != null) {
+                          // Fallback for flat structure
+                          countryImage = country['image'] is Map
+                              ? country['image']['url']
+                              : country['image'];
+                        }
 
                         return CountryCard(
                           countryName: countryName,
                           countrySlug: countrySlug,
                           countryImage: countryImage,
                           onTap: () {
-                            // ✅ Navigate to Step 3
                             Navigator.pushNamed(
                               context,
                               Routes.packagesListView,
                               arguments: {
-                                'countrySlug': countrySlug, // Pass Slug
-                                'packageTypeSlug':
-                                    packageTypeSlug, // Pass Parent Slug
+                                'countrySlug': countrySlug,
+                                'packageTypeSlug': packageTypeSlug,
                                 'countryName': countryName,
                               },
                             );

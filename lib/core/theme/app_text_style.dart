@@ -19,7 +19,7 @@ class AppTextStyle {
 
   static TextStyle setPoppinsWhite({
     required double fontSize,
-    required FontWeight fontWeight,
+    required FontWeight fontWeight, 
   }){
     return GoogleFonts.poppins(
       fontSize: fontSize.sp,

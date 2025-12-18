@@ -20,7 +20,7 @@ class PackageCardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isArabic = context.watch<LanguageCubit>().isArabic;
-
+    print("Image URL: ${package.imageCover}");
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Container(
@@ -61,6 +61,7 @@ class PackageCardView extends StatelessWidget {
                 child: Stack(
                   children: [
                     CachedNetworkImage(
+                      
                       imageUrl: package.imageCover ?? '',
                       width: 420.w,
                       height: 200.h,

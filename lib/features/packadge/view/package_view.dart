@@ -76,8 +76,7 @@ class _PackageViewState extends State<PackageView> {
                     return PackageCardView(
                       package: pkg,
                       onTap: () {
-                        // ✅ Pass the Slug and Name to the next screen
-                        // We do NOT call the API here. The next screen will call it.
+                        
                         Navigator.pushNamed(
                           context,
                           Routes.countriesView,
@@ -122,4 +121,6 @@ class _PackageViewState extends State<PackageView> {
     _packageCubit.close();
     super.dispose();
   }
+  
+
 }

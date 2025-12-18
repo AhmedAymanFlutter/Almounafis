@@ -161,7 +161,7 @@ class PackageDetailsView extends StatelessWidget {
                                               Text(
                                                 isArabic
                                                     ? (details.nameAr ??
-                                                          packageTitle)
+                                                          'Tour ')
                                                     : (details.name ??
                                                           packageTitle),
                                                 style:

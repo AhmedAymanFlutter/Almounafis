@@ -24,7 +24,7 @@ class PackageTypeRepo {
               return ApiResponse(
                 status: true,
                 statusCode: apiResponse.statusCode,
-                data: allPackageData.data,
+                data: allPackageData,
                 message: 'تم تحميل الباقات بنجاح',
               );
             } else {
