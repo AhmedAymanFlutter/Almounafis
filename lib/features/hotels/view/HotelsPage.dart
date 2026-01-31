@@ -40,7 +40,6 @@ class __AllHotelsScreenContentState extends State<_AllHotelsScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-    final isArabic = context.watch<LanguageCubit>().isArabic;
 
     return Scaffold(
       appBar: AppBar(

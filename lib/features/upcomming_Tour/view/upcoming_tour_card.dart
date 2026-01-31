@@ -68,51 +68,48 @@ class UpcomingTourCard extends StatelessWidget {
             child: Row(
               children: [
                 // 🖼️ Modern Image Section
-                Hero(
-                  tag: 'tour_image_${tour.id ?? tour.sId}',
-                  child: Container(
-                    width: 110.w,
-                    height: 130.h,
-                    margin: EdgeInsets.all(6.w),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        hasImage
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Container(
-                                  color: Colors.grey[100],
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
+                Container(
+                  width: 110.w,
+                  height: 130.h,
+                  margin: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      hasImage
+                          ? CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: Colors.grey[100],
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
                                   ),
                                 ),
-                                errorWidget: (context, url, error) =>
-                                    _buildPlaceholder(isArabic),
-                              )
-                            : _buildPlaceholder(isArabic),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  _buildPlaceholder(isArabic),
+                            )
+                          : _buildPlaceholder(isArabic),
 
-                        // subtle gradient overlay
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.0),
-                                Colors.black.withOpacity(0.1),
-                              ],
-                            ),
+                      // subtle gradient overlay
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.0),
+                              Colors.black.withOpacity(0.1),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
 

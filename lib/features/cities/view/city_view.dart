@@ -11,21 +11,31 @@ import 'package:almonafs_flutter/features/cities/manger/city_state.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_stete.dart';
 import '../../../../config/router/routes.dart';
-// import 'package:almonafs_flutter/features/cities/data/model/cities_model.dart'; // Ensure this model exists
+import '../../localization/manager/localization_cubit.dart'; // Add this import
 
 class CityPage extends StatelessWidget {
   const CityPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CityCubit(CityRepository())..getCities(),
-      child: Scaffold(
-        backgroundColor: Colors.grey[100],
-        // You might want to localize this title
-        appBar: AppBar(title: const Text("Almounafies Destinations")),
-        body: const CityView(),
-      ),
+    return BlocBuilder<LanguageCubit, AppLanguage>(
+      builder: (context, languageState) {
+        final isArabic = languageState == AppLanguage.arabic;
+        return BlocProvider(
+          create: (context) => CityCubit(CityRepository())..getCities(),
+          child: Scaffold(
+            backgroundColor: Colors.grey[100],
+            appBar: AppBar(
+              leading: const SizedBox(),
+              title: Text(
+                isArabic ? "وجهات المنافس" : "Almounafies Destinations",
+              ),
+              centerTitle: true,
+            ),
+            body: const CityView(),
+          ),
+        );
+      },
     );
   }
 }
@@ -161,6 +171,9 @@ class CityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Check Directionality to determine if it is Arabic
+    final isArabic = Directionality.of(context) == TextDirection.rtl;
+
     // ✅ Safely resolve the image URL
     String? imageUrl;
     if (city.imagesObject?.coverImage?.url != null) {
@@ -227,7 +240,9 @@ class CityCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          city.name ?? "Unknown City",
+                          isArabic
+                              ? (city.nameAr ?? city.name ?? "مدينة غير معروفة")
+                              : (city.name ?? "Unknown City"),
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -236,6 +251,7 @@ class CityCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      // ... (rest of the card content)
                       if (city.weather?.currentTemp != null)
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -272,7 +288,11 @@ class CityCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    city.descriptionFlutter ?? city.description ?? "",
+                    isArabic
+                        ? (city.descriptionFlutter ??
+                              city.description ??
+                              "") // Fallback if no Ar specific field
+                        : (city.descriptionFlutter ?? city.description ?? ""),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(height: 1.4),
@@ -286,7 +306,9 @@ class CityCard extends StatelessWidget {
                       if (city.bestTimeToVisit?.months?.isNotEmpty == true)
                         _buildChip(
                           Icons.calendar_today,
-                          "Best: ${city.bestTimeToVisit!.months!.take(2).join(', ')}",
+                          isArabic
+                              ? "أفضل وقت: ${city.bestTimeToVisit!.months!.take(2).join(', ')}"
+                              : "Best: ${city.bestTimeToVisit!.months!.take(2).join(', ')}",
                         ),
                       if (city.weather?.windSpeed != null)
                         _buildChip(

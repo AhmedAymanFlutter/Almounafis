@@ -12,13 +12,15 @@ class CityCubit extends Cubit<CityState> {
       emit(CityLoading());
       final response = await _repository.fetchCities();
 
+      if (isClosed) return; // Prevent emitting after close
+
       if (response.success == true && response.data != null) {
         emit(CityLoaded(response));
       } else {
         emit(CityError(response.message ?? "Unknown error occurred"));
       }
     } catch (e) {
-      emit(CityError("Failed to fetch data: $e"));
+      if (!isClosed) emit(CityError("Failed to fetch data: $e"));
     }
   }
 
@@ -27,13 +29,15 @@ class CityCubit extends Cubit<CityState> {
       emit(CityDetailsLoading());
       final response = await _repository.fetchCityDetails(idOrSlug);
 
+      if (isClosed) return; // Prevent emitting after close
+
       if (response.success == true && response.data != null) {
         emit(CityDetailsLoaded(response));
       } else {
         emit(CityDetailsError(response.message ?? "Unknown error occurred"));
       }
     } catch (e) {
-      emit(CityDetailsError("Failed to fetch details: $e"));
+      if (!isClosed) emit(CityDetailsError("Failed to fetch details: $e"));
     }
   }
 }

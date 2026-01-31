@@ -17,11 +17,14 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
-          height: 80,
+          height: 80 + bottomPadding,
+          padding: EdgeInsets.only(bottom: bottomPadding),
           decoration: BoxDecoration(
             color: AppColor.secondaryblue,
             borderRadius: const BorderRadius.only(
@@ -46,7 +49,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 isSelected: currentIndex == 0,
                 onTap: () => onTap(0),
               ),
-              
+
               // Booking Tab (Center-Left)
               _NavBarItem(
                 icon: 'assets/icons/sleep.svg',
@@ -69,7 +72,6 @@ class CustomBottomNavBar extends StatelessWidget {
                 isSelected: currentIndex == 4,
                 onTap: () => onTap(4),
               ),
-
             ],
           ),
         ),
@@ -77,7 +79,7 @@ class CustomBottomNavBar extends StatelessWidget {
         Positioned(
           left: 0,
           right: 0,
-          bottom: 15,
+          bottom: 15 + bottomPadding,
           child: Center(
             child: _NavBarItem(
               icon: 'assets/icons/home.svg',
@@ -119,8 +121,8 @@ class _NavBarItem extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             decoration: isSelected || isCenter
                 ? BoxDecoration(
-                    color: isCenter 
-                        ? Colors.white 
+                    color: isCenter
+                        ? Colors.white
                         : Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
                     boxShadow: isCenter
@@ -139,8 +141,8 @@ class _NavBarItem extends StatelessWidget {
               width: isCenter ? 28 : 24,
               height: isCenter ? 28 : 24,
               colorFilter: ColorFilter.mode(
-                isCenter 
-                    ? AppColor.secondaryblue 
+                isCenter
+                    ? AppColor.secondaryblue
                     : (isSelected ? Colors.white : Colors.grey[300]!),
                 BlendMode.srcIn,
               ),
@@ -149,14 +151,15 @@ class _NavBarItem extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: AppTextStyle.setPoppinsWhite(
-              fontSize: isCenter ? 11 : 10,
-              fontWeight: isCenter ? FontWeight.w600 : FontWeight.w500,
-            ).copyWith(
-              color: isCenter 
-                  ? Colors.white 
-                  : (isSelected ? Colors.white : Colors.grey[300]),
-            ),
+            style:
+                AppTextStyle.setPoppinsWhite(
+                  fontSize: isCenter ? 11 : 10,
+                  fontWeight: isCenter ? FontWeight.w600 : FontWeight.w500,
+                ).copyWith(
+                  color: isCenter
+                      ? Colors.white
+                      : (isSelected ? Colors.white : Colors.grey[300]),
+                ),
           ),
         ],
       ),

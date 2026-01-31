@@ -1,9 +1,9 @@
 import 'package:almonafs_flutter/config/router/router_transation.dart';
 import 'package:almonafs_flutter/config/router/routes.dart';
+import 'package:almonafs_flutter/core/widgets/ExitConfirmWrapper_widget.dart';
 import 'package:almonafs_flutter/features/auth/presentation/views/sign_up_view.dart';
 import 'package:almonafs_flutter/features/cities/view/city_view.dart';
 import 'package:almonafs_flutter/features/cities/view/city_details_view.dart';
-
 import 'package:almonafs_flutter/features/flightScreen/view/UpcomingTripsPage.dart';
 import 'package:almonafs_flutter/features/home/presentation/views/home_view.dart';
 import 'package:almonafs_flutter/features/onboarding/presentation/views/on_boarding_view.dart';
@@ -33,13 +33,21 @@ class AppRouter {
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.splash:
-        return RouterTransitions.build(SplashScreen());
+        return RouterTransitions.build(
+          ExitConfirmWrapper(child: SplashScreen()),
+        );
       case Routes.onBoarding:
-        return RouterTransitions.build(OnBoardingView());
+        return RouterTransitions.build(
+          ExitConfirmWrapper(child: OnBoardingView()),
+        );
       case Routes.signUp:
-        return RouterTransitions.buildHorizontal(SignUpView());
+        return RouterTransitions.buildHorizontal(
+          ExitConfirmWrapper(child: SignUpView()),
+        );
       case Routes.home:
-        return RouterTransitions.buildHorizontal(HomeView());
+        return RouterTransitions.buildHorizontal(
+          ExitConfirmWrapper(child: HomeView()),
+        );
       case Routes.packageView:
         return RouterTransitions.buildHorizontal(PackageView());
       case Routes.countriesView:

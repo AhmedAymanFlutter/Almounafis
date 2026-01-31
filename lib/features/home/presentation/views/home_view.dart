@@ -1,6 +1,7 @@
 import 'package:almonafs_flutter/features/global_Settings/data/model/global_Setting_model.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_stete.dart';
+import 'package:almonafs_flutter/features/home/presentation/views/widget/modern_home_content.dart';
 import 'package:almonafs_flutter/features/packadge/view/package_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +13,6 @@ import '../../../flightScreen/view/UpcomingTripsPage.dart';
 import '../../../hotels/view/HotelsPage.dart';
 import '../../../localization/manager/localization_cubit.dart';
 import 'widget/cusstom_drawer_widget.dart';
-import 'widget/home_content.dart';
 import 'widget/custom_bottom_nav_bar.dart';
 
 class HomeView extends StatefulWidget {
@@ -77,8 +77,10 @@ class _HomeViewState extends State<HomeView> {
                     width: 30,
                     height: 30,
                     fit: BoxFit.scaleDown,
-                    colorFilter:
-                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
                 drawer: CustomDrawer(
@@ -87,7 +89,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 body: SafeArea(
                   child: _selectedIndex == 1
-                      ? const HomeContent()
+                      ? const ModernHomeContent()
                       : _buildOtherPages(),
                 ),
                 bottomNavigationBar: CustomBottomNavBar(
@@ -114,7 +116,7 @@ class _HomeViewState extends State<HomeView> {
       case 4:
         return const CityPage();
       default:
-        return const HomeContent();
+        return const ModernHomeContent();
     }
   }
 }
