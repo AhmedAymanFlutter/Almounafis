@@ -1,3 +1,4 @@
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/theme/app_color.dart';
@@ -15,7 +16,7 @@ class ModernSearchBar extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20.r),
@@ -32,15 +33,20 @@ class ModernSearchBar extends StatelessWidget {
               Icon(Icons.search, color: Colors.grey, size: 24.sp),
               SizedBox(width: 12.w),
               Expanded(
-                child: Text(
-                  isArabic
-                      ? 'ابحث عن وجهتك التالية...'
-                      : 'Search your next destination...',
-                  style: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 14.sp,
-                    fontFamily:
-                        'Poppins', // Assuming Poppins is available as per pubspec
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: isArabic
+                        ? 'ابحث عن وجهتك التالية...'
+                        : 'Search your next destination...',
+                    hintStyle: AppTextStyle.setPoppinsSecondlightGrey(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
                   ),
                 ),
               ),
