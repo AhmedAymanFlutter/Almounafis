@@ -44,9 +44,9 @@ class CountryCubit extends Cubit<CountryState> {
       if (isClosed) return;
 
       if (response.status) {
-        final countryData = response.data;
-        if (countryData != null && countryData.data != null) {
-          emit(SingleCountryLoaded(countryData.data!));
+        final countryData = response.data; // Already CountryDetailsData
+        if (countryData != null) {
+          emit(SingleCountryLoaded(countryData));
         } else {
           emit(const SingleCountryError("لم يتم العثور على بيانات الدولة."));
         }

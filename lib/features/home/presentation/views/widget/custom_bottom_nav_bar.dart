@@ -50,25 +50,22 @@ class CustomBottomNavBar extends StatelessWidget {
                 onTap: () => onTap(0),
               ),
 
-              // Booking Tab (Center-Left)
               _NavBarItem(
                 icon: 'assets/icons/sleep.svg',
                 label: isArabic ? 'الفنادق' : 'hotels',
                 isSelected: currentIndex == 2,
                 onTap: () => onTap(2),
               ),
-              // Empty space for Home (will be in Stack)
               const SizedBox(width: 60),
-              // Profile Tab (Center-Right)
               _NavBarItem(
                 icon: 'assets/icons/Packages.svg',
-                label: isArabic ? 'الحزم' : 'packages',
+                label: isArabic ? 'الباقات' : 'packages',
                 isSelected: currentIndex == 3,
                 onTap: () => onTap(3),
               ),
               _NavBarItem(
                 icon: 'assets/icons/city-block-svgrepo-com.svg',
-                label: isArabic ? 'الحزم' : 'cites',
+                label: isArabic ? 'المدن' : 'cities',
                 isSelected: currentIndex == 4,
                 onTap: () => onTap(4),
               ),

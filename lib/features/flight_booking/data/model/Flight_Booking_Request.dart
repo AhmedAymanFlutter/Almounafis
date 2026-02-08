@@ -27,31 +27,60 @@ class FlightBookingRequest {
     required this.bookingMethod,
   });
 
-  Map<String, dynamic> toJson() {
-    // ✅ نظف الـ dates من المسافات
-    final cleanDepartureDate = departureDate.replaceAll(' ', '');
-    final cleanReturnDate = returnDate?.replaceAll(' ', '');
+  // Helper method to convert date from dd-MM-yyyy to ISO 8601
+  String _convertToISODate(String dateStr) {
+    try {
+      // Remove spaces and split the date
+      final cleanDate = dateStr.replaceAll(' ', '');
+      final parts = cleanDate.split('-');
 
+      if (parts.length == 3) {
+        final day = parts[0].padLeft(2, '0');
+        final month = parts[1].padLeft(2, '0');
+        final year = parts[2];
+
+        // Return ISO 8601 format with time
+        return '$year-$month-${day}T08:00:00.000Z';
+      }
+
+      // If format is wrong, return as is
+      return cleanDate;
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  Map<String, dynamic> toJson() {
     return {
       'tripType': tripType,
-      'origin': origin,
-      'destination': destination,
-      'departureDate': cleanDepartureDate, 
-      if (cleanReturnDate != null && cleanReturnDate.isNotEmpty) 
-        'returnDate': cleanReturnDate,
+      'origin': {
+        'city': origin,
+        'cityAr': origin,
+        'airport': origin,
+        'airportCode': origin,
+      },
+      'destination': {
+        'city': destination,
+        'cityAr': destination,
+        'airport': destination,
+        'airportCode': destination,
+      },
+      'departureDate': _convertToISODate(departureDate),
+      if (returnDate != null && returnDate!.isNotEmpty)
+        'returnDate': _convertToISODate(returnDate!),
       'passengers': {
         'adults': adults,
         'children': children,
         'infants': infants,
       },
-      if (airlinePreference != null && airlinePreference!.isNotEmpty) 
+      if (airlinePreference != null && airlinePreference!.isNotEmpty)
         'airlinePreference': airlinePreference,
       'travelClass': travelClass,
       'contactInfo': {
         'email': contactInfo['email'],
         'phone': contactInfo['phone'],
         'countryCode': contactInfo['countryCode'],
-        if (contactInfo['whatsapp'] != null && 
+        if (contactInfo['whatsapp'] != null &&
             (contactInfo['whatsapp'] as String).isNotEmpty)
           'whatsapp': contactInfo['whatsapp'],
       },

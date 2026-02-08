@@ -3,7 +3,6 @@ class Routes {
   static const String splash = '/splash';
   static const String home = '/home';
   static const String onBoarding = '/onBoarding';
-  static const String signUp = '/signUp';
   static const String seeAllPage = '/SeeAllPage';
   static const String tourCity = '/CityToursView';
   static const String countryDetails = '/SingleCountryView';
@@ -25,4 +24,6 @@ class Routes {
   static const String flightBookingScreen = '/FlightBookingScreen';
   static const String cityPage = '/CityPage';
   static const String cityDetailsPage = '/CityDetailsPage';
+  static const String allHotelsPage = '/AllHotelsPage';
+  static const String viatorAllToursPage = '/viatorAllToursPage';
 }

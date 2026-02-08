@@ -1,4 +1,6 @@
 import 'package:almonafs_flutter/config/router/app_router.dart' show AppRouter;
+import 'package:almonafs_flutter/features/cities/data/repo/citeies_repo.dart';
+import 'package:almonafs_flutter/features/cities/manger/city_cubit.dart';
 import 'package:almonafs_flutter/features/getAilplaneState/data/repo/Airplan_city_repo.dart';
 import 'package:almonafs_flutter/features/global_Settings/data/repo/global_Setting_repo.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_cubit.dart';
@@ -32,6 +34,7 @@ class AlmonafsApp extends StatelessWidget {
       child: MultiRepositoryProvider(
         providers: [
           RepositoryProvider(create: (_) => CountryRepository()),
+          RepositoryProvider(create: (_) => CityRepository()),
           RepositoryProvider(create: (_) => CityTourRepository()),
           RepositoryProvider(
             create: (_) => ServicesRepository(
@@ -73,6 +76,9 @@ class AlmonafsApp extends StatelessWidget {
               create: (_) =>
                   GlobalSettingsCubit(repository: GlobalSettingsRepository())
                     ..getGlobalSettings(),
+            ),
+            BlocProvider(
+              create: (context) => CityCubit(context.read<CityRepository>()),
             ),
           ],
           child: BlocBuilder<LanguageCubit, AppLanguage>(

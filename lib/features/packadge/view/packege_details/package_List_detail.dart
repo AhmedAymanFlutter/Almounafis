@@ -1,5 +1,6 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
+import 'package:almonafs_flutter/core/helper/html_helper.dart'; // Import HtmlHelper
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +9,8 @@ import '../../data/repo/package_repo.dart';
 import '../../manager/package_cubit.dart';
 import '../../manager/package_state.dart';
 import 'widget/build_book_btn.dart';
+import 'widget/itinerary_widget.dart';
+import 'widget/inclusions_widget.dart';
 
 class PackageDetailsView extends StatelessWidget {
   final String slug;
@@ -37,17 +40,23 @@ class PackageDetailsView extends StatelessWidget {
                   if (state is PackageDetailsLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is PackageDetailsLoaded) {
-                    final details = state.packageDetails.data?.first;
+                    // Access PackageDetailsData directly
+                    final details = state.packageDetails;
 
-                    if (details == null) {
-                      return Center(
-                        child: Text(
-                          isArabic
-                              ? 'لا توجد تفاصيل متاحة'
-                              : 'No details available',
-                        ),
-                      );
-                    }
+                    // Determine fields based on language
+                    final title = isArabic
+                        ? (details.titleAr ?? details.title)
+                        : (details.title ?? packageTitle);
+                    final descriptionHtml = isArabic
+                        ? (details.descriptionAr ?? details.description)
+                        : details.description;
+                    final description = HtmlHelper.stripHtml(
+                      descriptionHtml ?? '',
+                    );
+
+                    final price = details.pricing?.price ?? 'N/A';
+                    final currency = details.pricing?.currency ?? '';
+                    final imageUrl = details.images?.coverImage?.url ?? '';
 
                     return Scaffold(
                       body: Padding(
@@ -72,7 +81,7 @@ class PackageDetailsView extends StatelessWidget {
                                             30.r,
                                           ),
                                           child: Image.network(
-                                            details.imageCover ?? '',
+                                            imageUrl,
                                             height: 650.h,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
@@ -159,11 +168,7 @@ class PackageDetailsView extends StatelessWidget {
                                                 : CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                isArabic
-                                                    ? (details.nameAr ??
-                                                          'Tour ')
-                                                    : (details.name ??
-                                                          packageTitle),
+                                                title ?? '',
                                                 style:
                                                     AppTextStyle.setPoppinsTextStyle(
                                                       fontSize: 22,
@@ -187,7 +192,7 @@ class PackageDetailsView extends StatelessWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // ⏱️ المدة
+                                          // ⏱️ المدة / السعر
                                           Container(
                                             padding: EdgeInsets.symmetric(
                                               horizontal: 12.w,
@@ -203,7 +208,7 @@ class PackageDetailsView extends StatelessWidget {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  isArabic ? ' السعر' : 'price',
+                                                  isArabic ? ' السعر' : 'Price',
                                                   style:
                                                       AppTextStyle.setPoppinsTextStyle(
                                                         fontSize: 10,
@@ -215,7 +220,7 @@ class PackageDetailsView extends StatelessWidget {
                                                 ),
                                                 SizedBox(height: 4.h),
                                                 Text(
-                                                  (details.price).toString(),
+                                                  '$price $currency',
                                                   style:
                                                       AppTextStyle.setPoppinsTextStyle(
                                                         fontSize: 16,
@@ -241,11 +246,11 @@ class PackageDetailsView extends StatelessWidget {
                                           ),
                                           SizedBox(height: 12.h),
                                           Text(
-                                            (isArabic
-                                                ? (details.descriptionAr ??
-                                                      'لا يوجد وصف متاح')
-                                                : (details.description ??
-                                                      'No description available')),
+                                            description.isNotEmpty
+                                                ? description
+                                                : (isArabic
+                                                      ? 'لا يوجد وصف متاح'
+                                                      : 'No description available'),
                                             style:
                                                 AppTextStyle.setPoppinsTextStyle(
                                                   fontSize: 13,
@@ -256,6 +261,37 @@ class PackageDetailsView extends StatelessWidget {
                                                 ? TextAlign.right
                                                 : TextAlign.left,
                                           ),
+
+                                          if (details.itinerary != null &&
+                                              details
+                                                  .itinerary!
+                                                  .isNotEmpty) ...[
+                                            SizedBox(height: 24.h),
+                                            ItineraryWidget(
+                                              itinerary: details.itinerary!,
+                                              isArabic: isArabic,
+                                            ),
+                                          ],
+
+                                          if ((details.includes != null &&
+                                                  details
+                                                      .includes!
+                                                      .isNotEmpty) ||
+                                              (details.excludes != null &&
+                                                  details
+                                                      .excludes!
+                                                      .isNotEmpty)) ...[
+                                            SizedBox(height: 24.h),
+                                            InclusionsWidget(
+                                              includes: details.includes,
+                                              excludes: details.excludes,
+                                              isArabic: isArabic,
+                                            ),
+                                          ],
+
+                                          SizedBox(
+                                            height: 100.h,
+                                          ), // Bottom padding for button
                                         ],
                                       ),
                                     ),

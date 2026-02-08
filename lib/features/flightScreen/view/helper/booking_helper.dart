@@ -13,8 +13,8 @@ class BookingHelper {
   static void handleSearchButtonPress(
     BuildContext context,
     bool isArabic, {
-    required dynamic selectedFromCity,
-    required dynamic selectedToCity,
+    required String fromCity,
+    required String toCity,
     required TextEditingController departureDateController,
     required TextEditingController returnDateController,
     required bool isRoundTrip,
@@ -28,21 +28,21 @@ class BookingHelper {
     required TextEditingController whatsappController,
   }) {
     // ✅ Validation checks
-    if (selectedFromCity?.id == null) {
+    if (fromCity.trim().isEmpty) {
       _showError(
         context,
         isArabic
-            ? 'الرجاء اختيار مدينة المغادرة'
-            : 'Please select departure city',
+            ? 'الرجاء إدخال مدينة المغادرة'
+            : 'Please enter departure city',
       );
       return;
     }
-    if (selectedToCity?.id == null) {
+    if (toCity.trim().isEmpty) {
       _showError(
         context,
         isArabic
-            ? 'الرجاء اختيار مدينة الوصول'
-            : 'Please select destination city',
+            ? 'الرجاء إدخال مدينة الوصول'
+            : 'Please enter destination city',
       );
       return;
     }
@@ -65,8 +65,8 @@ class BookingHelper {
 
     // ✅ Build request
     final bookingRequest = FlightBookingRequest(
-      origin: selectedFromCity!.id!,
-      destination: selectedToCity!.id!,
+      origin: fromCity.trim(),
+      destination: toCity.trim(),
       tripType: isRoundTrip ? 'round-trip' : 'one-way',
       departureDate: departureDateController.text,
       returnDate: isRoundTrip ? returnDateController.text : null,
@@ -96,8 +96,8 @@ class BookingHelper {
           child: ContactInfoView(
             bookingRequest: bookingRequest,
             selectedAirline: selectedAirlineData,
-            fromCity: selectedFromCity,
-            toCity: selectedToCity,
+            fromCity: fromCity,
+            toCity: toCity,
           ),
         ),
       ),

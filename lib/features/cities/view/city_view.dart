@@ -188,7 +188,10 @@ class CityCard extends StatelessWidget {
         Navigator.pushNamed(
           context,
           Routes.cityDetailsPage,
-          arguments: {'idOrSlug': city.id ?? city.name, 'cityName': city.name},
+          arguments: {
+            'idOrSlug': city.slug ?? city.id ?? city.name,
+            'cityName': city.name,
+          },
         );
       },
       child: Card(

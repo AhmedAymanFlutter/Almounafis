@@ -3,7 +3,10 @@ import 'package:almonafs_flutter/features/cities/manger/city_state.dart';
 import 'package:almonafs_flutter/features/cities/view/widgets/city_details_header.dart';
 import 'package:almonafs_flutter/features/cities/view/widgets/city_info_section.dart';
 import 'package:almonafs_flutter/features/cities/view/widgets/city_tours_section.dart';
+import 'package:almonafs_flutter/features/cities/view/widgets/city_gallery_section.dart';
+import 'package:almonafs_flutter/features/cities/view/widgets/related_cities_section.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CityDetailsView extends StatelessWidget {
@@ -59,8 +62,21 @@ class CityDetailsView extends StatelessWidget {
                         // Description Section
                         CityInfoSection(city: city),
 
-                        if (city.packages?.isNotEmpty == true)
-                          const SizedBox(height: 32),
+                        SizedBox(height: 24.h),
+
+                        // Gallery Section
+                        if (city.images?.isNotEmpty == true) ...[
+                          CityGallerySection(images: city.images!),
+                          SizedBox(height: 24.h),
+                        ],
+
+                        // Related Cities Section
+                        if (city.relatedCities?.isNotEmpty == true) ...[
+                          RelatedCitiesSection(
+                            relatedCities: city.relatedCities!,
+                          ),
+                          SizedBox(height: 24.h),
+                        ],
 
                         // Tours Section (Vertical List)
                         if (city.cityTours?.isNotEmpty == true)

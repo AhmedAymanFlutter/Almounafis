@@ -18,7 +18,9 @@ class CityDetailsResponse {
   CityDetailsResponse.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
-    data = json['data'] != null ? CityDetails.fromJson(json['data']) : null;
+    data = json['data'] != null && json['data']['city'] != null
+        ? CityDetails.fromJson(json['data']['city'])
+        : null;
   }
 }
 
@@ -33,18 +35,12 @@ class CityDetails {
   Coordinates? coordinates;
   Weather? weather;
   BestTimeToVisit? bestTimeToVisit;
-  SeoPage?
-  seo; // Note: In CityResponse it was SeoPage, in JSON it is 'seo' with meta tags. The provided JSON has 'seo' object which looks like 'Seo' class in package_model, but let's check.
-  // In the provided JSON: "seo": { "metaTitle": ... } -> This matches 'Seo' class in package_model.dart or similar.
-  // In existing cities_model.dart, 'SeoPage' has 'hero' and 'header'.
-  // The provided JSON has "seo" (meta) AND "seoPage" is NOT in the top level data of single city? Wait, let's check JSON again.
-  // JSON has 'seo' inside 'data'. It does NOT show 'seoPage' (hero/header) in the 'data' of the single city JSON provided by user.
-  // However, the user might want to show hero section?
-  // The provided JSON has 'images', 'packages', 'cityTours'.
-
+  CitySeo? seo;
+  Country? country;
+  List<RelatedCity>? relatedCities;
   List<ImageItem>? images;
-  List<pkg.Data>? packages; // reusing Package Data model
-  List<tour.CityTourData>? cityTours; // reusing CityTourData model
+  List<pkg.Data>? packages;
+  List<tour.CityTourData>? cityTours;
 
   CityDetails.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
@@ -65,11 +61,27 @@ class CityDetails {
         ? BestTimeToVisit.fromJson(json['bestTimeToVisit'])
         : null;
 
+    // Parse SEO data
+    seo = json['seo'] != null ? CitySeo.fromJson(json['seo']) : null;
+
+    // Parse country
+    country = json['country'] != null
+        ? Country.fromJson(json['country'])
+        : null;
+
     // Images
     if (json['images'] != null && json['images'] is List) {
       images = [];
       json['images'].forEach((v) {
         images!.add(ImageItem.fromJson(v));
+      });
+    }
+
+    // Related Cities
+    if (json['relatedCities'] != null && json['relatedCities'] is List) {
+      relatedCities = [];
+      json['relatedCities'].forEach((v) {
+        relatedCities!.add(RelatedCity.fromJson(v));
       });
     }
 
@@ -88,5 +100,53 @@ class CityDetails {
         cityTours!.add(tour.CityTourData.fromJson(v));
       });
     }
+  }
+}
+
+// SEO Data Model
+class CitySeo {
+  String? metaTitle;
+  String? metaTitleAr;
+  String? metaDescription;
+  String? metaDescriptionAr;
+  String? slugUrl;
+
+  CitySeo.fromJson(Map<String, dynamic> json) {
+    metaTitle = json['metaTitle'];
+    metaTitleAr = json['metaTitleAr'];
+    metaDescription = json['metaDescription'];
+    metaDescriptionAr = json['metaDescriptionAr'];
+    slugUrl = json['slugUrl'];
+  }
+}
+
+// Related City Model
+class RelatedCity {
+  String? id;
+  String? name;
+  String? nameAr;
+  String? slug;
+  CoverImage? coverImage;
+
+  RelatedCity.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
+    name = json['name'];
+    nameAr = json['nameAr'];
+    slug = json['slug'];
+    coverImage = json['coverImage'] != null
+        ? CoverImage.fromJson(json['coverImage'])
+        : null;
+  }
+}
+
+class CoverImage {
+  String? url;
+  String? alt;
+  String? altAr;
+
+  CoverImage.fromJson(Map<String, dynamic> json) {
+    url = json['url'];
+    alt = json['alt'];
+    altAr = json['altAr'];
   }
 }

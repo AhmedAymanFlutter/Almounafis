@@ -1,4 +1,5 @@
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart';
+import 'package:almonafs_flutter/features/singel_country/data/model/country_details_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class CountryState extends Equatable {
@@ -32,7 +33,7 @@ class CountryError extends CountryState {
 class SingleCountryLoading extends CountryState {}
 
 class SingleCountryLoaded extends CountryState {
-  final CountryData country;
+  final CountryDetailsData country;
   const SingleCountryLoaded(this.country);
 
   @override

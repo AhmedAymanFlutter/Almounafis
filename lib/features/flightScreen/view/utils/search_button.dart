@@ -4,8 +4,8 @@ import '../helper/booking_helper.dart'; // ✅ adjust this import path if needed
 class SearchButton extends StatelessWidget {
   final bool isArabic;
   final BuildContext contextRef; // pass parent context
-  final dynamic selectedFromCity;
-  final dynamic selectedToCity;
+  final String fromCity;
+  final String toCity;
   final TextEditingController departureDateController;
   final TextEditingController? returnDateController;
   final bool isRoundTrip;
@@ -22,8 +22,8 @@ class SearchButton extends StatelessWidget {
     super.key,
     required this.isArabic,
     required this.contextRef,
-    required this.selectedFromCity,
-    required this.selectedToCity,
+    required this.fromCity,
+    required this.toCity,
     required this.departureDateController,
     this.returnDateController,
     required this.isRoundTrip,
@@ -80,8 +80,8 @@ class SearchButton extends StatelessWidget {
     BookingHelper.handleSearchButtonPress(
       contextRef,
       isArabic,
-      selectedFromCity: selectedFromCity,
-      selectedToCity: selectedToCity,
+      fromCity: fromCity,
+      toCity: toCity,
       departureDateController: departureDateController,
       returnDateController: returnDateController ?? TextEditingController(),
       isRoundTrip: isRoundTrip,

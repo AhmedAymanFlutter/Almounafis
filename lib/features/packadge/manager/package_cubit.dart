@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/model/package_model.dart';
+import '../data/model/package_details_model.dart';
 import '../data/repo/package_repo.dart';
 import 'package_state.dart';
 
@@ -56,7 +57,7 @@ class PackageCubit extends Cubit<PackageState> {
     if (isClosed) return;
 
     if (response.status) {
-      emit(PackageDetailsLoaded(response.data as PackageModel));
+      emit(PackageDetailsLoaded(response.data as PackageDetailsData));
     } else {
       emit(PackageError(response.message));
     }

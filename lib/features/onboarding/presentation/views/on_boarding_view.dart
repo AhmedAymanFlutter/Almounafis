@@ -49,7 +49,7 @@ class OnBoardingView extends StatelessWidget {
                 SizedBox(height: 70.h),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, Routes.signUp);
+                    Navigator.pushReplacementNamed(context, Routes.home);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.mainWhite,

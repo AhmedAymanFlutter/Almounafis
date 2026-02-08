@@ -40,4 +40,22 @@ class CityRepository {
       throw Exception("Repository Error: $e");
     }
   }
+
+  /// Fetch cities by country ID
+  Future<CityResponse> fetchCitiesByCountry(String countryId) async {
+    try {
+      final ApiResponse response = await _apiHelper.getRequest(
+        endPoint: EndPoints.cities,
+        queryParameters: {'country': countryId},
+      );
+
+      if (response.data != null) {
+        return CityResponse.fromJson(response.data);
+      } else {
+        throw Exception(response.message);
+      }
+    } catch (e) {
+      throw Exception("Repository Error: $e");
+    }
+  }
 }

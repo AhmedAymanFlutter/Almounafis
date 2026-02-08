@@ -1,5 +1,4 @@
 import 'package:almonafs_flutter/features/flight_booking/view/widget/confirm_booking_button.dart';
-import 'package:almonafs_flutter/features/getAilplaneState/data/model/Airplane_City_model.dart';
 import 'package:almonafs_flutter/features/global_Settings/manager/global_stete.dart';
 import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
 import 'package:flutter/material.dart';
@@ -17,15 +16,15 @@ import 'widget/contact_summary_card.dart';
 class ContactInfoView extends StatefulWidget {
   final FlightBookingRequest bookingRequest;
   final AirLineData? selectedAirline;
-  final GetCitesAirplane? fromCity;
-  final GetCitesAirplane? toCity;
+  final String fromCity;
+  final String toCity;
 
   const ContactInfoView({
     super.key,
     required this.bookingRequest,
     this.selectedAirline,
-    this.fromCity,
-    this.toCity,
+    required this.fromCity,
+    required this.toCity,
   });
 
   @override
@@ -52,13 +51,9 @@ class _ContactInfoViewState extends State<ContactInfoView> {
     final booking = widget.bookingRequest;
     final airline = widget.selectedAirline;
 
-    final fromCityName = isArabic
-        ? (widget.fromCity?.nameAr ?? widget.fromCity?.name ?? 'غير محددة')
-        : (widget.fromCity?.name ?? widget.fromCity?.nameAr ?? 'Not specified');
+    final fromCityName = isArabic ? widget.fromCity : widget.fromCity;
 
-    final toCityName = isArabic
-        ? (widget.toCity?.nameAr ?? widget.toCity?.name ?? 'غير محددة')
-        : (widget.toCity?.name ?? widget.toCity?.nameAr ?? 'Not specified');
+    final toCityName = isArabic ? widget.toCity : widget.toCity;
 
     if (isArabic) {
       return '''

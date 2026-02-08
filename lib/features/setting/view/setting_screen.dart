@@ -3,7 +3,7 @@ import 'package:almonafs_flutter/features/auth/presentation/widgets/account_info
 import 'package:flutter/material.dart';
 
 import '../../servicepackadge/view/Service_view.dart';
-import '../../auth/presentation/views/sign_up_view.dart';
+
 import '../widget/About_us.dart';
 import '../widget/card_sitting.dart';
 import '../widget/languang.dart';
@@ -31,19 +31,6 @@ class SittingScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MenuItemWidget(
-                        title: 'Account',
-                        onTap: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpView(),
-                            ),
-                            (route) => false,
-                          );
-                        },
-                        iconPath: 'assets/icons/user.svg',
-                      ),
                       SizedBox(height: 10),
                       MenuItemWidget(
                         title: 'Languange',

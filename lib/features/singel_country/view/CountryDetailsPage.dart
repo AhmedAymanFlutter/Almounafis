@@ -12,6 +12,9 @@ import '../../localization/manager/localization_cubit.dart';
 import 'widget/build_Booking_Button.dart';
 import 'widget/build_Info_Card.dart';
 import 'widget/build_Styled_Cover_Image.dart';
+import 'widget/country_cities_widget.dart';
+import 'widget/related_countries_widget.dart';
+import 'widget/tour_guide_section.dart';
 import 'widget/shimmer_widget.dart';
 
 class CountryDetailsPage extends StatefulWidget {
@@ -41,7 +44,7 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
     final isArabic = context.watch<LanguageCubit>().isArabic;
 
     return Scaffold(
-      bottomNavigationBar:   buildBookButton(context),
+      bottomNavigationBar: buildBookButton(context),
       body: BlocBuilder<CountryCubit, CountryState>(
         builder: (context, state) {
           if (state is SingleCountryLoading) {
@@ -101,8 +104,6 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                         ),
                         SizedBox(height: 24.h),
 
-                      
-
                         SizedBox(height: 24.h),
                         Text(
                           isArabic ? 'نبذة عن البلد' : 'About',
@@ -116,21 +117,22 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                         Text(
                           isArabic
                               ? (country.descriptionArFlutter ??
-                                  country.descriptionFlutter ??
-                                  'لا توجد معلومات حالياً')
+                                    country.descriptionFlutter ??
+                                    'لا توجد معلومات حالياً')
                               : (country.descriptionFlutter ??
-                                  country.description ??
-                                  'No description available'),
+                                    country.description ??
+                                    'No description available'),
                           style: AppTextStyle.setPoppinsTextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w300,
-                            color: AppColor.mainBlack,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColor.secondaryBlack,
+                            height: 1.6,
                           ),
                         ),
 
                         // جاليري الصور
-                        if (country.images != null &&
-                            country.images!.isNotEmpty) ...[
+                        if (country.images?.gallery != null &&
+                            country.images!.gallery!.isNotEmpty) ...[
                           SizedBox(height: 24.h),
                           Text(
                             isArabic ? 'المعرض' : 'Gallery',
@@ -144,20 +146,21 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                             height: 120.h,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: country.images!.length,
+                              itemCount: country.images!.gallery!.length,
                               itemBuilder: (context, index) {
+                                final imageUrl =
+                                    country.images!.gallery![index].url ?? '';
                                 return Padding(
                                   padding: EdgeInsets.only(right: 12.w),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: CachedNetworkImage(
-                                      imageUrl: country.images![index],
+                                      imageUrl: imageUrl,
                                       width: 150.w,
                                       height: 120.h,
                                       fit: BoxFit.cover,
                                       placeholder: (context, url) => Shimmer(
-                                        duration:
-                                            const Duration(seconds: 2),
+                                        duration: const Duration(seconds: 2),
                                         color: Colors.grey.shade400,
                                         colorOpacity: 0.3,
                                         enabled: true,
@@ -167,15 +170,13 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                                           color: Colors.grey[300],
                                         ),
                                       ),
-                                      errorWidget:
-                                          (context, url, error) =>
-                                              Container(
-                                        width: 150.w,
-                                        height: 120.h,
-                                        color: Colors.grey[300],
-                                        child:
-                                            const Icon(Icons.error),
-                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                            width: 150.w,
+                                            height: 120.h,
+                                            color: Colors.grey[300],
+                                            child: const Icon(Icons.error),
+                                          ),
                                     ),
                                   ),
                                 );
@@ -183,6 +184,32 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                             ),
                           ),
                         ],
+
+                        // Cities in this country
+                        SizedBox(height: 24.h),
+                        CountryCitiesWidget(
+                          countryId: country.sId ?? '',
+                          countryName: isArabic
+                              ? (country.nameAr ?? country.name ?? '')
+                              : (country.name ?? ''),
+                        ),
+
+                        // Related Countries Section
+                        SizedBox(height: 32.h),
+                        RelatedCountriesWidget(
+                          relatedCountries: country.relatedCountries,
+                          isArabic: isArabic,
+                        ),
+                        SizedBox(height: 24.h),
+
+                        // Tour Guide Section
+                        SizedBox(height: 32.h),
+                        TourGuideSection(
+                          countrySlug:
+                              country.seo?.slugUrl ?? widget.countryIdOrSlug,
+                          isArabic: isArabic,
+                        ),
+                        SizedBox(height: 24.h),
                       ],
                     ),
                   ),
@@ -207,9 +234,9 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                   SizedBox(height: 16.h),
                   ElevatedButton(
                     onPressed: () {
-                      context
-                          .read<CountryCubit>()
-                          .fetchCountryDetails(widget.countryIdOrSlug);
+                      context.read<CountryCubit>().fetchCountryDetails(
+                        widget.countryIdOrSlug,
+                      );
                     },
                     child: Text(isArabic ? 'أعد المحاولة' : 'Try Again'),
                   ),

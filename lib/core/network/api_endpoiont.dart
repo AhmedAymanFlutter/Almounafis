@@ -1,5 +1,5 @@
 abstract class EndPoints {
-  static const String baseUrl = 'https://api.almounafies.com/api/';
+  static const String baseUrl = 'http://192.168.1.4:5000/api/';
   static const String countries = '/countries';
   static const String getPopularTours = 'tours/popular';
   static const String refreshToken = 'refresh_token';
@@ -11,4 +11,6 @@ abstract class EndPoints {
   static const String bookFlight = 'flight-bookings';
   static const String getGlobalSettings = 'global-settings';
   static const String cities = 'cities';
+  static const String tourGuides = 'tour-guides';
+  static String viatorTours = "viator/tours";
 }

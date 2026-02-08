@@ -2,6 +2,7 @@ import 'package:almonafs_flutter/core/network/api_response.dart';
 import 'package:almonafs_flutter/core/network/api_endpoiont.dart';
 import 'package:almonafs_flutter/core/network/api_helper.dart';
 import '../model/package_model.dart';
+import '../model/package_details_model.dart';
 
 class PackageTypeRepo {
   final APIHelper _apiHelper = APIHelper();
@@ -160,7 +161,7 @@ class PackageTypeRepo {
     }
   }
 
-  // Step 4: Get package details by ID
+  // Step 4: Get package details by Slug
   Future<ApiResponse> getPackageDetails(String slug) async {
     try {
       print('🔍 Step 4 - API Call: /packages/$slug');
@@ -171,30 +172,33 @@ class PackageTypeRepo {
       );
 
       print('📥 Response Status: ${apiResponse.statusCode}');
-      print('📥 Response Data Type: ${apiResponse.data.runtimeType}');
 
       if (apiResponse.status) {
         if (apiResponse.data is Map<String, dynamic>) {
-          final responseData = apiResponse.data as Map<String, dynamic>;
-
           try {
-            // Wrap single object in data array for consistency with PackageModel
-            Map<String, dynamic> wrappedData = {
-              'status': responseData['status'],
-              'results': responseData['results'],
-              'data': responseData['data'] is List
-                  ? responseData['data']
-                  : [responseData['data']],
-            };
-
-            final packageData = PackageModel.fromJson(wrappedData);
-
-            return ApiResponse(
-              status: true,
-              statusCode: apiResponse.statusCode,
-              data: packageData,
-              message: 'تم تحميل تفاصيل الباقة بنجاح',
+            final packageDetailsResponse = PackageDetailsResponse.fromJson(
+              apiResponse.data,
             );
+
+            if (packageDetailsResponse.success == true &&
+                packageDetailsResponse.data != null) {
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: packageDetailsResponse.data, // Return PackageDetailsData
+                message:
+                    packageDetailsResponse.message ??
+                    'تم تحميل تفاصيل الباقة بنجاح',
+              );
+            } else {
+              return ApiResponse(
+                status: false,
+                statusCode: apiResponse.statusCode,
+                message:
+                    packageDetailsResponse.message ??
+                    'فشل في تحميل تفاصيل الباقة',
+              );
+            }
           } catch (e) {
             print('❌ Parsing Error Step 4: $e');
             return ApiResponse(

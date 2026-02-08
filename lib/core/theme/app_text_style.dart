@@ -8,77 +8,91 @@ class AppTextStyle {
     required double fontSize,
     required FontWeight fontWeight,
     required Color color,
-  }){
+    double? height,
+  }) {
     return GoogleFonts.poppins(
-      
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: color,
+      height: height,
     );
   }
 
   static TextStyle setPoppinsWhite({
     required double fontSize,
-    required FontWeight fontWeight, 
-  }){
+    required FontWeight fontWeight,
+    double? height,
+  }) {
     return GoogleFonts.poppins(
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColor.mainWhite,
+      height: height,
     );
   }
 
   static TextStyle setPoppinsSecondaryBlack({
     required double fontSize,
     required FontWeight fontWeight,
-  }){
+    double? height,
+  }) {
     return GoogleFonts.poppins(
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColor.secondaryBlack,
+      height: height,
     );
   }
 
   static TextStyle setPoppinsSecondlightGrey({
     required double fontSize,
     required FontWeight fontWeight,
-  }){
+    double? height,
+  }) {
     return GoogleFonts.poppins(
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColor.secondeLightGrey,
+      height: height,
     );
   }
 
   static TextStyle setPoppinssecondaryGery({
     required double fontSize,
     required FontWeight fontWeight,
-  }){
+    double? height,
+  }) {
     return GoogleFonts.poppins(
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColor.secondaryGrey,
+      height: height,
     );
   }
 
   static TextStyle setPoppinsBlack({
     required double fontSize,
     required FontWeight fontWeight,
-  }){
+    double? height,
+  }) {
     return GoogleFonts.poppins(
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColor.mainBlack,
+      height: height,
     );
   }
-   static TextStyle setPoppinsDeepPurple({
+
+  static TextStyle setPoppinsDeepPurple({
     required double fontSize,
     required FontWeight fontWeight,
-  }){
+    double? height,
+  }) {
     return GoogleFonts.poppins(
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: AppColor.lightPurple,
+      height: height,
     );
   }
 }

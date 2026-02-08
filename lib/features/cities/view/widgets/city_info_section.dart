@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:almonafs_flutter/features/cities/data/model/city_details_model.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../core/theme/app_text_style.dart';
 
 class CityInfoSection extends StatelessWidget {
   final CityDetails city;
@@ -14,19 +17,21 @@ class CityInfoSection extends StatelessWidget {
         // Description Section
         Text(
           "About ${city.name}",
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          style: AppTextStyle.setPoppinsTextStyle(
+            fontSize: 24.sp,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Text(
           city.descriptionFlutter ??
               city.description?.replaceAll(RegExp(r'<[^>]*>'), '') ??
               "Discover the beauty of ${city.name}.",
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            height: 1.6,
-            color: Colors.grey[700],
+          style: AppTextStyle.setPoppinsTextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
           ),
         ),
       ],

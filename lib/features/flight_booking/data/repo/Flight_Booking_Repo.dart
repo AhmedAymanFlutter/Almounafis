@@ -5,7 +5,9 @@ import 'package:almonafs_flutter/core/network/api_helper.dart';
 import '../model/Flight_Booking_Request.dart';
 
 abstract class FlightBookingRepository {
-  Future<ApiResponse> submitBooking(FlightBookingRequest request); // ✅ Change parameter type
+  Future<ApiResponse> submitBooking(
+    FlightBookingRequest request,
+  ); //  Change parameter type
 }
 
 class FlightBookingRepositoryImpl implements FlightBookingRepository {
@@ -14,24 +16,18 @@ class FlightBookingRepositoryImpl implements FlightBookingRepository {
   @override
   Future<ApiResponse> submitBooking(FlightBookingRequest request) async {
     try {
-      print('🛰 Sending booking request to: ${EndPoints.bookFlight}');
-      
-      // ✅ Use the request's toJson() directly
+      //  Use the request's toJson() directly
       final requestData = request.toJson();
-      print('📦 Request data: $requestData');
 
       final ApiResponse apiResponse = await _apiHelper.postRequest(
         endPoint: EndPoints.bookFlight,
         data: requestData, // This now has the correct structure
         isAuthorized: true,
+        isFormData: false,
       );
-
-      print('📥 Response Status: ${apiResponse.statusCode}');
-      print('📥 Response Data: ${apiResponse.data}');
 
       return _handleApiResponse(apiResponse);
     } catch (e) {
-      print('❌ Repository Error: $e');
       return ApiResponse(
         status: false,
         statusCode: 500,

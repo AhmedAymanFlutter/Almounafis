@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../data/model/package_model.dart';
+import '../data/model/package_details_model.dart';
 
 abstract class PackageState extends Equatable {
   const PackageState();
@@ -47,9 +48,9 @@ class PackagesLoaded extends PackageState {
 class PackageDetailsLoading extends PackageState {}
 
 class PackageDetailsLoaded extends PackageState {
-  final PackageModel packageDetails;
+  final PackageDetailsData packageDetails;
 
-  const PackageDetailsLoaded(this.packageDetails);
+  PackageDetailsLoaded(this.packageDetails);
 
   @override
   List<Object?> get props => [packageDetails];

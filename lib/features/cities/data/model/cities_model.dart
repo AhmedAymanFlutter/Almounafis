@@ -37,6 +37,7 @@ class Data {
 
 class City {
   String? id;
+  String? slug;
   String? name;
   String? nameAr;
   String? description; // HTML content
@@ -49,6 +50,7 @@ class City {
 
   City({
     this.id,
+    this.slug,
     this.name,
     this.nameAr,
     this.description,
@@ -61,7 +63,9 @@ class City {
   });
 
   City.fromJson(Map<String, dynamic> json) {
-    id = json['id']; // or json['_id']
+    id = json['id'] ?? json['_id']; // MongoDB uses _id
+    // Slug is nested in seo.slugUrl
+    slug = json['seo'] != null ? json['seo']['slugUrl'] : null;
     name = json['name'];
     nameAr = json['nameAr'];
     description = json['description'];

@@ -11,6 +11,9 @@ import '../../../localization/manager/localization_cubit.dart';
 Widget buildStyledCoverImage(BuildContext context, dynamic country) {
   final isArabic = context.watch<LanguageCubit>().state == AppLanguage.arabic;
 
+  // Safely get image URL based on model type
+  final String? imageUrl = country.images?.coverImage?.url;
+
   return Padding(
     padding: const EdgeInsets.only(left: 15, top: 77, right: 15),
     child: ClipRRect(
@@ -18,9 +21,9 @@ Widget buildStyledCoverImage(BuildContext context, dynamic country) {
       child: Stack(
         children: [
           // ✅ Cover Image
-          if (country.images?.isNotEmpty == true)
+          if (imageUrl != null && imageUrl.isNotEmpty)
             CachedNetworkImage(
-              imageUrl: country.images![0],
+              imageUrl: imageUrl,
               height: 650.h,
               width: double.infinity,
               fit: BoxFit.cover,

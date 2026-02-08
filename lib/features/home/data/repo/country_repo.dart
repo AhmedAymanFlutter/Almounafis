@@ -3,7 +3,8 @@ import 'package:almonafs_flutter/core/network/api_endpoiont.dart';
 import 'package:almonafs_flutter/core/network/api_helper.dart';
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart'
     show GetAllCountriesModel;
-import '../../../singel_country/data/model/get_Singel_city.dart';
+import '../../../singel_country/data/model/country_details_model.dart';
+import '../../../singel_country/data/model/tour_guide_model.dart';
 
 class CountryRepository {
   final APIHelper _apiHelper = APIHelper();
@@ -82,12 +83,14 @@ class CountryRepository {
           final responseData = apiResponse.data as Map<String, dynamic>;
 
           try {
-            final countryData = GetSingleCountry.fromJson(responseData);
+            final countryResponse = CountryDetailsResponse.fromJson(
+              responseData,
+            );
 
             return ApiResponse(
               status: true,
               statusCode: apiResponse.statusCode,
-              data: countryData,
+              data: countryResponse.data, // Return CountryDetailsData
               message: 'تم تحميل بيانات الدولة بنجاح',
             );
           } catch (e) {
@@ -118,6 +121,58 @@ class CountryRepository {
         status: false,
         statusCode: 500,
         message: 'خطأ في المستودع: $e',
+      );
+    }
+  }
+
+  Future<ApiResponse> getTourGuides(String countrySlug) async {
+    try {
+      print('🌐 API Call: ${EndPoints.tourGuides}/$countrySlug');
+      final ApiResponse apiResponse = await _apiHelper.getRequest(
+        endPoint: EndPoints.tourGuides,
+        resourcePath: countrySlug,
+      );
+
+      if (apiResponse.status) {
+        if (apiResponse.data is Map<String, dynamic>) {
+          try {
+            final tourGuideResponse = TourGuideResponse.fromJson(
+              apiResponse.data,
+            );
+            return ApiResponse(
+              status: true,
+              statusCode: apiResponse.statusCode,
+              data: tourGuideResponse.data,
+              message: 'Successfully fetched tour guide data',
+            );
+          } catch (e) {
+            print('❌ Parsing Error (Tour Guides): $e');
+            return ApiResponse(
+              status: false,
+              statusCode: apiResponse.statusCode,
+              message: 'Error parsing tour guide data: $e',
+            );
+          }
+        } else {
+          return ApiResponse(
+            status: false,
+            statusCode: apiResponse.statusCode,
+            message: 'Invalid data structure received',
+          );
+        }
+      } else {
+        return ApiResponse(
+          status: false,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        );
+      }
+    } catch (e) {
+      print('❌ Repository Error (Tour Guides): $e');
+      return ApiResponse(
+        status: false,
+        statusCode: 500,
+        message: 'Repository error: $e',
       );
     }
   }

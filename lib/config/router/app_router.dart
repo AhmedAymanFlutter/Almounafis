@@ -1,7 +1,6 @@
 import 'package:almonafs_flutter/config/router/router_transation.dart';
 import 'package:almonafs_flutter/config/router/routes.dart';
 import 'package:almonafs_flutter/core/widgets/ExitConfirmWrapper_widget.dart';
-import 'package:almonafs_flutter/features/auth/presentation/views/sign_up_view.dart';
 import 'package:almonafs_flutter/features/cities/view/city_view.dart';
 import 'package:almonafs_flutter/features/cities/view/city_details_view.dart';
 import 'package:almonafs_flutter/features/flightScreen/view/UpcomingTripsPage.dart';
@@ -25,9 +24,13 @@ import '../../features/servicepackadge/view/Service_view.dart';
 import '../../features/setting/widget/languang.dart';
 import '../../features/singel_country/view/CountryDetailsPage.dart';
 import '../../features/upcomming_Tour/view/widget/CityTour_Details.dart';
+import '../../features/hotels/view/HotelsPage.dart';
 
 import '../../features/cities/data/repo/citeies_repo.dart';
 import '../../features/cities/manger/city_cubit.dart';
+import '../../features/viator/data/repo/viator_repo.dart';
+import '../../features/viator/manager/viator_cubit.dart';
+import '../../features/viator/view/viator_all_tours_page.dart';
 
 class AppRouter {
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -40,10 +43,7 @@ class AppRouter {
         return RouterTransitions.build(
           ExitConfirmWrapper(child: OnBoardingView()),
         );
-      case Routes.signUp:
-        return RouterTransitions.buildHorizontal(
-          ExitConfirmWrapper(child: SignUpView()),
-        );
+
       case Routes.home:
         return RouterTransitions.buildHorizontal(
           ExitConfirmWrapper(child: HomeView()),
@@ -126,10 +126,19 @@ class AppRouter {
         return RouterTransitions.buildHorizontal(AllCountriesPage());
       case Routes.allToursPage:
         return RouterTransitions.buildHorizontal(AllToursPage());
+      case Routes.allHotelsPage:
+        return RouterTransitions.buildHorizontal(HotelsPage());
       case Routes.globalSettingsView:
         return RouterTransitions.buildHorizontal(GlobalSettingsView());
       case Routes.flightBookingScreen:
         return RouterTransitions.buildHorizontal(FlightBookingScreen());
+      case Routes.viatorAllToursPage:
+        return RouterTransitions.buildHorizontal(
+          BlocProvider(
+            create: (_) => ViatorCubit(ViatorRepository())..fetchTours(),
+            child: const ViatorAllToursPage(),
+          ),
+        );
       default:
         return RouterTransitions.build(
           Scaffold(body: Center(child: Text("No Route"))),

@@ -8,16 +8,17 @@ import '../../../data/repo/country_repo.dart';
 import '../../../manager/country_cubit.dart';
 import '../../../manager/country_state.dart';
 import '../widget/utils/get_image.dart';
-import 'category_filter_list.dart';
 import 'modern_country_card.dart';
 import 'modern_home_app_bar.dart';
-import 'modern_promo_slider.dart';
-import 'modern_search_bar.dart';
-import 'modern_tour_card.dart';
 
-import '../../../../upcomming_Tour/manager/tour_cubit.dart';
-import '../../../../upcomming_Tour/manager/tour_state.dart';
-import '../../../../upcomming_Tour/data/repo/city_repo_tour.dart';
+import '../../../../hotels/manager/hotel_cubit.dart';
+import '../../../../hotels/manager/hotel_state.dart';
+import '../../../../hotels/data/repo/Hotel_repo_tour.dart';
+import 'modern_hotel_card.dart';
+import 'reviews_section.dart';
+import 'package:almonafs_flutter/features/viator/data/repo/viator_repo.dart';
+import 'package:almonafs_flutter/features/viator/manager/viator_cubit.dart';
+import 'package:almonafs_flutter/features/viator/view/widget/viator_tour_list.dart';
 
 class ModernHomeContent extends StatelessWidget {
   const ModernHomeContent({super.key});
@@ -30,8 +31,10 @@ class ModernHomeContent extends StatelessWidget {
           create: (_) => CountryCubit(CountryRepository())..fetchAllCountries(),
         ),
         BlocProvider(
-          create: (_) =>
-              CityTourCubit(repository: CityTourRepository())..getAllCities(),
+          create: (_) => HotelCubit(HotelRepository())..getAllHotels(),
+        ),
+        BlocProvider(
+          create: (_) => ViatorCubit(ViatorRepository())..fetchTours(),
         ),
       ],
       child: const _ModernHomeBody(),
@@ -49,7 +52,7 @@ class _ModernHomeBody extends StatelessWidget {
     return Directionality(
       textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA), // Slight off-white background
+        backgroundColor: const Color(0xFFF8F9FA),
         body: SafeArea(
           child: CustomScrollView(
             slivers: [
@@ -57,14 +60,12 @@ class _ModernHomeBody extends StatelessWidget {
                 child: ModernHomeAppBar(
                   isArabic: isArabic,
                   onMenuTap: () => Scaffold.of(context).openDrawer(),
-                  onNotificationTap: () {},
                 ),
               ),
-              SliverToBoxAdapter(child: ModernSearchBar(isArabic: isArabic)),
               SliverToBoxAdapter(child: SizedBox(height: 20.h)),
-              SliverToBoxAdapter(child: ModernPromoSlider(isArabic: isArabic)),
-              SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-              SliverToBoxAdapter(child: CategoryFilterList(isArabic: isArabic)),
+
+              // Reviews Section
+              SliverToBoxAdapter(child: ReviewsSection(isArabic: isArabic)),
               SliverToBoxAdapter(child: SizedBox(height: 32.h)),
 
               // Countries Section
@@ -165,7 +166,52 @@ class _ModernHomeBody extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        isArabic ? "الجولات القادمة" : "Upcoming Tours",
+                        isArabic ? "الجولات المميزة" : "Featured Tours",
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            Routes.viatorAllToursPage,
+                          );
+                        },
+                        child: Text(
+                          isArabic ? "عرض الكل" : "See All",
+                          style: TextStyle(
+                            color: AppColor.secondaryblue,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+
+              SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+
+              // Tour List
+              SliverToBoxAdapter(
+                child: ViatorTourListWidget(isArabic: isArabic),
+              ),
+
+              SliverToBoxAdapter(child: SizedBox(height: 32.h)),
+
+              // Hotels Section
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                sliver: SliverToBoxAdapter(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isArabic ? "الفنادق" : "Hotels",
                         style: TextStyle(
                           fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
@@ -174,7 +220,7 @@ class _ModernHomeBody extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () =>
-                            Navigator.pushNamed(context, Routes.allToursPage),
+                            Navigator.pushNamed(context, Routes.allHotelsPage),
                         child: Text(
                           isArabic ? "عرض الكل" : "See All",
                           style: TextStyle(
@@ -192,22 +238,22 @@ class _ModernHomeBody extends StatelessWidget {
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 280.h,
-                  child: BlocBuilder<CityTourCubit, CityTourState>(
+                  child: BlocBuilder<HotelCubit, HotelState>(
                     builder: (context, state) {
-                      if (state is CityTourLoading) {
+                      if (state is HotelLoading) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      final tours = state is CityTourFiltered
-                          ? state.filteredTours
-                          : (state is CityTourLoaded
-                                ? state.allCityTour.data ?? []
+                      final hotels = state is HotelFiltered
+                          ? state.filteredHotels
+                          : (state is HotelLoaded
+                                ? state.hotels.data ?? []
                                 : []);
 
-                      if (tours.isEmpty) {
+                      if (hotels.isEmpty) {
                         return Center(
                           child: Text(
-                            isArabic ? "لا توجد جولات" : "No tours found",
+                            isArabic ? "لا توجد فنادق" : "No hotels found",
                           ),
                         );
                       }
@@ -215,46 +261,49 @@ class _ModernHomeBody extends StatelessWidget {
                       return ListView.builder(
                         padding: EdgeInsets.symmetric(horizontal: 20.w),
                         scrollDirection: Axis.horizontal,
-                        itemCount: tours.length,
+                        itemCount: hotels.length,
                         itemBuilder: (context, index) {
-                          final tour = tours[index];
+                          final hotel = hotels[index];
                           return GestureDetector(
                             onTap: () {
-                              final tourIdentifier = tour.id ?? tour.sId ?? '';
-                              if (tourIdentifier.isNotEmpty) {
+                              final hotelIdentifier =
+                                  hotel.id ?? hotel.sId ?? '';
+                              if (hotelIdentifier.isNotEmpty) {
                                 Navigator.pushNamed(
                                   context,
-                                  Routes.cityTourDetails,
-                                  arguments: {
-                                    'tourIdOrSlug': tourIdentifier,
-                                    'tourTitle': tour.title,
-                                  },
+                                  Routes.hotelDetails,
+                                  arguments: {'hotelId': hotelIdentifier},
                                 );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
                                       isArabic
-                                          ? 'معرف الجولة غير متاح'
-                                          : 'Tour ID not available',
+                                          ? 'معرف الفندق غير متاح'
+                                          : 'Hotel ID not available',
                                     ),
                                   ),
                                 );
                               }
                             },
-                            child: ModernTourCard(
-                              tour: tour,
-                              title: isArabic
-                                  ? tour.titleAr ?? "لا يوجد عنوان"
-                                  : tour.title ?? "No title",
-                              // Passing description as subtitle, but card uses city/location internally if available
-                              subtitle: isArabic
-                                  ? tour.descriptionArFlutter ?? "لا يوجد وصف"
-                                  : tour.descriptionFlutter ?? "No description",
-                              imageUrl: tour.coverImage.toString(),
-                              tag:
-                                  tour.tags?.join(", ") ??
-                                  (isArabic ? "غير متوفر" : "N/A"),
+                            child: ModernHotelCard(
+                              hotel: hotel,
+                              name: isArabic
+                                  ? hotel.nameAr ?? hotel.name ?? "فندق"
+                                  : hotel.name ?? "Hotel",
+                              location: isArabic
+                                  ? hotel.addressAr ??
+                                        hotel.address ??
+                                        hotel.city ??
+                                        "الموقع غير متاح"
+                                  : hotel.address ??
+                                        hotel.city ??
+                                        "Location not available",
+                              imageUrl:
+                                  hotel.imageCover ??
+                                  (hotel.images?.isNotEmpty == true
+                                      ? hotel.images!.first
+                                      : 'https://via.placeholder.com/200x140'),
                             ),
                           );
                         },

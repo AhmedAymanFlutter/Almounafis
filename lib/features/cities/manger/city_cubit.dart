@@ -40,4 +40,22 @@ class CityCubit extends Cubit<CityState> {
       if (!isClosed) emit(CityDetailsError("Failed to fetch details: $e"));
     }
   }
+
+  /// Get cities filtered by country ID
+  Future<void> getCitiesByCountry(String countryId) async {
+    try {
+      emit(CityLoading());
+      final response = await _repository.fetchCitiesByCountry(countryId);
+
+      if (isClosed) return;
+
+      if (response.success == true && response.data != null) {
+        emit(CityLoaded(response));
+      } else {
+        emit(CityError(response.message ?? "No cities found"));
+      }
+    } catch (e) {
+      if (!isClosed) emit(CityError("Failed to fetch cities: $e"));
+    }
+  }
 }

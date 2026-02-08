@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../getAilplaneState/manager/Airplane_citys_cubit.dart';
 import '../../localization/manager/localization_cubit.dart';
 import 'utils/date_Card_utils.dart';
-import 'utils/location_card.dart';
+import 'utils/simple_location_card.dart';
 import 'utils/search_button.dart';
 
 class FlightBookingScreen extends StatefulWidget {
@@ -22,6 +22,8 @@ class _FlightBookingScreenState extends State<FlightBookingScreen> {
 
   final _departureDateController = TextEditingController();
   final _returnDateController = TextEditingController();
+  final _fromCityController = TextEditingController();
+  final _toCityController = TextEditingController();
 
   int adultsCount = 1;
   int childrenCount = 0;
@@ -93,14 +95,10 @@ class _FlightBookingScreenState extends State<FlightBookingScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        LocationCard(
+                        SimpleLocationCard(
                           isArabic: isArabic,
-                          selectedFromCity: selectedFromCity,
-                          selectedToCity: selectedToCity,
-                          onFromSelected: (city) =>
-                              setState(() => selectedFromCity = city),
-                          onToSelected: (city) =>
-                              setState(() => selectedToCity = city),
+                          fromController: _fromCityController,
+                          toController: _toCityController,
                         ),
                         const SizedBox(height: 20),
                         DateCard(
@@ -132,10 +130,9 @@ class _FlightBookingScreenState extends State<FlightBookingScreen> {
                         const SizedBox(height: 24),
                         SearchButton(
                           isArabic: isArabic,
-                          contextRef:
-                              context, // parent context to use inside helper
-                          selectedFromCity: selectedFromCity,
-                          selectedToCity: selectedToCity,
+                          contextRef: context,
+                          fromCity: _fromCityController.text,
+                          toCity: _toCityController.text,
                           departureDateController: _departureDateController,
                           returnDateController: _returnDateController,
                           isRoundTrip: isRoundTrip,
@@ -164,6 +161,8 @@ class _FlightBookingScreenState extends State<FlightBookingScreen> {
   void dispose() {
     _departureDateController.dispose();
     _returnDateController.dispose();
+    _fromCityController.dispose();
+    _toCityController.dispose();
     emailController.dispose();
     phoneController.dispose();
     whatsappController.dispose();

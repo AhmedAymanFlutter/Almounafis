@@ -33,15 +33,7 @@ class CustomDrawer extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: [
                   buildDrawerHeader(isArabic),
-                  buildDrawerItem(
-                    context,
-                    iconPath: 'assets/icons/user.svg',
-                    title: isArabic ? 'الملف الشخصي' : 'Profile',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, Routes.signUp);
-                    },
-                  ),
+
                   buildDrawerItem(
                     context,
                     iconPath: 'assets/icons/translate.svg',
@@ -69,7 +61,7 @@ class CustomDrawer extends StatelessWidget {
                       Navigator.pushNamed(context, Routes.aboutUsScreen);
                     },
                   ),
-                 
+
                   buildDrawerItem(
                     context,
                     iconPath: 'assets/icons/setting-2.svg',
