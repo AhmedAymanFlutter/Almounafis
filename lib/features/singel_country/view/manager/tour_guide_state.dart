@@ -1,4 +1,4 @@
-import 'package:almonafs_flutter/features/singel_country/data/model/tour_guide_model.dart';
+import 'package:almonafs_flutter/features/cities/data/model/city_guide_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class TourGuideState extends Equatable {
@@ -13,7 +13,7 @@ class TourGuideInitial extends TourGuideState {}
 class TourGuideLoading extends TourGuideState {}
 
 class TourGuideLoaded extends TourGuideState {
-  final TourGuideData tourGuideData;
+  final CityGuideData tourGuideData;
   const TourGuideLoaded(this.tourGuideData);
 
   @override

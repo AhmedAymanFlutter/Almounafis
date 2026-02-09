@@ -20,6 +20,7 @@ Widget buildContent(BuildContext context, HotelState state) {
       child: Skeletonizer(
         enabled: true,
         child: ListView.separated(
+          padding: const EdgeInsets.only(bottom: 100),
           itemCount: 6,
           separatorBuilder: (_, __) => const SizedBox(height: 16),
           itemBuilder: (context, index) {
@@ -152,7 +153,7 @@ Widget buildContent(BuildContext context, HotelState state) {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(bottom: 100, left: 16, right: 16, top: 16),
       itemCount: hotels.length,
       itemBuilder: (context, index) {
         return _buildHotelCard(context, hotels[index], isArabic);
@@ -179,7 +180,12 @@ Widget buildContent(BuildContext context, HotelState state) {
     return RefreshIndicator(
       onRefresh: () => context.read<HotelCubit>().refreshHotels(),
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(
+          bottom: 100,
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
         itemCount: hotels.length,
         itemBuilder: (context, index) {
           return _buildHotelCard(context, hotels[index], isArabic);

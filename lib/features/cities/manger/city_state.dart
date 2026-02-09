@@ -1,5 +1,6 @@
 import 'package:almonafs_flutter/features/cities/data/model/cities_model.dart';
 import 'package:almonafs_flutter/features/cities/data/model/city_details_model.dart';
+import 'package:almonafs_flutter/features/cities/data/model/city_guide_model.dart';
 
 abstract class CityState {}
 
@@ -9,8 +10,9 @@ class CityLoading extends CityState {}
 
 class CityLoaded extends CityState {
   final CityResponse cityResponse;
+  final bool isLoadingMore;
 
-  CityLoaded(this.cityResponse);
+  CityLoaded(this.cityResponse, {this.isLoadingMore = false});
 }
 
 class CityError extends CityState {
@@ -23,8 +25,9 @@ class CityDetailsLoading extends CityState {}
 
 class CityDetailsLoaded extends CityState {
   final CityDetailsResponse cityDetailsResponse;
+  final CityGuideResponse? cityGuideResponse;
 
-  CityDetailsLoaded(this.cityDetailsResponse);
+  CityDetailsLoaded(this.cityDetailsResponse, {this.cityGuideResponse});
 }
 
 class CityDetailsError extends CityState {

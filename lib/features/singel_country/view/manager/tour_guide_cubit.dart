@@ -13,23 +13,16 @@ class TourGuideCubit extends Cubit<TourGuideState> {
     emit(TourGuideLoading());
 
     try {
-      final response = await repository.getTourGuides(countrySlug);
+      final guideResponse = await repository.fetchCountryGuide(countrySlug);
       if (isClosed) return;
 
-      print("📥 API Status: ${response.status}, Message: ${response.message}");
+      print("✅ Guide Response Loaded: ${guideResponse.data != null}");
 
-      if (response.status) {
-        final data = response.data; // TourGuideData
-        if (data != null) {
-          print("✅ Tour Guide Data Loaded: ${data.introduction != null}");
-          emit(TourGuideLoaded(data));
-        } else {
-          print("⚠️ No data in response");
-          emit(const TourGuideError("No tour guide data available."));
-        }
+      if (guideResponse.success == true && guideResponse.data != null) {
+        emit(TourGuideLoaded(guideResponse.data!));
       } else {
-        print("❌ API Error: ${response.message}");
-        emit(TourGuideError(response.message));
+        print("⚠️ No data in response");
+        emit(const TourGuideError("No tour guide data available."));
       }
     } catch (e) {
       print("❌ Exception in TourGuideCubit: $e");

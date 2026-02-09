@@ -1,5 +1,6 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
+import 'package:almonafs_flutter/core/widgets/html_content_widget.dart';
 import 'package:almonafs_flutter/features/home/manager/country_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +14,14 @@ import 'widget/build_Booking_Button.dart';
 import 'widget/build_Info_Card.dart';
 import 'widget/build_Styled_Cover_Image.dart';
 import 'widget/country_cities_widget.dart';
+import 'widget/country_restaurants_section.dart';
+import 'widget/country_places_to_visit_section.dart';
+import 'widget/country_things_to_do_section.dart';
 import 'widget/related_countries_widget.dart';
-import 'widget/tour_guide_section.dart';
 import 'widget/shimmer_widget.dart';
+import 'package:almonafs_flutter/config/router/routes.dart';
+import 'package:almonafs_flutter/features/packadge/data/model/package_model.dart';
+import 'package:almonafs_flutter/features/packadge/view/widget/Package_widget.dart';
 
 class CountryDetailsPage extends StatefulWidget {
   final String countryIdOrSlug;
@@ -114,20 +120,17 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                           ),
                         ),
                         SizedBox(height: 8.h),
-                        Text(
-                          isArabic
-                              ? (country.descriptionArFlutter ??
-                                    country.descriptionFlutter ??
-                                    'لا توجد معلومات حالياً')
-                              : (country.descriptionFlutter ??
+                        HtmlContentWidget(
+                          htmlContent: isArabic
+                              ? (country.descriptionAr ??
                                     country.description ??
-                                    'No description available'),
-                          style: AppTextStyle.setPoppinsTextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: AppColor.secondaryBlack,
-                            height: 1.6,
-                          ),
+                                    '<p>لا توجد معلومات حالياً</p>')
+                              : (country.description ??
+                                    country.descriptionAr ??
+                                    '<p>No description available</p>'),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          textColor: AppColor.secondaryBlack,
                         ),
 
                         // جاليري الصور
@@ -194,19 +197,113 @@ class _CountryDetailsPageState extends State<CountryDetailsPage> {
                               : (country.name ?? ''),
                         ),
 
+                        // Guide Sections
+                        if (state.guideResponse?.data != null) ...[
+                          if (state
+                                  .guideResponse!
+                                  .data!
+                                  .restaurants
+                                  ?.isNotEmpty ??
+                              false) ...[
+                            SizedBox(height: 24.h),
+                            CountryRestaurantsSection(
+                              restaurants:
+                                  state.guideResponse!.data!.restaurants!,
+                            ),
+                          ],
+                          if (state
+                                  .guideResponse!
+                                  .data!
+                                  .placesToVisit
+                                  ?.isNotEmpty ??
+                              false) ...[
+                            SizedBox(height: 24.h),
+                            CountryPlacesToVisitSection(
+                              placesToVisit:
+                                  state.guideResponse!.data!.placesToVisit!,
+                            ),
+                          ],
+                          if (state
+                                  .guideResponse!
+                                  .data!
+                                  .thingsToDo
+                                  ?.isNotEmpty ??
+                              false) ...[
+                            SizedBox(height: 24.h),
+                            CountryThingsToDoSection(
+                              thingsToDo:
+                                  state.guideResponse!.data!.thingsToDo!,
+                            ),
+                          ],
+                        ],
+
+                        // Packages Section
+                        if (state.packages != null &&
+                            state.packages!.isNotEmpty) ...[
+                          SizedBox(height: 24.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isArabic ? 'باقات سياحية' : 'Tour Packages',
+                                  style: TextStyle(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 12.h),
+                                SizedBox(
+                                  height: 340.h,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: state.packages!.length,
+                                    itemBuilder: (context, index) {
+                                      final packageData =
+                                          state.packages![index];
+                                      final package = Data.fromJson(
+                                        packageData as Map<String, dynamic>,
+                                      );
+
+                                      return Padding(
+                                        padding: EdgeInsets.only(right: 12.w),
+                                        child: SizedBox(
+                                          width: 300.w,
+                                          child: PackageCardView(
+                                            package: package,
+                                            onTap: () {
+                                              Navigator.pushNamed(
+                                                context,
+                                                Routes.packageDetailsView,
+                                                arguments: {
+                                                  'slug':
+                                                      package.slug ??
+                                                      package.sId ??
+                                                      '',
+                                                  'packageTitle': isArabic
+                                                      ? (package.nameAr ??
+                                                            package.name ??
+                                                            '')
+                                                      : (package.name ?? ''),
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
                         // Related Countries Section
                         SizedBox(height: 32.h),
                         RelatedCountriesWidget(
                           relatedCountries: country.relatedCountries,
-                          isArabic: isArabic,
-                        ),
-                        SizedBox(height: 24.h),
-
-                        // Tour Guide Section
-                        SizedBox(height: 32.h),
-                        TourGuideSection(
-                          countrySlug:
-                              country.seo?.slugUrl ?? widget.countryIdOrSlug,
                           isArabic: isArabic,
                         ),
                         SizedBox(height: 24.h),

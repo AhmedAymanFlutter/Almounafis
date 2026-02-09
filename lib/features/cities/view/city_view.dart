@@ -40,8 +40,41 @@ class CityPage extends StatelessWidget {
   }
 }
 
-class CityView extends StatelessWidget {
+class CityView extends StatefulWidget {
   const CityView({super.key});
+
+  @override
+  State<CityView> createState() => _CityViewState();
+}
+
+class _CityViewState extends State<CityView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<CityCubit>().loadMoreCities();
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +84,18 @@ class CityView extends StatelessWidget {
     return BlocBuilder<CityCubit, CityState>(
       builder: (context, state) {
         if (state is CityLoading) {
+          if (state is CityLoaded &&
+              (state as CityLoaded).cityResponse.data != null) {
+            // This case might happen if we emit Loading but want to keep data?
+            // But currently strict types prevent this.
+            // We just handle CityLoaded below.
+          }
           return const Center(child: CircularProgressIndicator());
         } else if (state is CityError) {
           return Center(child: Text(state.message));
         } else if (state is CityLoaded) {
           return CustomScrollView(
+            controller: _scrollController,
             slivers: [
               // 1. SEO Hero Section
               SliverToBoxAdapter(
@@ -89,6 +129,16 @@ class CityView extends StatelessWidget {
                   return CityCard(city: city);
                 }, childCount: state.cityResponse.data?.cities?.length ?? 0),
               ),
+
+              // 4. Loading Indicator
+              if (state.isLoadingMore)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           );
         }

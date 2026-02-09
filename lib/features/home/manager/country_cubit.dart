@@ -1,3 +1,5 @@
+import 'package:almonafs_flutter/core/network/api_response.dart';
+import 'package:almonafs_flutter/features/cities/data/model/city_guide_model.dart';
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/repo/country_repo.dart';
@@ -40,18 +42,34 @@ class CountryCubit extends Cubit<CountryState> {
     emit(SingleCountryLoading());
 
     try {
-      final response = await repository.getCountry(countryIdOrSlug);
+      // Fetch country details and guide data concurrently
+      final responses = await Future.wait([
+        repository.getCountry(countryIdOrSlug),
+        repository.fetchCountryGuide(countryIdOrSlug),
+        repository.fetchCountryPackages(countryIdOrSlug),
+      ]);
+
       if (isClosed) return;
 
-      if (response.status) {
-        final countryData = response.data; // Already CountryDetailsData
+      final detailsResponse = responses[0] as ApiResponse;
+      final guideResponse = responses[1] as CityGuideResponse;
+      final packagesList = responses[2] as List<dynamic>;
+
+      if (detailsResponse.status) {
+        final countryData = detailsResponse.data;
         if (countryData != null) {
-          emit(SingleCountryLoaded(countryData));
+          emit(
+            SingleCountryLoaded(
+              countryData,
+              guideResponse: guideResponse,
+              packages: packagesList,
+            ),
+          );
         } else {
           emit(const SingleCountryError("لم يتم العثور على بيانات الدولة."));
         }
       } else {
-        emit(SingleCountryError(response.message));
+        emit(SingleCountryError(detailsResponse.message));
       }
     } catch (e) {
       if (!isClosed) emit(SingleCountryError("حدث خطأ أثناء تحميل الدولة: $e"));

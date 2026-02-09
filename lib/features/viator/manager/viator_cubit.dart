@@ -9,7 +9,14 @@ class ViatorCubit extends Cubit<ViatorState> {
 
   Map<String, dynamic> _currentFilters = {};
 
+  Map<String, dynamic> get currentFilters => Map.unmodifiable(_currentFilters);
+
   ViatorCubit(this.repository) : super(ViatorInitial());
+
+  int _currentPage = 1;
+  bool _hasReachedMax = false;
+  List<ViatorTour> _allTours = [];
+  bool _isLoadingMore = false;
 
   Future<void> fetchTours({
     String? search,
@@ -19,13 +26,17 @@ class ViatorCubit extends Cubit<ViatorState> {
     String? sort,
     int page = 1,
     int limit = 10,
-    String lang = 'en',
+    String? lang,
     bool isRefresh = false,
   }) async {
-    // If not refreshing and already loading, return (optional debouncing)
-    // if (state is ViatorLoading && !isRefresh) return;
-
-    if (!isRefresh) {
+    // If refreshing or new search/filter, reset pagination
+    if (isRefresh || page == 1) {
+      _currentPage = 1;
+      _hasReachedMax = false;
+      _allTours.clear();
+      // Only emit loading if not a refresh (pull-to-refresh usually handles its own UI)
+      if (!isRefresh) emit(ViatorLoading());
+    } else if (state is! ViatorLoaded && state is! ViatorLoading) {
       emit(ViatorLoading());
     }
 
@@ -36,6 +47,7 @@ class ViatorCubit extends Cubit<ViatorState> {
     if (cancellationType != null)
       _currentFilters['cancellationType'] = cancellationType;
     if (sort != null) _currentFilters['sort'] = sort;
+    if (lang != null) _currentFilters['lang'] = lang;
 
     // Use current filters if not provided in arguments, else use arguments
     final effectiveSearch = search ?? _currentFilters['search'];
@@ -44,6 +56,7 @@ class ViatorCubit extends Cubit<ViatorState> {
     final effectiveCancellationType =
         cancellationType ?? _currentFilters['cancellationType'];
     final effectiveSort = sort ?? _currentFilters['sort'];
+    final effectiveLang = lang ?? _currentFilters['lang'] ?? 'en';
 
     try {
       final ApiResponse response = await repository.getTours(
@@ -52,21 +65,88 @@ class ViatorCubit extends Cubit<ViatorState> {
         minRating: effectiveMinRating,
         cancellationType: effectiveCancellationType,
         sort: effectiveSort,
-        page: page,
+        page: _currentPage, // Use class level page
         limit: limit,
-        lang: lang,
+        lang: effectiveLang,
       );
 
       if (response.status && response.data != null) {
         final viatorResponse = response.data as ViatorTourResponse;
+        final newTours = viatorResponse.tours ?? [];
+
+        if (isRefresh || _currentPage == 1) {
+          _allTours = newTours;
+        } else {
+          _allTours.addAll(newTours);
+        }
+
+        // Check if we reached max pages
+        final pagination = viatorResponse.pagination;
+        if (pagination != null) {
+          _hasReachedMax = _currentPage >= (pagination.totalPages ?? 1);
+        } else {
+          _hasReachedMax = newTours.isEmpty;
+        }
 
         emit(
           ViatorLoaded(
-            tours: viatorResponse.tours ?? [],
-            pagination: viatorResponse.pagination,
+            tours: List.from(_allTours),
+            pagination: pagination,
             activeFilters: Map.from(_currentFilters),
+            isLoadingMore: false,
           ),
         );
+      } else {
+        emit(ViatorError(response.message));
+      }
+    } catch (e) {
+      emit(ViatorError(e.toString()));
+    }
+  }
+
+  Future<void> loadMoreTours() async {
+    if (_hasReachedMax || _isLoadingMore) return;
+
+    try {
+      _isLoadingMore = true;
+      if (state is ViatorLoaded) {
+        emit(
+          ViatorLoaded(
+            tours: (state as ViatorLoaded).tours,
+            pagination: (state as ViatorLoaded).pagination,
+            activeFilters: (state as ViatorLoaded).activeFilters,
+            isLoadingMore: true,
+          ),
+        );
+      }
+
+      _currentPage++;
+      // Call fetchTours but let it know it's a pagination call implicitly by using the updated _currentPage
+      // We pass null for filters to use existing ones
+      await fetchTours(page: _currentPage);
+    } catch (e) {
+      _currentPage--; // Revert page on error
+      if (state is ViatorLoaded) {
+        emit(
+          ViatorLoaded(
+            tours: (state as ViatorLoaded).tours,
+            pagination: (state as ViatorLoaded).pagination,
+            activeFilters: (state as ViatorLoaded).activeFilters,
+            isLoadingMore: false,
+          ),
+        );
+      }
+    } finally {
+      _isLoadingMore = false;
+    }
+  }
+
+  Future<void> fetchTourDetails(String productCodeOrSlug) async {
+    emit(ViatorLoading());
+    try {
+      final response = await repository.getTourDetails(productCodeOrSlug);
+      if (response.status && response.data != null) {
+        emit(ViatorTourDetailsLoaded(response.data));
       } else {
         emit(ViatorError(response.message));
       }
@@ -81,11 +161,11 @@ class ViatorCubit extends Cubit<ViatorState> {
     } else {
       _currentFilters[key] = value;
     }
-    fetchTours(isRefresh: false); // Trigger fetch with new filters
+    fetchTours(isRefresh: false, page: 1); // Reset to page 1 for new filters
   }
 
   void clearFilters() {
     _currentFilters.clear();
-    fetchTours(isRefresh: false);
+    fetchTours(isRefresh: false, page: 1);
   }
 }

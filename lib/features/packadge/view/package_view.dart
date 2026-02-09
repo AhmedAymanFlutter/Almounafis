@@ -69,14 +69,15 @@ class _PackageViewState extends State<PackageView> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(
+                    bottom: 100,
+                  ), // Padding for floating nav bar
                   itemCount: packages.length,
                   itemBuilder: (context, index) {
                     final pkg = packages[index];
                     return PackageCardView(
                       package: pkg,
                       onTap: () {
-                        
                         Navigator.pushNamed(
                           context,
                           Routes.countriesView,
@@ -121,6 +122,4 @@ class _PackageViewState extends State<PackageView> {
     _packageCubit.close();
     super.dispose();
   }
-  
-
 }

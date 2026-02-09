@@ -26,4 +26,5 @@ class Routes {
   static const String cityDetailsPage = '/CityDetailsPage';
   static const String allHotelsPage = '/AllHotelsPage';
   static const String viatorAllToursPage = '/viatorAllToursPage';
+  static const String cityGuideDetailsView = '/CityGuideDetailsView';
 }

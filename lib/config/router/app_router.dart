@@ -31,6 +31,8 @@ import '../../features/cities/manger/city_cubit.dart';
 import '../../features/viator/data/repo/viator_repo.dart';
 import '../../features/viator/manager/viator_cubit.dart';
 import '../../features/viator/view/viator_all_tours_page.dart';
+import '../../features/cities/view/city_guide_details_view.dart';
+import '../../features/cities/data/model/city_guide_model.dart';
 
 class AppRouter {
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -138,6 +140,11 @@ class AppRouter {
             create: (_) => ViatorCubit(ViatorRepository())..fetchTours(),
             child: const ViatorAllToursPage(),
           ),
+        );
+      case Routes.cityGuideDetailsView:
+        final place = settings.arguments as GuidePlace;
+        return RouterTransitions.buildHorizontal(
+          CityGuideDetailsView(place: place),
         );
       default:
         return RouterTransitions.build(

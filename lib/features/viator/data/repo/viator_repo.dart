@@ -84,4 +84,69 @@ class ViatorRepository {
       );
     }
   }
+
+  Future<ApiResponse> getTourDetails(String productCodeOrSlug) async {
+    try {
+      final String endPoint = '${EndPoints.viatorTours}/$productCodeOrSlug';
+      print('🌐 API Call: $endPoint');
+
+      final ApiResponse apiResponse = await _apiHelper.getRequest(
+        endPoint: endPoint,
+      );
+
+      if (apiResponse.status) {
+        if (apiResponse.data is Map<String, dynamic>) {
+          try {
+            // The response structure for details might have "data" field directly containing the tour
+            // checking the recursive structure.
+            final data = apiResponse.data['data'];
+            if (data != null) {
+              final tour = ViatorTour.fromJson(data);
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: tour,
+                message: 'Successfully fetched tour details',
+              );
+            } else {
+              // Fallback if structure is different or flat
+              final tour = ViatorTour.fromJson(apiResponse.data);
+              return ApiResponse(
+                status: true,
+                statusCode: apiResponse.statusCode,
+                data: tour,
+                message: 'Successfully fetched tour details',
+              );
+            }
+          } catch (e) {
+            print('❌ Parsing Error (Viator Tour Details): $e');
+            return ApiResponse(
+              status: false,
+              statusCode: apiResponse.statusCode,
+              message: 'Error parsing tour details: $e',
+            );
+          }
+        } else {
+          return ApiResponse(
+            status: false,
+            statusCode: apiResponse.statusCode,
+            message: 'Invalid data structure received',
+          );
+        }
+      } else {
+        return ApiResponse(
+          status: false,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        );
+      }
+    } catch (e) {
+      print('❌ Repository Error (Viator Tour Details): $e');
+      return ApiResponse(
+        status: false,
+        statusCode: 500,
+        message: 'Repository error: $e',
+      );
+    }
+  }
 }

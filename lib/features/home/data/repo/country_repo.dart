@@ -4,7 +4,7 @@ import 'package:almonafs_flutter/core/network/api_helper.dart';
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart'
     show GetAllCountriesModel;
 import '../../../singel_country/data/model/country_details_model.dart';
-import '../../../singel_country/data/model/tour_guide_model.dart';
+import '../../../cities/data/model/city_guide_model.dart';
 
 class CountryRepository {
   final APIHelper _apiHelper = APIHelper();
@@ -125,55 +125,56 @@ class CountryRepository {
     }
   }
 
-  Future<ApiResponse> getTourGuides(String countrySlug) async {
+  Future<CityGuideResponse> fetchCountryGuide(
+    String slug, {
+    String lang = 'en',
+  }) async {
     try {
-      print('🌐 API Call: ${EndPoints.tourGuides}/$countrySlug');
-      final ApiResponse apiResponse = await _apiHelper.getRequest(
-        endPoint: EndPoints.tourGuides,
-        resourcePath: countrySlug,
+      print('🌐 API Call: ${EndPoints.tourGuides}/$slug?lang=$lang');
+      final response = await _apiHelper.getRequest(
+        endPoint: '${EndPoints.tourGuides}/$slug',
+        queryParameters: {'lang': lang},
       );
 
-      if (apiResponse.status) {
-        if (apiResponse.data is Map<String, dynamic>) {
-          try {
-            final tourGuideResponse = TourGuideResponse.fromJson(
-              apiResponse.data,
-            );
-            return ApiResponse(
-              status: true,
-              statusCode: apiResponse.statusCode,
-              data: tourGuideResponse.data,
-              message: 'Successfully fetched tour guide data',
-            );
-          } catch (e) {
-            print('❌ Parsing Error (Tour Guides): $e');
-            return ApiResponse(
-              status: false,
-              statusCode: apiResponse.statusCode,
-              message: 'Error parsing tour guide data: $e',
-            );
-          }
-        } else {
-          return ApiResponse(
-            status: false,
-            statusCode: apiResponse.statusCode,
-            message: 'Invalid data structure received',
-          );
-        }
+      if (response.status && response.data is Map<String, dynamic>) {
+        return CityGuideResponse.fromJson(response.data);
       } else {
-        return ApiResponse(
-          status: false,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        );
+        throw Exception(response.message);
       }
     } catch (e) {
-      print('❌ Repository Error (Tour Guides): $e');
-      return ApiResponse(
-        status: false,
-        statusCode: 500,
-        message: 'Repository error: $e',
+      print('❌ Error fetching country guide: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<dynamic>> fetchCountryPackages(String slug) async {
+    try {
+      print(
+        '🌐 API Call: ${EndPoints.countries}/$slug/packages?packageType=international-tour-packages',
       );
+      final response = await _apiHelper.getRequest(
+        endPoint: '${EndPoints.countries}/$slug/packages',
+        queryParameters: {'packageType': 'international-tour-packages'},
+      );
+
+      print('📦 Packages Response: ${response.data}');
+
+      if (response.status) {
+        if (response.data is Map<String, dynamic> &&
+            response.data.containsKey('data')) {
+          final data = response.data['data'];
+          if (data is List) return data;
+          if (data is Map && data.containsKey('packages'))
+            return data['packages'] ?? [];
+          return [];
+        } else if (response.data is List) {
+          return response.data;
+        }
+      }
+      return [];
+    } catch (e) {
+      print('❌ Error fetching country packages: $e');
+      return [];
     }
   }
 }

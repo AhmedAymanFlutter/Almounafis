@@ -1,5 +1,6 @@
 import 'package:almonafs_flutter/features/home/data/model/getAllcountry.dart';
 import 'package:almonafs_flutter/features/singel_country/data/model/country_details_model.dart';
+import 'package:almonafs_flutter/features/cities/data/model/city_guide_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class CountryState extends Equatable {
@@ -34,10 +35,13 @@ class SingleCountryLoading extends CountryState {}
 
 class SingleCountryLoaded extends CountryState {
   final CountryDetailsData country;
-  const SingleCountryLoaded(this.country);
+  final CityGuideResponse? guideResponse;
+  final List<dynamic>? packages;
+
+  const SingleCountryLoaded(this.country, {this.guideResponse, this.packages});
 
   @override
-  List<Object> get props => [country];
+  List<Object?> get props => [country, guideResponse, packages];
 }
 
 class SingleCountryError extends CountryState {

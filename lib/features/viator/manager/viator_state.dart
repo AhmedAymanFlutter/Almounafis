@@ -10,12 +10,20 @@ class ViatorLoaded extends ViatorState {
   final List<ViatorTour> tours;
   final Pagination? pagination;
   final Map<String, dynamic> activeFilters;
+  final bool isLoadingMore;
 
   ViatorLoaded({
     required this.tours,
     this.pagination,
     this.activeFilters = const {},
+    this.isLoadingMore = false,
   });
+}
+
+class ViatorTourDetailsLoaded extends ViatorState {
+  final ViatorTour tour;
+
+  ViatorTourDetailsLoaded(this.tour);
 }
 
 class ViatorError extends ViatorState {

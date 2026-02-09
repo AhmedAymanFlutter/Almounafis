@@ -13,7 +13,7 @@ import '../../../flightScreen/view/UpcomingTripsPage.dart';
 import '../../../hotels/view/HotelsPage.dart';
 import '../../../localization/manager/localization_cubit.dart';
 import 'widget/cusstom_drawer_widget.dart';
-import 'widget/custom_bottom_nav_bar.dart';
+import 'widget/glass_bottom_nav_bar.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -88,11 +88,13 @@ class _HomeViewState extends State<HomeView> {
                   socialMedia: socialMedia,
                 ),
                 body: SafeArea(
+                  bottom: false, // Allow content to go behind nav bar
                   child: _selectedIndex == 1
                       ? const ModernHomeContent()
                       : _buildOtherPages(),
                 ),
-                bottomNavigationBar: CustomBottomNavBar(
+                extendBody: true,
+                bottomNavigationBar: GlassBottomNavBar(
                   currentIndex: _selectedIndex,
                   onTap: _onItemTapped,
                   isArabic: isArabic,

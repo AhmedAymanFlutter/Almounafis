@@ -77,7 +77,12 @@ class _FlightBookingScreenState extends State<FlightBookingScreen> {
                 ),
                 child: SafeArea(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.only(
+                      top: 16,
+                      left: 16,
+                      right: 16,
+                      bottom: 120,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       //  crossAxisAlignment: CrossAxisAlignment.stretch,

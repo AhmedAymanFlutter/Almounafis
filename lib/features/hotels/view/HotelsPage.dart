@@ -40,7 +40,6 @@ class __AllHotelsScreenContentState extends State<_AllHotelsScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         leading: SizedBox(),

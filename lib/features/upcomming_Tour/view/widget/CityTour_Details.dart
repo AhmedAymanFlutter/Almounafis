@@ -1,4 +1,5 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
+import 'package:almonafs_flutter/core/widgets/html_content_widget.dart';
 import 'package:almonafs_flutter/features/upcomming_Tour/view/widget/utils/Utils_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -65,16 +66,31 @@ class _CityTourDetailsPageState extends State<CityTourDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 📝 Description
-                        buildSection(
-                          title: isArabic ? 'الوصف' : 'Description',
-                          content: isArabic
-                              ? (tour.descriptionArFlutter ??
-                                    tour.descriptionAr ??
-                                    'لا يوجد وصف متاح')
-                              : (tour.descriptionFlutter ??
-                                    tour.description ??
-                                    'No description available'),
-                          context: context,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isArabic ? 'الوصف' : 'Description',
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            HtmlContentWidget(
+                              htmlContent: isArabic
+                                  ? (tour.descriptionArFlutter ??
+                                        tour.descriptionAr ??
+                                        '<p>لا يوجد وصف متاح</p>')
+                                  : (tour.descriptionFlutter ??
+                                        tour.description ??
+                                        '<p>No description available</p>'),
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              textColor: AppColor.secondaryBlack,
+                            ),
+                            SizedBox(height: 16.h),
+                          ],
                         ),
 
                         // ✅ Includes

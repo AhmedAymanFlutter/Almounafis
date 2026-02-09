@@ -1,6 +1,6 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
-import 'package:almonafs_flutter/features/singel_country/data/model/tour_guide_model.dart';
+import 'package:almonafs_flutter/features/cities/data/model/city_guide_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PlaceListWidget extends StatelessWidget {
   final String title;
-  final List<Place> places;
+  final List<GuidePlace> places;
   final bool isArabic;
 
   const PlaceListWidget({
@@ -59,15 +59,11 @@ class PlaceListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceCard(BuildContext context, Place place) {
+  Widget _buildPlaceCard(BuildContext context, GuidePlace place) {
     // Get cover image or first image
     String imageUrl = '';
     if (place.images != null && place.images!.isNotEmpty) {
-      final cover = place.images!.firstWhere(
-        (img) => img.isCover == true,
-        orElse: () => place.images!.first,
-      );
-      imageUrl = cover.url ?? '';
+      imageUrl = place.images!.first.url ?? '';
     }
 
     return GestureDetector(
