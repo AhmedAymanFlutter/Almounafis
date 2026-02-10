@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HtmlContentWidget extends StatelessWidget {
   final String htmlContent;
@@ -25,6 +26,14 @@ class HtmlContentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Html(
       data: htmlContent,
+      onLinkTap: (url, _, __) async {
+        if (url != null) {
+          final uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        }
+      },
       style: {
         "body": Style(
           margin: Margins.zero,

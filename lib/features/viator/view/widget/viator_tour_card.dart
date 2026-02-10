@@ -1,4 +1,5 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/viator/data/model/viator_tour_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class ViatorTourCard extends StatelessWidget {
           // Image
           ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-            child: tour.coverImage != null
+            child: (tour.coverImage != null && tour.coverImage!.isNotEmpty)
                 ? CachedNetworkImage(
                     imageUrl: tour.coverImage!,
                     height: 110.h,
@@ -76,10 +77,9 @@ class ViatorTourCard extends StatelessWidget {
                   title ?? '',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14.sp,
+                  style: AppTextStyle.setPoppinsBlack(
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: AppColor.mainBlack,
                   ),
                 ),
                 SizedBox(height: 8.h),
@@ -99,9 +99,9 @@ class ViatorTourCard extends StatelessWidget {
                           cityName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: AppColor.secondaryGrey,
+                          style: AppTextStyle.setPoppinssecondaryGery(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ),
@@ -118,8 +118,8 @@ class ViatorTourCard extends StatelessWidget {
                     if (price != null)
                       Text(
                         '${price.amount} ${price.currency}',
-                        style: TextStyle(
-                          fontSize: 14.sp,
+                        style: AppTextStyle.setPoppinsTextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: AppColor.secondaryblue,
                         ),
@@ -133,10 +133,9 @@ class ViatorTourCard extends StatelessWidget {
                           SizedBox(width: 4.w),
                           Text(
                             '${rating.average}',
-                            style: TextStyle(
-                              fontSize: 12.sp,
+                            style: AppTextStyle.setPoppinsBlack(
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: AppColor.mainBlack,
                             ),
                           ),
                         ],

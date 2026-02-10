@@ -1,6 +1,6 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
-import 'package:almonafs_flutter/core/helper/html_helper.dart'; // Import HtmlHelper
+import 'package:almonafs_flutter/core/widgets/html_content_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -34,274 +34,327 @@ class PackageDetailsView extends StatelessWidget {
             textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
             child: Scaffold(
               bottomNavigationBar: buildBookButton(context),
-              backgroundColor: AppColor.mainWhite,
+              backgroundColor: AppColor.mainWhite, // Changed to match theme
               body: BlocBuilder<PackageCubit, PackageState>(
                 builder: (context, state) {
                   if (state is PackageDetailsLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is PackageDetailsLoaded) {
-                    // Access PackageDetailsData directly
                     final details = state.packageDetails;
 
-                    // Determine fields based on language
+                    // Text Fields
                     final title = isArabic
                         ? (details.titleAr ?? details.title)
                         : (details.title ?? packageTitle);
-                    final descriptionHtml = isArabic
+                    final description = isArabic
                         ? (details.descriptionAr ?? details.description)
                         : details.description;
-                    final description = HtmlHelper.stripHtml(
-                      descriptionHtml ?? '',
-                    );
 
+                    // Pricing & Duration
                     final price = details.pricing?.price ?? 'N/A';
                     final currency = details.pricing?.currency ?? '';
-                    final imageUrl = details.images?.coverImage?.url ?? '';
+                    final durationDays = details.duration?.days;
+                    final durationNights = details.duration?.nights;
+                    final minGroup = details.availability?.minGroupSize;
 
-                    return Scaffold(
-                      body: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 15,
-                          right: 15,
-                          top: 56,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: Stack(
-                            children: [
-                              SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // 🖼️ الصورة الرئيسية
-                                    Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            30.r,
-                                          ),
-                                          child: Image.network(
-                                            imageUrl,
-                                            height: 650.h,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    Container(
-                                                      height: 650.h,
-                                                      color: Colors.grey[300],
-                                                      child: const Icon(
-                                                        Icons.broken_image,
-                                                        size: 50,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                          ),
-                                        ),
-                                        // تدرج لوني
-                                        Positioned(
-                                          bottom: 0,
-                                          left: 0,
-                                          right: 0,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.only(
-                                              bottomLeft: Radius.circular(30.r),
-                                              bottomRight: Radius.circular(
-                                                30.r,
-                                              ),
-                                            ),
-                                            child: Container(
-                                              height: 650.h,
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                  colors: [
-                                                    Colors.transparent,
-                                                    Colors.black.withOpacity(
-                                                      0.6,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        // زر الرجوع
-                                        Positioned(
-                                          top: 16.h,
-                                          left: isArabic ? null : 16.w,
-                                          right: isArabic ? 16.w : null,
-                                          child: GestureDetector(
-                                            onTap: () => Navigator.pop(context),
-                                            child: Container(
-                                              width: 40.w,
-                                              height: 40.h,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(
-                                                  0.9,
-                                                ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Transform(
-                                                alignment: Alignment.center,
-                                                transform: Matrix4.rotationY(
-                                                  isArabic ? 3.14159 : 0,
-                                                ),
-                                                child: Icon(
-                                                  Icons.arrow_back_ios_new,
-                                                  size: 18.sp,
-                                                  color: AppColor.mainBlack,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        // العنوان
-                                        Positioned(
-                                          bottom: 16.h,
-                                          left: 16.w,
-                                          right: 16.w,
-                                          child: Column(
-                                            crossAxisAlignment: isArabic
-                                                ? CrossAxisAlignment.end
-                                                : CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                title ?? '',
-                                                style:
-                                                    AppTextStyle.setPoppinsTextStyle(
-                                                      fontSize: 22,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: Colors.white,
-                                                    ),
-                                                textAlign: isArabic
-                                                    ? TextAlign.right
-                                                    : TextAlign.left,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                    // Images
+                    final imageUrl = details.images?.coverImage?.url ?? '';
+                    final gallery = details.images?.gallery ?? [];
+
+                    return CustomScrollView(
+                      slivers: [
+                        // 1. Sliver App Bar with Image & Gallery Button
+                        SliverAppBar(
+                          expandedHeight: 300.h,
+                          pinned: true,
+                          leading: IconButton(
+                            icon: Container(
+                              padding: EdgeInsets.all(8.r),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.arrow_back_ios_new,
+                                size: 18.sp,
+                                color: Colors.black,
+                              ),
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) =>
+                                      Container(color: Colors.grey[300]),
+                                ),
+                                // Gradient Overlay
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        Colors.black.withOpacity(0.7),
                                       ],
                                     ),
-                                    // 🧾 المحتوى
-                                    Padding(
-                                      padding: EdgeInsets.all(20.w),
-                                      child: Column(
+                                  ),
+                                ),
+                                // Gallery Button (if gallery exists)
+                                if (gallery.isNotEmpty)
+                                  Positioned(
+                                    bottom: 20.h,
+                                    right: isArabic ? null : 20.w,
+                                    left: isArabic ? 20.w : null,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        // TODO: Open Gallery View
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 12.w,
+                                          vertical: 6.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(
+                                            20.r,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(
+                                              0.5,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.photo_library,
+                                              color: Colors.white,
+                                              size: 16.sp,
+                                            ),
+                                            SizedBox(width: 6.w),
+                                            Text(
+                                              '${gallery.length} ${isArabic ? 'صور' : 'Photos'}',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.sp,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.all(20.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 2. Title & Rating (Future consideration)
+                                Text(
+                                  title ?? '',
+                                  style: AppTextStyle.setPoppinsTextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.mainBlack,
+                                  ),
+                                ),
+                                SizedBox(height: 12.h),
+
+                                // 3. Info Chips (Duration, Group, Location)
+                                Row(
+                                  children: [
+                                    if (durationDays != null)
+                                      _buildInfoChip(
+                                        Icons.access_time,
+                                        isArabic
+                                            ? '$durationDays أيام / $durationNights ليالي'
+                                            : '$durationDays Days / $durationNights Nights',
+                                      ),
+                                    if (minGroup != null) ...[
+                                      SizedBox(width: 8.w),
+                                      _buildInfoChip(
+                                        Icons.group,
+                                        isArabic
+                                            ? 'مجموعة: $minGroup+'
+                                            : 'Group: $minGroup+',
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                SizedBox(height: 24.h),
+
+                                // 4. Price Section
+                                Container(
+                                  padding: EdgeInsets.all(16.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColor.lightBlue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    border: Border.all(
+                                      color: AppColor.lightBlue.withOpacity(
+                                        0.3,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // ⏱️ المدة / السعر
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 12.w,
-                                              vertical: 8.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[100],
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  isArabic ? ' السعر' : 'Price',
-                                                  style:
-                                                      AppTextStyle.setPoppinsTextStyle(
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color:
-                                                            AppColor.lightGrey,
-                                                      ),
-                                                ),
-                                                SizedBox(height: 4.h),
-                                                Text(
-                                                  '$price $currency',
-                                                  style:
-                                                      AppTextStyle.setPoppinsTextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            AppColor.mainBlack,
-                                                      ),
-                                                ),
-                                              ],
+                                          Text(
+                                            isArabic
+                                                ? 'يبدأ من'
+                                                : 'Starts from',
+                                            style: TextStyle(
+                                              fontSize: 12.sp,
+                                              color: AppColor.secondaryBlack,
                                             ),
                                           ),
-                                          SizedBox(height: 24.h),
-                                          // 📖 الوصف
                                           Text(
-                                            isArabic ? 'الوصف' : 'Description',
+                                            '$price $currency',
                                             style:
                                                 AppTextStyle.setPoppinsTextStyle(
-                                                  fontSize: 16,
+                                                  fontSize: 20,
                                                   fontWeight: FontWeight.w700,
-                                                  color: AppColor.mainBlack,
+                                                  color: AppColor.mainColor,
                                                 ),
                                           ),
-                                          SizedBox(height: 12.h),
-                                          Text(
-                                            description.isNotEmpty
-                                                ? description
-                                                : (isArabic
-                                                      ? 'لا يوجد وصف متاح'
-                                                      : 'No description available'),
-                                            style:
-                                                AppTextStyle.setPoppinsTextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppColor.lightGrey,
-                                                ),
-                                            textAlign: isArabic
-                                                ? TextAlign.right
-                                                : TextAlign.left,
-                                          ),
-
-                                          if (details.itinerary != null &&
-                                              details
-                                                  .itinerary!
-                                                  .isNotEmpty) ...[
-                                            SizedBox(height: 24.h),
-                                            ItineraryWidget(
-                                              itinerary: details.itinerary!,
-                                              isArabic: isArabic,
-                                            ),
-                                          ],
-
-                                          if ((details.includes != null &&
-                                                  details
-                                                      .includes!
-                                                      .isNotEmpty) ||
-                                              (details.excludes != null &&
-                                                  details
-                                                      .excludes!
-                                                      .isNotEmpty)) ...[
-                                            SizedBox(height: 24.h),
-                                            InclusionsWidget(
-                                              includes: details.includes,
-                                              excludes: details.excludes,
-                                              isArabic: isArabic,
-                                            ),
-                                          ],
-
-                                          SizedBox(
-                                            height: 100.h,
-                                          ), // Bottom padding for button
                                         ],
                                       ),
-                                    ),
-                                  ],
+                                      // Discount Badge if exists
+                                      if ((details
+                                                  .pricing
+                                                  ?.discountPercentage ??
+                                              0) >
+                                          0)
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w,
+                                            vertical: 4.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.redAccent,
+                                            borderRadius: BorderRadius.circular(
+                                              20.r,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${details.pricing!.discountPercentage}% ${isArabic ? 'خصم' : 'OFF'}',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12.sp,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                                SizedBox(height: 24.h),
+
+                                // 5. Description
+                                Text(
+                                  isArabic ? 'عن الرحلة' : 'About the trip',
+                                  style: AppTextStyle.setPoppinsTextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.mainBlack,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                HtmlContentWidget(
+                                  htmlContent:
+                                      description ??
+                                      (isArabic
+                                          ? 'لا يوجد وصف متاح'
+                                          : 'No description available'),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  textColor: AppColor.secondaryBlack,
+                                ),
+                                SizedBox(height: 24.h),
+
+                                // 6. Itinerary
+                                if (details.itinerary != null &&
+                                    details.itinerary!.isNotEmpty) ...[
+                                  ItineraryWidget(
+                                    itinerary: details.itinerary!,
+                                    isArabic: isArabic,
+                                  ),
+                                  SizedBox(height: 24.h),
+                                ],
+
+                                // 7. Inclusions & Exclusions
+                                if ((details.includes?.isNotEmpty ?? false) ||
+                                    (details.excludes?.isNotEmpty ??
+                                        false)) ...[
+                                  InclusionsWidget(
+                                    includes: details.includes,
+                                    excludes: details.excludes,
+                                    isArabic: isArabic,
+                                  ),
+                                  SizedBox(height: 24.h),
+                                ],
+
+                                // 8. Available Dates (Simple List for now)
+                                if (details
+                                        .availability
+                                        ?.availableDates
+                                        ?.isNotEmpty ??
+                                    false) ...[
+                                  Text(
+                                    isArabic
+                                        ? 'المواعيد المتاحة'
+                                        : 'Available Dates',
+                                    style: AppTextStyle.setPoppinsTextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColor.mainBlack,
+                                    ),
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  Wrap(
+                                    spacing: 8.w,
+                                    runSpacing: 8.h,
+                                    children: details
+                                        .availability!
+                                        .availableDates!
+                                        .map((date) {
+                                          return Chip(
+                                            label: Text(date),
+                                            backgroundColor: AppColor.offWhite,
+                                            side: BorderSide(
+                                              color: AppColor.lightGrey
+                                                  .withOpacity(0.3),
+                                            ),
+                                          );
+                                        })
+                                        .toList(),
+                                  ),
+                                  SizedBox(height: 24.h),
+                                ],
+
+                                SizedBox(height: 80.h), // Bottom Padding
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     );
                   } else if (state is PackageError) {
                     return Center(child: Text(state.message));
@@ -312,6 +365,31 @@ class PackageDetailsView extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String label) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: AppColor.offWhite,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16.sp, color: AppColor.secondaryBlack),
+          SizedBox(width: 6.w),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: AppColor.secondaryBlack,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

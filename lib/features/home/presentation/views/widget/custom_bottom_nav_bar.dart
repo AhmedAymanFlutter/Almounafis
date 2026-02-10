@@ -151,7 +151,7 @@ class _NavBarItem extends StatelessWidget {
             style:
                 AppTextStyle.setPoppinsWhite(
                   fontSize: isCenter ? 11 : 10,
-                  fontWeight: isCenter ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: isCenter ? FontWeight.w700 : FontWeight.w600,
                 ).copyWith(
                   color: isCenter
                       ? Colors.white

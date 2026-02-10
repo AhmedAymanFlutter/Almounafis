@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/theme/app_color.dart';
 import '../../../../../core/theme/app_text_style.dart';
+import '../../../../../core/widgets/html_content_widget.dart';
 import '../../../../localization/manager/localization_cubit.dart';
 
 class PackageCard extends StatelessWidget {
   final String title;
-  final dynamic price;
   final String image;
   final String description;
   final VoidCallback onTap;
@@ -15,7 +15,6 @@ class PackageCard extends StatelessWidget {
   const PackageCard({
     super.key,
     required this.title,
-    required this.price,
     required this.image,
     required this.description,
     required this.onTap,
@@ -37,10 +36,7 @@ class PackageCard extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              colors: [
-                AppColor.secondaryBlack,
-                AppColor.lightBlue,
-              ],
+              colors: [AppColor.secondaryBlack, AppColor.lightBlue],
             ),
             boxShadow: [
               BoxShadow(
@@ -58,14 +54,20 @@ class PackageCard extends StatelessWidget {
                 flex: 2,
                 child: ClipPath(
                   clipper: _CurvedClipper(),
-                  child: Image.network(
-                    image,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  ),
+                  child: image.isNotEmpty
+                      ? Image.network(
+                          image,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: Colors.grey[300],
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                        )
+                      : Container(color: Colors.grey[300]),
                 ),
               ),
 
@@ -73,7 +75,10 @@ class PackageCard extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 8.h,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -89,35 +94,24 @@ class PackageCard extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 6.h),
-                      Text(
-                        description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyle.setPoppinsTextStyle(
+                      SizedBox(
+                        height: 35.h, // Fixed height to prevent overflow
+                        child: HtmlContentWidget(
+                          htmlContent: description,
                           fontSize: 10,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.9),
+                          textColor: Colors.white.withOpacity(0.9),
                         ),
-                        textAlign: isArabic ? TextAlign.right : TextAlign.left,
                       ),
                       SizedBox(height: 10.h),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(
-                            isArabic
-                                ? '${price ?? 0} دولار'
-                                : '\$${price ?? 0}',
-                            style: AppTextStyle.setPoppinsTextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
                           Transform(
                             alignment: Alignment.center,
-                            transform:
-                                Matrix4.rotationY(isArabic ? 3.14159 : 0),
+                            transform: Matrix4.rotationY(
+                              isArabic ? 3.14159 : 0,
+                            ),
                             child: Icon(
                               Icons.arrow_forward_ios,
                               size: 14.sp,

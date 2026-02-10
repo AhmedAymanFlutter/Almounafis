@@ -31,8 +31,9 @@ class PackagesListView extends StatelessWidget {
         final isArabic = languageState == AppLanguage.arabic;
 
         return BlocProvider(
-          create: (_) => PackageCubit(PackageTypeRepo())
-            ..getPackagesForCountry(countrySlug, packageTypeSlug),
+          create: (_) =>
+              PackageCubit(PackageTypeRepo())
+                ..getPackagesForCountry(countrySlug, packageTypeSlug),
           child: Directionality(
             textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
             child: Scaffold(
@@ -64,31 +65,35 @@ class PackagesListView extends StatelessWidget {
                 builder: (context, state) {
                   if (state is PackagesLoading) {
                     return ListView.separated(
-                      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
-                      itemCount: 4,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16.h,
+                        horizontal: 16.w,
+                      ),
+                      itemCount: 6,
                       separatorBuilder: (_, __) => SizedBox(height: 16.h),
                       itemBuilder: (context, index) => Skeletonizer(
                         enabled: true,
                         child: PackageCard(
-                          title: "Loading...",
-                          price: "—",
+                          title: "Amazing Package Title Placeholder",
                           image: "",
-                          description: "Loading...",
+                          description:
+                              "This is a long description placeholder to simulate the actual content of the package. It includes multiple lines to look realistic.",
                           onTap: () {},
                         ),
                       ),
                     );
                   } else if (state is PackagesLoaded) {
-                    
                     final List<dynamic> packages =
                         state.packagesData['data'] is List
-                            ? state.packagesData['data']
-                            : (state.packagesData['data']['packages'] ?? []);
+                        ? state.packagesData['data']
+                        : (state.packagesData['data']['packages'] ?? []);
 
                     if (packages.isEmpty) {
                       return Center(
                         child: Text(
-                          isArabic ? 'لا توجد باقات متاحة' : 'No packages available',
+                          isArabic
+                              ? 'لا توجد باقات متاحة'
+                              : 'No packages available',
                           style: AppTextStyle.setPoppinsTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -99,27 +104,51 @@ class PackagesListView extends StatelessWidget {
                     }
 
                     return ListView.builder(
-                      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16.h,
+                        horizontal: 16.w,
+                      ),
                       itemCount: packages.length,
                       itemBuilder: (context, index) {
                         final package = packages[index];
 
                         final packageTitle = isArabic
-                            ? (package['nameAr'] ?? package['name'] ?? 'بلا عنوان')
-                            : (package['name'] ?? 'Unknown');
+                            ? (package['nameAr'] ??
+                                  package['name'] ??
+                                  package['seo']?['metaTitleAr'] ??
+                                  package['seo']?['metaTitle'] ??
+                                  'بلا عنوان')
+                            : (package['name'] ??
+                                  package['seo']?['metaTitle'] ??
+                                  'Unknown');
 
-                        final packageSlug = package['slug'] ?? package['_id'] ?? '';
-                        final packagePrice = package['price'] ?? 'N/A';
+                        final packageSlug =
+                            package['slug'] ??
+                            package['seo']?['slugUrl'] ??
+                            package['_id'] ??
+                            '';
+
+                        // Fix Price Extraction
+                        dynamic packagePrice = package['price'];
+                        if (packagePrice == null &&
+                            package['pricing'] != null &&
+                            package['pricing'] is Map) {
+                          packagePrice =
+                              package['pricing']['price'] ??
+                              package['pricing']['amount'];
+                        }
+                        packagePrice = packagePrice ?? 'N/A';
 
                         // ✅✅ FIXED IMAGE PARSING LOGIC ✅✅
                         String packageImage = '';
 
                         // Priority 1: Check nested "images.coverImage.url" (From your logs)
-                        if (package['images'] != null && 
-                            package['images'] is Map && 
+                        if (package['images'] != null &&
+                            package['images'] is Map &&
                             package['images']['coverImage'] != null) {
-                          packageImage = package['images']['coverImage']['url'] ?? '';
-                        } 
+                          packageImage =
+                              package['images']['coverImage']['url'] ?? '';
+                        }
                         // Priority 2: Check "imageCover" object (Standard in some endpoints)
                         else if (package['imageCover'] != null) {
                           if (package['imageCover'] is Map) {
@@ -138,12 +167,17 @@ class PackagesListView extends StatelessWidget {
                         }
 
                         final packageDescription = isArabic
-                            ? (package['descriptionAr'] ?? package['description'] ?? '')
-                            : (package['description'] ?? '');
+                            ? (package['descriptionAr'] ??
+                                  package['description'] ??
+                                  package['seo']?['metaDescriptionAr'] ??
+                                  package['seo']?['metaDescription'] ??
+                                  '')
+                            : (package['description'] ??
+                                  package['seo']?['metaDescription'] ??
+                                  '');
 
                         return PackageCard(
                           title: packageTitle,
-                          price: packagePrice,
                           image: packageImage, // ✅ Passing correct URL
                           description: packageDescription,
                           onTap: () {

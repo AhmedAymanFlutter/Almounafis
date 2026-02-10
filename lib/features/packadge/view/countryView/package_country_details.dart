@@ -27,8 +27,13 @@ class CountriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PackageCubit(PackageTypeRepo())
-        ..getCountriesForPackageType(packageTypeSlug),
+      create: (_) {
+        print(
+          '🔍 [CountriesView] Received packageTypeSlug: "$packageTypeSlug"',
+        );
+        return PackageCubit(PackageTypeRepo())
+          ..getCountriesForPackageType(packageTypeSlug);
+      },
       child: BlocBuilder<LanguageCubit, AppLanguage>(
         builder: (context, langState) {
           final isArabic = langState == AppLanguage.arabic;
@@ -80,13 +85,15 @@ class CountriesView extends StatelessWidget {
                   } else if (state is CountriesLoaded) {
                     final List<dynamic> countries =
                         state.countriesData['data'] is List
-                            ? state.countriesData['data']
-                            : (state.countriesData['data']['countries'] ?? []);
+                        ? state.countriesData['data']
+                        : (state.countriesData['data']['countries'] ?? []);
 
                     if (countries.isEmpty) {
                       return Center(
                         child: Text(
-                          isArabic ? 'لا توجد دول متاحة' : 'No countries available',
+                          isArabic
+                              ? 'لا توجد دول متاحة'
+                              : 'No countries available',
                           style: AppTextStyle.setPoppinsTextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,

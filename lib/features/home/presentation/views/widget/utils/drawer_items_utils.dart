@@ -1,6 +1,8 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,23 +16,11 @@ Widget buildDrawerHeader(bool isArabic) {
           : CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 40,
-          backgroundColor: Colors.white,
-          child: Image.asset(
-            'assets/splash/main_logo.png',
-            width: 48,
-            height: 48,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          isArabic ? 'مرحبًا بك' : 'Welcome User',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+        Image.asset(
+          'assets/splash/main_logo.png',
+          width: 100.w,
+          height: 100.h,
+          fit: BoxFit.contain,
         ),
       ],
     ),
@@ -54,7 +44,10 @@ Widget buildDrawerItem(
     ),
     title: Text(
       title,
-      style: TextStyle(fontSize: 16, color: textColor ?? Colors.black87),
+      style: AppTextStyle.setPoppinsBlack(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
     ),
     onTap: onTap,
     hoverColor: Colors.grey.shade100,
@@ -96,9 +89,7 @@ Widget buildSocialMediaIcon(
   );
 }
 
-// Build icon widget - use backend SVG if available, otherwise use default icon
 Widget _buildIconWidget(String platform, String? iconUrl) {
-  // Special handling for Snapchat - use image with fallback
   if (platform.toLowerCase() == 'snapchat') {
     print('🎯 Building Snapchat icon with image');
     return _buildSnapchatIcon();
@@ -220,7 +211,6 @@ class _SafeSvgIcon extends StatelessWidget {
         },
       );
     } else {
-      // non-SVG images
       return ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Image.network(
@@ -236,14 +226,12 @@ class _SafeSvgIcon extends StatelessWidget {
     }
   }
 
-  /// Try loading SVG and return success/fail without crashing
   Future<bool> _loadSvgSafely(String url) async {
     try {
       final response = await NetworkAssetBundle(Uri.parse(url)).load(url);
       if (response.lengthInBytes == 0) return false;
-      // just to test if it's valid text
       final data = String.fromCharCodes(response.buffer.asUint8List());
-      if (data.contains('%')) return false; // SVG with % values
+      if (data.contains('%')) return false;
       return true;
     } catch (_) {
       return false;

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/theme/app_color.dart';
+import '../../../../../core/theme/app_text_style.dart';
 import '../../../../hotels/data/model/hotel_model.dart';
 
 class ModernHotelCard extends StatelessWidget {
@@ -49,17 +50,27 @@ class ModernHotelCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  height: 140.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => Container(
-                    height: 140.h,
-                    color: Colors.grey[200],
-                    child: Icon(Icons.hotel, color: Colors.grey, size: 40.sp),
-                  ),
-                ),
+                child: imageUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        height: 140.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Container(
+                          height: 140.h,
+                          color: Colors.grey[200],
+                          child: Icon(
+                            Icons.hotel,
+                            color: Colors.grey,
+                            size: 40.sp,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        height: 140.h,
+                        width: double.infinity,
+                        color: Colors.grey[200],
+                      ),
               ),
               // Star Rating Badge (Top Right)
               Positioned(
@@ -87,10 +98,9 @@ class ModernHotelCard extends StatelessWidget {
                       SizedBox(width: 4.w),
                       Text(
                         '$starRating',
-                        style: TextStyle(
-                          fontSize: 12.sp,
+                        style: AppTextStyle.setPoppinsBlack(
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
                         ),
                       ),
                     ],
@@ -110,10 +120,9 @@ class ModernHotelCard extends StatelessWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 16.sp,
+                  style: AppTextStyle.setPoppinsBlack(
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
                   ),
                 ),
                 SizedBox(height: 6.h),
@@ -130,9 +139,9 @@ class ModernHotelCard extends StatelessWidget {
                         location,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.grey.shade500,
+                        style: AppTextStyle.setPoppinssecondaryGery(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ),
@@ -144,17 +153,17 @@ class ModernHotelCard extends StatelessWidget {
                   children: [
                     Text(
                       '$currency$pricePerNight',
-                      style: TextStyle(
-                        fontSize: 16.sp,
+                      style: AppTextStyle.setPoppinsTextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppColor.secondaryblue,
                       ),
                     ),
                     Text(
                       '/night',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: Colors.grey.shade500,
+                      style: AppTextStyle.setPoppinssecondaryGery(
+                        fontSize: 11,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ],

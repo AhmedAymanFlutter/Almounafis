@@ -1,4 +1,5 @@
 import 'package:almonafs_flutter/features/cities/data/model/cities_model.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // Keep your existing imports
@@ -85,12 +86,70 @@ class _CityViewState extends State<CityView> {
       builder: (context, state) {
         if (state is CityLoading) {
           if (state is CityLoaded &&
-              (state as CityLoaded).cityResponse.data != null) {
-            // This case might happen if we emit Loading but want to keep data?
-            // But currently strict types prevent this.
-            // We just handle CityLoaded below.
-          }
-          return const Center(child: CircularProgressIndicator());
+              (state as CityLoaded).cityResponse.data != null) {}
+          return CustomScrollView(
+            slivers: [
+              // 1. SEO Hero Section - Dummy
+              SliverToBoxAdapter(
+                child: Skeletonizer(
+                  enabled: true,
+                  child: _buildHeroSection(
+                    context,
+                    HeroSection(
+                      heroTitle: "Explore Amazing Cities",
+                      heroDescription:
+                          "Discover the best destinations for your next trip with Almounafis.",
+                      heroButtonText: "Explore Now",
+                    ),
+                    isArabic,
+                  ),
+                ),
+              ),
+
+              // 2. Header Section - Dummy
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Skeletonizer(
+                    enabled: true,
+                    child: Text(
+                      isArabic ? "الوجهات" : "Cities",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 3. Cities List - Dummy
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  return Skeletonizer(
+                    enabled: true,
+                    child: CityCard(
+                      city: City(
+                        name: "City Name Placeholder",
+                        nameAr: "اسم المدينة",
+                        descriptionFlutter:
+                            "This is a placeholder description for the city to simulate loading content. It should be long enough to cover multiple lines.",
+                        imagesObject: ImagesObject(
+                          coverImage: ImageItem(url: ""),
+                        ),
+                        weather: Weather(currentTemp: 25, windSpeed: 10),
+                        bestTimeToVisit: BestTimeToVisit(
+                          months: ["Jan", "Feb"],
+                        ),
+                        country: Country(name: "Country Name"),
+                      ),
+                    ),
+                  );
+                }, childCount: 6),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            ],
+          );
         } else if (state is CityError) {
           return Center(child: Text(state.message));
         } else if (state is CityLoaded) {
@@ -260,7 +319,7 @@ class CityCard extends StatelessWidget {
                 height: 180,
                 width: double.infinity,
                 color: Colors.grey[200], // Placeholder color
-                child: imageUrl != null
+                child: imageUrl != null && imageUrl.isNotEmpty
                     ? Image.network(
                         imageUrl,
                         fit: BoxFit.cover,

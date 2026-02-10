@@ -34,17 +34,36 @@ class ItineraryWidget extends StatelessWidget {
           itemCount: itinerary.length,
           itemBuilder: (context, index) {
             final day = itinerary[index];
-            return Padding(
-              padding: EdgeInsets.only(bottom: 24.h),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Timeline Indicator
-                  Column(
+            final isLast = index == itinerary.length - 1;
+
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Vertical Line (Behind everything)
+                if (!isLast)
+                  Positioned(
+                    top: 28.w, // Start below the circle
+                    bottom:
+                        -24.h -
+                        4.h, // Extend to next item (covering bottom padding)
+                    left: 13
+                        .w, // Center of 28.w circle (14) - half of 2.w line (1) = 13
+                    child: Container(
+                      width: 2.w,
+                      color: AppColor.lightGrey.withOpacity(0.3),
+                    ),
+                  ),
+
+                // Content
+                Padding(
+                  padding: EdgeInsets.only(bottom: 24.h),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Timeline Indicator Circle
                       Container(
-                        width: 24.w,
-                        height: 24.w,
+                        width: 28.w,
+                        height: 28.w,
                         decoration: BoxDecoration(
                           color: AppColor.mainColor,
                           shape: BoxShape.circle,
@@ -61,94 +80,137 @@ class ItineraryWidget extends StatelessWidget {
                           child: Text(
                             '${day.day}',
                             style: AppTextStyle.setPoppinsTextStyle(
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                      if (index != itinerary.length - 1)
-                        Container(
-                          width: 2.w,
-                          height: 60.h,
-                          color: AppColor.lightGrey.withOpacity(0.3),
+                      SizedBox(width: 16.w),
+                      // Content Card
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(
+                              color: AppColor.lightGrey.withOpacity(0.2),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Theme(
+                            data: Theme.of(
+                              context,
+                            ).copyWith(dividerColor: Colors.transparent),
+                            child: ExpansionTile(
+                              tilePadding: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 8.h,
+                              ),
+                              childrenPadding: EdgeInsets.fromLTRB(
+                                16.w,
+                                0,
+                                16.w,
+                                16.h,
+                              ),
+                              initiallyExpanded: index == 0,
+                              shape: const Border(), // Remove default borders
+                              collapsedShape: const Border(),
+                              title: Text(
+                                isArabic
+                                    ? (day.titleAr ?? 'اليوم ${day.day}')
+                                    : (day.title ?? 'Day ${day.day}'),
+                                style: AppTextStyle.setPoppinsTextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColor.mainBlack,
+                                ),
+                              ),
+                              children: [
+                                if (day.description != null ||
+                                    day.descriptionAr != null)
+                                  Text(
+                                    isArabic
+                                        ? (day.descriptionAr ??
+                                              day.description ??
+                                              '')
+                                        : (day.description ?? ''),
+                                    style: AppTextStyle.setPoppinsTextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColor.secondaryBlack,
+                                      height: 1.6,
+                                    ),
+                                  ),
+
+                                if (day.activities != null &&
+                                    day.activities!.isNotEmpty) ...[
+                                  SizedBox(height: 16.h),
+                                  Wrap(
+                                    spacing: 8.w,
+                                    runSpacing: 8.h,
+                                    children: day.activities!.map((activity) {
+                                      return Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w,
+                                          vertical: 6.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColor.mainColor.withOpacity(
+                                            0.05,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            8.r,
+                                          ),
+                                          border: Border.all(
+                                            color: AppColor.mainColor
+                                                .withOpacity(0.1),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.local_activity,
+                                              size: 14.sp,
+                                              color: AppColor.mainColor,
+                                            ),
+                                            SizedBox(width: 6.w),
+                                            Text(
+                                              isArabic
+                                                  ? (activity.nameAr ??
+                                                        activity.name ??
+                                                        '')
+                                                  : (activity.name ?? ''),
+                                              style:
+                                                  AppTextStyle.setPoppinsTextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColor.mainColor,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
                         ),
+                      ),
                     ],
                   ),
-                  SizedBox(width: 16.w),
-                  // Content
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isArabic
-                              ? (day.titleAr ?? 'اليوم ${day.day}')
-                              : (day.title ?? 'Day ${day.day}'),
-                          style: AppTextStyle.setPoppinsTextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.mainBlack,
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                        if (day.description != null ||
-                            day.descriptionAr != null)
-                          Text(
-                            isArabic
-                                ? (day.descriptionAr ?? day.description ?? '')
-                                : (day.description ?? ''),
-                            style: AppTextStyle.setPoppinsTextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: AppColor.secondaryBlack,
-                              height: 1.5,
-                            ),
-                          ),
-                        if (day.activities != null &&
-                            day.activities!.isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.only(top: 12.h),
-                            child: Wrap(
-                              spacing: 8.w,
-                              runSpacing: 8.h,
-                              children: day.activities!.map((activity) {
-                                return Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12.w,
-                                    vertical: 6.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColor.offWhite,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: AppColor.lightGrey.withOpacity(
-                                        0.3,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    isArabic
-                                        ? (activity.nameAr ??
-                                              activity.name ??
-                                              '')
-                                        : (activity.name ?? ''),
-                                    style: AppTextStyle.setPoppinsTextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColor.secondaryBlack,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         ),

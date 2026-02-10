@@ -2,6 +2,7 @@ import 'package:almonafs_flutter/core/network/api_response.dart';
 import 'package:almonafs_flutter/features/viator/data/model/viator_tour_model.dart';
 import 'package:almonafs_flutter/features/viator/data/repo/viator_repo.dart';
 import 'package:almonafs_flutter/features/viator/manager/viator_state.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ViatorCubit extends Cubit<ViatorState> {
@@ -74,6 +75,11 @@ class ViatorCubit extends Cubit<ViatorState> {
         final viatorResponse = response.data as ViatorTourResponse;
         final newTours = viatorResponse.tours ?? [];
 
+        debugPrint('✅ ViatorCubit: Received ${newTours.length} tours');
+        if (newTours.isNotEmpty) {
+          debugPrint('📌 First tour title: ${newTours[0].title}');
+        }
+
         if (isRefresh || _currentPage == 1) {
           _allTours = newTours;
         } else {
@@ -88,6 +94,7 @@ class ViatorCubit extends Cubit<ViatorState> {
           _hasReachedMax = newTours.isEmpty;
         }
 
+        debugPrint('🔄 Emitting ViatorLoaded with ${_allTours.length} tours');
         emit(
           ViatorLoaded(
             tours: List.from(_allTours),
@@ -96,6 +103,7 @@ class ViatorCubit extends Cubit<ViatorState> {
             isLoadingMore: false,
           ),
         );
+        debugPrint('✅ State emitted successfully');
       } else {
         emit(ViatorError(response.message));
       }
@@ -121,11 +129,9 @@ class ViatorCubit extends Cubit<ViatorState> {
       }
 
       _currentPage++;
-      // Call fetchTours but let it know it's a pagination call implicitly by using the updated _currentPage
-      // We pass null for filters to use existing ones
       await fetchTours(page: _currentPage);
     } catch (e) {
-      _currentPage--; // Revert page on error
+      _currentPage--;
       if (state is ViatorLoaded) {
         emit(
           ViatorLoaded(
@@ -141,11 +147,21 @@ class ViatorCubit extends Cubit<ViatorState> {
     }
   }
 
-  Future<void> fetchTourDetails(String productCodeOrSlug) async {
+  Future<void> fetchTourDetails(
+    String productCodeOrSlug, {
+    String? lang,
+  }) async {
     emit(ViatorLoading());
     try {
-      final response = await repository.getTourDetails(productCodeOrSlug);
+      final effectiveLang = lang!;
+      debugPrint('🔍 Fetching tour details with lang: $effectiveLang');
+
+      final response = await repository.getTourDetails(
+        productCodeOrSlug,
+        lang: effectiveLang,
+      );
       if (response.status && response.data != null) {
+        debugPrint('✅ Tour details loaded successfully');
         emit(ViatorTourDetailsLoaded(response.data));
       } else {
         emit(ViatorError(response.message));

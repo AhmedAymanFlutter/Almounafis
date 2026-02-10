@@ -78,6 +78,9 @@ class _PackageViewState extends State<PackageView> {
                     return PackageCardView(
                       package: pkg,
                       onTap: () {
+                        print(
+                          '🔍 [PackageView] Navigating to CountriesView with slug: "${pkg.slug}"',
+                        );
                         Navigator.pushNamed(
                           context,
                           Routes.countriesView,

@@ -1,3 +1,4 @@
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -45,50 +46,26 @@ class ModernCountryCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  height: 140.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => Container(
-                    height: 140.h,
-                    color: Colors.grey[200],
-                    child: Icon(Icons.image_not_supported, color: Colors.grey),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 12.h,
-                right: 12.w,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(20.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 14.sp),
-                      SizedBox(width: 4.w),
-                      Text(
-                        '4.8',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
+                child: imageUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        height: 140.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Container(
+                          height: 140.h,
+                          color: Colors.grey[200],
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey,
+                          ),
                         ),
+                      )
+                    : Container(
+                        height: 140.h,
+                        width: double.infinity,
+                        color: Colors.grey[200],
                       ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
@@ -103,10 +80,9 @@ class ModernCountryCard extends StatelessWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: AppTextStyle.setPoppinsBlack(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
                   ),
                 ),
                 SizedBox(height: 6.h),
@@ -123,9 +99,9 @@ class ModernCountryCard extends StatelessWidget {
                         location,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.grey.shade500,
+                        style: AppTextStyle.setPoppinssecondaryGery(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                     ),

@@ -1,6 +1,7 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/core/widgets/html_content_widget.dart';
+import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
 import 'package:almonafs_flutter/features/viator/data/model/viator_tour_model.dart';
 import 'package:almonafs_flutter/features/viator/data/repo/viator_repo.dart';
 import 'package:almonafs_flutter/features/viator/manager/viator_cubit.dart';
@@ -27,41 +28,57 @@ class ViatorTourDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get current language
+    final isArabic = context.read<LanguageCubit>().state == AppLanguage.arabic;
+    final currentLang = isArabic ? 'ar' : 'en';
+
     return BlocProvider(
       create: (context) =>
-          ViatorCubit(ViatorRepository())..fetchTourDetails(productCode),
-      child: Scaffold(
-        backgroundColor: AppColor.mainWhite,
-        bottomNavigationBar: BlocBuilder<ViatorCubit, ViatorState>(
-          builder: (context, state) {
-            if (state is ViatorTourDetailsLoaded) {
-              return TourBookingBottomBar(tour: state.tour);
-            }
-            return const SizedBox();
-          },
-        ),
-        body: SafeArea(
-          child: BlocBuilder<ViatorCubit, ViatorState>(
+          ViatorCubit(ViatorRepository())
+            ..fetchTourDetails(productCode, lang: currentLang),
+      child: BlocListener<LanguageCubit, AppLanguage>(
+        listener: (context, langState) {
+          // Refetch tour details when language changes
+          final isArabic = langState == AppLanguage.arabic;
+          final lang = isArabic ? 'ar' : 'en';
+          debugPrint(
+            '🌍 Language changed in Tour Details, refetching with lang: $lang',
+          );
+          context.read<ViatorCubit>().fetchTourDetails(productCode, lang: lang);
+        },
+        child: Scaffold(
+          backgroundColor: AppColor.mainWhite,
+          bottomNavigationBar: BlocBuilder<ViatorCubit, ViatorState>(
             builder: (context, state) {
-              if (state is ViatorLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColor.mainColor),
-                );
-              } else if (state is ViatorError) {
-                return Center(
-                  child: Text(
-                    state.message,
-                    style: AppTextStyle.setPoppinsSecondlightGrey(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                );
-              } else if (state is ViatorTourDetailsLoaded) {
-                return _buildDetails(context, state.tour);
+              if (state is ViatorTourDetailsLoaded) {
+                return TourBookingBottomBar(tour: state.tour);
               }
               return const SizedBox();
             },
+          ),
+          body: SafeArea(
+            child: BlocBuilder<ViatorCubit, ViatorState>(
+              builder: (context, state) {
+                if (state is ViatorLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColor.mainColor),
+                  );
+                } else if (state is ViatorError) {
+                  return Center(
+                    child: Text(
+                      state.message,
+                      style: AppTextStyle.setPoppinsSecondlightGrey(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  );
+                } else if (state is ViatorTourDetailsLoaded) {
+                  return _buildDetails(context, state.tour);
+                }
+                return const SizedBox();
+              },
+            ),
           ),
         ),
       ),

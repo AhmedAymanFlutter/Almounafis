@@ -34,7 +34,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
               children: [
                 // Header with Menu
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -84,10 +87,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
 
-                /// 🌍 Our Countries Section
+                ///  Our Countries Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: SectionTitle(
@@ -109,7 +112,8 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: SectionTitle(
-                    onTap: () => Navigator.pushNamed(context, Routes.allToursPage),
+                    onTap: () =>
+                        Navigator.pushNamed(context, Routes.allToursPage),
                     title: isArabic ? "الجولات القادمة" : "Upcoming Tours",
                   ),
                 ),
@@ -118,7 +122,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                   height: 800,
                   child: SingleChildScrollView(child: UpcomingTourList()),
                 ),
-                
+
                 const SizedBox(height: 120), // Extra space for bottom nav
               ],
             ),

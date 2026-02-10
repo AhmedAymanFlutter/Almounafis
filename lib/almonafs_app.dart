@@ -10,6 +10,7 @@ import 'package:almonafs_flutter/features/localization/manager/localization_cubi
 import 'package:almonafs_flutter/features/servicepackadge/data/repo/Service_repo.dart';
 import 'package:almonafs_flutter/features/servicepackadge/manager/country_cubit.dart';
 import 'package:almonafs_flutter/features/upcomming_Tour/manager/tour_cubit.dart';
+import 'package:almonafs_flutter/features/viator/data/repo/viator_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,6 +43,7 @@ class AlmonafsApp extends StatelessWidget {
             ),
           ),
           RepositoryProvider(create: (_) => HotelRepository()),
+          RepositoryProvider(create: (_) => ViatorRepository()),
         ],
         child: MultiBlocProvider(
           providers: [

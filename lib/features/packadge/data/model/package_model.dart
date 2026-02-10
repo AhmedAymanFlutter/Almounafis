@@ -86,8 +86,8 @@ class Data {
 
     // ✅✅ FIXED IMAGE PARSING LOGIC ✅✅
     // Priority 1: Check nested "images.coverImage.url" (New API Standard)
-    if (json['images'] != null && 
-        json['images'] is Map && 
+    if (json['images'] != null &&
+        json['images'] is Map &&
         json['images']['coverImage'] != null) {
       imageCover = json['images']['coverImage']['url'];
     }
@@ -127,17 +127,21 @@ class Data {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     slug = json['slug'];
+    // Fallback: Try to get slug from SEO if not found in root
+    if (slug == null && json['seo'] != null && json['seo']['slugUrl'] != null) {
+      slug = json['seo']['slugUrl'];
+    }
     slugAr = json['slugAr'];
     id = json['id'];
-    
+
     // Fix Price Parsing if it comes inside 'pricing' object
     if (json['pricing'] != null && json['pricing'] is Map) {
-       // Assuming pricing might have a 'amount' or 'price' field, 
-       // or if you just want to store the currency/base price.
-       // Adjust based on exact pricing structure if needed.
-       price = json['pricing']['price'] ?? json['price']; 
+      // Assuming pricing might have a 'amount' or 'price' field,
+      // or if you just want to store the currency/base price.
+      // Adjust based on exact pricing structure if needed.
+      price = json['pricing']['price'] ?? json['price'];
     } else {
-       price = json['price'];
+      price = json['price'];
     }
   }
 
@@ -160,7 +164,7 @@ class Data {
     data['nameAr'] = nameAr;
     data['description'] = description;
     data['descriptionAr'] = descriptionAr;
-    data['imageCover'] = imageCover; 
+    data['imageCover'] = imageCover;
     if (destinations != null) {
       data['destinations'] = destinations!.map((v) => v.toJson()).toList();
     }
@@ -177,7 +181,6 @@ class Data {
     return data;
   }
 }
-
 
 class Seo {
   String? metaTitle;

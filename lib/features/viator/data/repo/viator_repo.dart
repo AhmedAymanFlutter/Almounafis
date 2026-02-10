@@ -85,13 +85,19 @@ class ViatorRepository {
     }
   }
 
-  Future<ApiResponse> getTourDetails(String productCodeOrSlug) async {
+  Future<ApiResponse> getTourDetails(
+    String productCodeOrSlug, {
+    String lang = 'en',
+  }) async {
     try {
+      final queryParameters = {'lang': lang};
       final String endPoint = '${EndPoints.viatorTours}/$productCodeOrSlug';
       print('🌐 API Call: $endPoint');
+      print('📝 Params: $queryParameters');
 
       final ApiResponse apiResponse = await _apiHelper.getRequest(
         endPoint: endPoint,
+        queryParameters: queryParameters,
       );
 
       if (apiResponse.status) {

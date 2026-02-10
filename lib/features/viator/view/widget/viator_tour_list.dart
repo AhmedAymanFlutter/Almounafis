@@ -5,6 +5,8 @@ import 'package:almonafs_flutter/features/viator/view/widget/viator_tour_card.da
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:almonafs_flutter/features/viator/data/model/viator_tour_model.dart';
 
 class ViatorTourListWidget extends StatefulWidget {
   final bool isArabic;
@@ -59,15 +61,7 @@ class _ViatorTourListWidgetState extends State<ViatorTourListWidget> {
   Widget build(BuildContext context) {
     return BlocBuilder<ViatorCubit, ViatorState>(
       builder: (context, state) {
-        if (state is ViatorLoading) {
-          if (widget.scrollDirection == Axis.vertical) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return SizedBox(
-            height: widget.height ?? 280.h,
-            child: const Center(child: CircularProgressIndicator()),
-          );
-        } else if (state is ViatorError) {
+        if (state is ViatorError) {
           if (widget.scrollDirection == Axis.vertical) {
             return Center(
               child: Text(
@@ -87,58 +81,74 @@ class _ViatorTourListWidgetState extends State<ViatorTourListWidget> {
               ),
             ),
           );
-        } else if (state is ViatorLoaded) {
-          if (state.tours.isEmpty) {
-            if (widget.scrollDirection == Axis.vertical) {
-              return Center(
-                child: Text(
-                  widget.isArabic
-                      ? 'لا توجد جولات متاحة'
-                      : 'No tours available',
-                  style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+        }
+
+        final isLoading = state is ViatorLoading;
+        final tours = isLoading
+            ? List.generate(
+                5,
+                (index) => ViatorTour(
+                  title: widget.isArabic
+                      ? "جولة سياحية استكشافية"
+                      : "Amazing Tour Title Placeholder",
+                  price: Price(amount: 150, currency: "USD"),
+                  rating: Rating(average: 4.5, count: 120),
+                  coverImage: "",
+                  productCode: "dummy_code_$index",
+                  itinerary: Itinerary(
+                    duration: DurationInfo(fixedDurationInMinutes: 180),
+                  ),
                 ),
-              );
-            }
-            return SizedBox(
-              height: widget.height ?? 280.h,
-              child: Center(
-                child: Text(
-                  widget.isArabic
-                      ? 'لا توجد جولات متاحة'
-                      : 'No tours available',
-                  style: TextStyle(fontSize: 16.sp, color: Colors.grey),
-                ),
+              )
+            : (state is ViatorLoaded ? state.tours : []);
+
+        if (!isLoading && tours.isEmpty) {
+          if (widget.scrollDirection == Axis.vertical) {
+            return Center(
+              child: Text(
+                widget.isArabic ? 'لا توجد جولات متاحة' : 'No tours available',
+                style: TextStyle(fontSize: 16.sp, color: Colors.grey),
               ),
             );
           }
+          return SizedBox(
+            height: widget.height ?? 280.h,
+            child: Center(
+              child: Text(
+                widget.isArabic ? 'لا توجد جولات متاحة' : 'No tours available',
+                style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+              ),
+            ),
+          );
+        }
 
-          Widget listView = ListView.separated(
-            controller: _scrollController, // Attach controller
+        final isLoadingMore = state is ViatorLoaded && state.isLoadingMore;
+
+        Widget listView = Skeletonizer(
+          enabled: isLoading,
+          child: ListView.separated(
+            controller: _scrollController,
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
             scrollDirection: widget.scrollDirection,
             physics: widget.physics,
             shrinkWrap: widget.shrinkWrap,
-            // Add +1 to item count if loading more to show spinner
-            itemCount: state.isLoadingMore
-                ? state.tours.length + 1
-                : state.tours.length,
+            itemCount: isLoadingMore ? tours.length + 1 : tours.length,
             separatorBuilder: (context, index) =>
                 widget.scrollDirection == Axis.horizontal
                 ? SizedBox(width: 0.w)
                 : SizedBox(height: 16.h),
             itemBuilder: (context, index) {
-              // Show loading indicator at the end
-              if (index >= state.tours.length) {
+              if (index >= tours.length) {
                 return Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   child: const Center(child: CircularProgressIndicator()),
                 );
               }
 
-              final tour = state.tours[index];
+              final tour = tours[index];
               return GestureDetector(
                 onTap: () {
-                  if (tour.productCode != null) {
+                  if (!isLoading && tour.productCode != null) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -154,7 +164,7 @@ class _ViatorTourListWidgetState extends State<ViatorTourListWidget> {
                   padding: widget.scrollDirection == Axis.horizontal
                       ? EdgeInsets.zero
                       : EdgeInsets.only(
-                          bottom: index == state.tours.length - 1 ? 20.h : 0,
+                          bottom: index == tours.length - 1 ? 20.h : 0,
                         ),
                   child: widget.scrollDirection == Axis.horizontal
                       ? ViatorTourCard(tour: tour, isArabic: widget.isArabic)
@@ -166,18 +176,14 @@ class _ViatorTourListWidgetState extends State<ViatorTourListWidget> {
                 ),
               );
             },
-          );
+          ),
+        );
 
-          if (widget.scrollDirection == Axis.vertical) {
-            return listView;
-          }
-
-          return SizedBox(height: widget.height ?? 280.h, child: listView);
-        } else {
-          return widget.scrollDirection == Axis.vertical
-              ? const SizedBox()
-              : SizedBox(height: widget.height ?? 280.h);
+        if (widget.scrollDirection == Axis.vertical) {
+          return listView;
         }
+
+        return SizedBox(height: widget.height ?? 280.h, child: listView);
       },
     );
   }

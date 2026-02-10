@@ -1,3 +1,4 @@
+import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -16,10 +17,22 @@ class ModernHomeAppBar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Menu Button with Glassmorphism
           _buildGlassIconButton(icon: Icons.menu, onTap: onMenuTap),
+
+          const Spacer(),
+
+          Text(
+            isArabic ? "المنافس" : "Almounafis",
+            style: AppTextStyle.setPoppinsBlack(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const Spacer(),
+
+          SizedBox(width: 44.w),
         ],
       ),
     );
