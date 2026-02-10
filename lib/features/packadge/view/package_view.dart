@@ -1,9 +1,11 @@
 import 'package:almonafs_flutter/core/theme/app_color.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/localization/manager/localization_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../config/router/routes.dart';
+import '../data/model/package_model.dart';
 import '../data/repo/package_repo.dart';
 import '../manager/package_cubit.dart';
 import '../manager/package_state.dart';
@@ -49,7 +51,30 @@ class _PackageViewState extends State<PackageView> {
           body: BlocBuilder<PackageCubit, PackageState>(
             builder: (context, state) {
               if (state is PackageLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return Skeletonizer(
+                  enabled: true,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(
+                      bottom: 100,
+                    ), // Padding for floating nav bar
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      return PackageCardView(
+                        package: Data(
+                          name: "Package Type Placeholder",
+                          nameAr: "نوع الباقة",
+                          description:
+                              "This is a placeholder description for the package type to simulate loading content.",
+                          descriptionAr:
+                              "هذا وصف توضيحي لنوع الباقة لمحاكاة تحميل المحتوى.",
+                          imageCover: "", // Empty string to trigger placeholder
+                          price: "100",
+                        ),
+                        onTap: () {},
+                      );
+                    },
+                  ),
+                );
               } else if (state is PackageLoaded) {
                 // ✅ Access data from the Model
                 final packages = state.packageModel.data ?? [];

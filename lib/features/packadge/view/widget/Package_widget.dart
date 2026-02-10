@@ -60,26 +60,41 @@ class PackageCardView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.r),
                 child: Stack(
                   children: [
-                    CachedNetworkImage(
-                      
-                      imageUrl: package.imageCover ?? '',
-                      width: 420.w,
-                      height: 200.h,
-                      fit: BoxFit.cover,
-                      errorWidget: (context, error, stackTrace) => Container(
-                        width: 420.w,
-                        height: 200.h,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        child: const Icon(
-                          Icons.broken_image,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
+                    (package.imageCover != null &&
+                            package.imageCover!.isNotEmpty)
+                        ? CachedNetworkImage(
+                            imageUrl: package.imageCover!,
+                            width: 420.w,
+                            height: 200.h,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, error, stackTrace) =>
+                                Container(
+                                  width: 420.w,
+                                  height: 200.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                  child: const Icon(
+                                    Icons.broken_image,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                          )
+                        : Container(
+                            width: 420.w,
+                            height: 200.h,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            child: const Icon(
+                              Icons.image_not_supported,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
+                          ),
 
                     /// تدرج شفاف للنص
                     Container(
