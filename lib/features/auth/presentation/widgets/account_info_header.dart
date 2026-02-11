@@ -20,16 +20,16 @@ class AccountInfoHeader extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
-            mainAxisAlignment:
-                isArabic ? MainAxisAlignment.start : MainAxisAlignment.end,
+            mainAxisAlignment: isArabic
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.end,
             children: [
               if (isArabic)
                 IconButton(
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeView()),
+                      MaterialPageRoute(builder: (context) => const HomeView()),
                       (route) => false,
                     );
                   },
@@ -50,8 +50,7 @@ class AccountInfoHeader extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeView()),
+                      MaterialPageRoute(builder: (context) => const HomeView()),
                       (route) => false,
                     );
                   },

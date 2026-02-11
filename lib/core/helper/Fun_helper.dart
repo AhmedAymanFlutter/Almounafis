@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../features/global_Settings/data/model/global_Setting_model.dart';
 
 class WhatsAppService {
@@ -8,9 +7,8 @@ class WhatsAppService {
     BuildContext context, {
     required bool isArabic,
     String? customMessage,
-    GlobalSettingModel? settings, // Add this parameter
+    GlobalSettingModel? settings,
   }) async {
-    // Use passed settings or fallback to static
     final whatsappNumber =
         settings?.data?.primaryWhatsApp?.number ??
         globalSettings?.data?.primaryWhatsApp?.number;

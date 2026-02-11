@@ -1,50 +1,55 @@
+import 'package:almonafs_flutter/features/singel_country/data/model/country_details_model.dart';
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
-import 'package:almonafs_flutter/features/cities/view/widgets/weather_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:almonafs_flutter/features/cities/data/model/city_details_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CityDetailsHeader extends StatefulWidget {
-  final CityDetails city;
+class CountryDetailsHeader extends StatefulWidget {
+  final CountryDetailsData country;
   final bool isArabic;
 
-  const CityDetailsHeader({
+  const CountryDetailsHeader({
     super.key,
-    required this.city,
+    required this.country,
     required this.isArabic,
   });
 
   @override
-  State<CityDetailsHeader> createState() => _CityDetailsHeaderState();
+  State<CountryDetailsHeader> createState() => _CountryDetailsHeaderState();
 }
 
-class _CityDetailsHeaderState extends State<CityDetailsHeader> {
+class _CountryDetailsHeaderState extends State<CountryDetailsHeader> {
   int _currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
-    // Collect all available images
+    // Collect all available images (gallery + cover)
+    // Collect all available images (gallery + cover)
     final List<String> imageUrls = [];
-    if (widget.city.images?.isNotEmpty == true) {
-      imageUrls.addAll(
-        widget.city.images!
-            .map((e) => e.url ?? "")
-            .where((url) => url.isNotEmpty),
-      );
+    final Set<String> uniqueUrls = {};
+
+    void addImage(String? url) {
+      if (url != null && url.isNotEmpty && !uniqueUrls.contains(url)) {
+        uniqueUrls.add(url);
+        imageUrls.add(url);
+      }
     }
-    // Fallback if no gallery images, try cover image if available (though usually covered by gallery)
-    if (imageUrls.isEmpty) {
-      // Add a placeholder or handle empty state if needed.
+
+    // Add cover image first (as priority)
+    addImage(widget.country.images?.coverImage?.url);
+
+    // Add gallery images
+    if (widget.country.images?.gallery != null) {
+      for (var img in widget.country.images!.gallery!) {
+        addImage(img.url);
+      }
     }
 
     return SliverAppBar(
       expandedHeight: 450.h,
       pinned: true,
       stretch: true,
-      backgroundColor: Colors.white, // Solid color to hide content behind
-      iconTheme: const IconThemeData(
-        color: Colors.black,
-      ), // Ensure back button is visible on white
+      backgroundColor: Colors.white, // Solid color for pinned state
+      iconTheme: const IconThemeData(color: Colors.black),
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: const BoxDecoration(
@@ -61,7 +66,7 @@ class _CityDetailsHeaderState extends State<CityDetailsHeader> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Hero Image Gallery PageView
+              // Image Carousel
               if (imageUrls.isNotEmpty)
                 PageView.builder(
                   itemCount: imageUrls.length,
@@ -74,24 +79,50 @@ class _CityDetailsHeaderState extends State<CityDetailsHeader> {
                     return Image.network(
                       imageUrls[index],
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (context, error, stackTrace) => Container(
                         color: Colors.grey[300],
-                        child: const Icon(
-                          Icons.broken_image,
-                          size: 50,
-                          color: Colors.grey,
+                        child: const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                            size: 40,
+                          ),
                         ),
                       ),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      },
                     );
                   },
                 )
               else
                 Container(
                   color: Colors.grey[300],
-                  child: const Icon(
-                    Icons.image_not_supported,
-                    size: 50,
-                    color: Colors.grey,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.image_not_supported,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          "No Images Available",
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -123,17 +154,17 @@ class _CityDetailsHeaderState extends State<CityDetailsHeader> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // City & Country Name
+                        // Country Name & Continent
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 widget.isArabic
-                                    ? (widget.city.nameAr ??
-                                          widget.city.name ??
+                                    ? (widget.country.nameAr ??
+                                          widget.country.name ??
                                           "")
-                                    : (widget.city.name ?? ""),
+                                    : (widget.country.name ?? ""),
                                 style: AppTextStyle.setPoppinsWhite(
                                   fontSize: 32.sp,
                                   fontWeight: FontWeight.bold,
@@ -141,22 +172,18 @@ class _CityDetailsHeaderState extends State<CityDetailsHeader> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              if (widget.city.country != null)
+                              if (widget.country.continent != null)
                                 Row(
                                   children: [
                                     const Icon(
-                                      Icons.location_on,
+                                      Icons.public,
                                       color: Colors.white70,
                                       size: 16,
                                     ),
                                     SizedBox(width: 4.w),
                                     Expanded(
                                       child: Text(
-                                        widget.isArabic
-                                            ? (widget.city.country?.nameAr ??
-                                                  widget.city.country?.name ??
-                                                  "")
-                                            : (widget.city.country?.name ?? ""),
+                                        widget.country.continent!,
                                         style: AppTextStyle.setPoppinsWhite(
                                           fontSize: 16.sp,
                                           fontWeight: FontWeight.w500,
@@ -171,16 +198,36 @@ class _CityDetailsHeaderState extends State<CityDetailsHeader> {
                           ),
                         ),
 
-                        // Weather Widget
-                        if (widget.city.weather != null)
-                          WeatherWidget(
-                            weather: widget.city.weather,
-                            bestTime: widget.city.bestTimeToVisit,
+                        // Weather (Placeholder if not available in model)
+                        // Assuming we don't have real weather in Country model yet,
+                        // keeping it simple or removed. If you want to keep the dummy "25", uncomment below:
+                        /*
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(20),
                           ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.wb_sunny, size: 20.sp, color: Colors.orange),
+                              SizedBox(width: 4.w),
+                              Text(
+                                '25°',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        */
                       ],
                     ),
 
-                    // Page Indicator dots
+                    // Page Indicator
                     if (imageUrls.length > 1) ...[
                       SizedBox(height: 16.h),
                       Row(

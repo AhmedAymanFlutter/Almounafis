@@ -29,19 +29,22 @@ Widget buildDrawerHeader(bool isArabic) {
 
 Widget buildDrawerItem(
   BuildContext context, {
-  required String iconPath,
+  String? iconPath,
+  IconData? icon,
   required String title,
   required VoidCallback onTap,
   Color? textColor,
 }) {
   return ListTile(
-    leading: SvgPicture.asset(
-      iconPath,
-      width: 24,
-      height: 24,
-      fit: BoxFit.scaleDown,
-      color: textColor ?? const Color(0xff0e2e4f),
-    ),
+    leading: icon != null
+        ? Icon(icon, size: 24, color: textColor ?? const Color(0xff0e2e4f))
+        : SvgPicture.asset(
+            iconPath!,
+            width: 24,
+            height: 24,
+            fit: BoxFit.scaleDown,
+            color: textColor ?? const Color(0xff0e2e4f),
+          ),
     title: Text(
       title,
       style: AppTextStyle.setPoppinsBlack(
@@ -111,8 +114,6 @@ Widget _buildIconWidget(String platform, String? iconUrl) {
   }
 }
 
-// Build Snapchat icon with image and fallback
-// Build Snapchat icon with PNG and fallback
 Widget _buildSnapchatIcon() {
   return Image.asset(
     'assets/images/snapchat.png',
@@ -120,7 +121,6 @@ Widget _buildSnapchatIcon() {
     height: 24,
     fit: BoxFit.contain,
     errorBuilder: (context, error, stackTrace) {
-      // Fallback to FontAwesome icon
       return Icon(
         FontAwesomeIcons.snapchat,
         color: _getSocialMediaColor('snapchat'),

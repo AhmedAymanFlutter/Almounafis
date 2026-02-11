@@ -1,9 +1,9 @@
+import 'package:almonafs_flutter/core/theme/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../../core/theme/app_color.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../../core/theme/app_text_style.dart';
-import '../../../../../core/widgets/html_content_widget.dart';
 import '../../../../localization/manager/localization_cubit.dart';
 
 class PackageCard extends StatelessWidget {
@@ -29,19 +29,15 @@ class PackageCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          margin: EdgeInsets.only(bottom: 12.h),
-          height: 120.h,
+          margin: EdgeInsets.only(bottom: 16.h, left: 4.w, right: 4.w),
+          height: 110.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.r),
-            gradient: const LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [AppColor.secondaryBlack, AppColor.lightBlue],
-            ),
+            color: AppColor.secondaryblue, // Vibrant blue
+            borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 8,
+                color: AppColor.secondaryblue.withOpacity(0.3),
+                blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
             ],
@@ -49,34 +45,41 @@ class PackageCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: Row(
             children: [
-              // 🖼️ صورة الباقة
-              Expanded(
-                flex: 2,
+              //  Image Section with white background "pop" effect
+              Container(
+                width: 125.w,
+                color: Colors.white,
                 child: ClipPath(
-                  clipper: _CurvedClipper(),
+                  clipper: _ModernCurvedClipper(),
                   child: image.isNotEmpty
-                      ? Image.network(
-                          image,
+                      ? CachedNetworkImage(
+                          imageUrl: image,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                color: Colors.grey[300],
-                                child: const Icon(
-                                  Icons.broken_image,
-                                  color: Colors.grey,
-                                ),
-                              ),
+                          height: double.infinity,
+                          width: double.infinity,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(
+                              Icons.broken_image,
+                              color: Colors.grey,
+                            ),
+                          ),
                         )
-                      : Container(color: Colors.grey[300]),
+                      : Container(color: Colors.grey[200]),
                 ),
               ),
 
-              // 💙 تفاصيل الباقة
+              // 💙 Package Details
               Expanded(
-                flex: 3,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 14.w,
+                    horizontal: 12.w,
                     vertical: 8.h,
                   ),
                   child: Column(
@@ -93,30 +96,39 @@ class PackageCard extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 6.h),
-                      SizedBox(
-                        height: 35.h, // Fixed height to prevent overflow
-                        child: HtmlContentWidget(
-                          htmlContent: description,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                          textColor: Colors.white.withOpacity(0.9),
+                      SizedBox(height: 4.h),
+                      Expanded(
+                        child: Text(
+                          // Simple text instead of HTML for cleaner look in small cards
+                          description.replaceAll(RegExp(r'<[^>]*>'), ''),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyle.setPoppinsTextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(0.9),
+                            height: 1.4,
+                          ),
                         ),
                       ),
-                      SizedBox(height: 10.h),
+
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.rotationY(
-                              isArabic ? 3.14159 : 0,
+                          Text(
+                            isArabic ? "شركة المنافس" : "Almounafies",
+                            style: AppTextStyle.setPoppinsTextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.white.withOpacity(0.7),
                             ),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              size: 14.sp,
-                              color: Colors.white.withOpacity(0.8),
-                            ),
+                          ),
+                          Icon(
+                            isArabic
+                                ? Icons.arrow_back_ios_new
+                                : Icons.arrow_forward_ios,
+                            size: 14.sp,
+                            color: Colors.white,
                           ),
                         ],
                       ),
@@ -132,16 +144,17 @@ class PackageCard extends StatelessWidget {
   }
 }
 
-///  Custom curved clipper for left image
-class _CurvedClipper extends CustomClipper<Path> {
+/// Modern slanted/curved clipper for the image section
+class _ModernCurvedClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.lineTo(size.width - 20, 0);
+    path.lineTo(size.width, 0);
+    // Add a slight curve or slant for a dynamic look
     path.quadraticBezierTo(
+      size.width * 0.85,
+      size.height * 0.5,
       size.width,
-      size.height / 2,
-      size.width - 20,
       size.height,
     );
     path.lineTo(0, size.height);

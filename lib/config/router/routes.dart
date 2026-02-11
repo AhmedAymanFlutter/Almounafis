@@ -27,4 +27,6 @@ class Routes {
   static const String allHotelsPage = '/AllHotelsPage';
   static const String viatorAllToursPage = '/viatorAllToursPage';
   static const String cityGuideDetailsView = '/CityGuideDetailsView';
+  static const String termsAndConditions = '/TermsAndConditions';
+  static const String privacyPolicy = '/PrivacyPolicy';
 }

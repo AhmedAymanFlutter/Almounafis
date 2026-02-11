@@ -42,6 +42,7 @@ class City {
   String? nameAr;
   String? description; // HTML content
   String? descriptionFlutter; // Clean content
+  String? descriptionArFlutter; // Clean content AR
   Coordinates? coordinates;
   Weather? weather;
   BestTimeToVisit? bestTimeToVisit;
@@ -55,6 +56,7 @@ class City {
     this.nameAr,
     this.description,
     this.descriptionFlutter,
+    this.descriptionArFlutter,
     this.coordinates,
     this.weather,
     this.bestTimeToVisit,
@@ -70,6 +72,7 @@ class City {
     nameAr = json['nameAr'];
     description = json['description'];
     descriptionFlutter = json['descriptionFlutter'];
+    descriptionArFlutter = json['descriptionArFlutter'];
     coordinates = json['coordinates'] != null
         ? Coordinates.fromJson(json['coordinates'])
         : null;
@@ -119,23 +122,27 @@ class Weather {
 class BestTimeToVisit {
   List<String>? months;
   String? description;
+  String? descriptionAr;
 
-  BestTimeToVisit({this.months, this.description});
+  BestTimeToVisit({this.months, this.description, this.descriptionAr});
 
   BestTimeToVisit.fromJson(Map<String, dynamic> json) {
     months = json['months'] != null ? List<String>.from(json['months']) : [];
     description = json['description'];
+    descriptionAr = json['descriptionAr'];
   }
 }
 
 class Country {
   String? name;
+  String? nameAr;
   String? code;
 
-  Country({this.name, this.code});
+  Country({this.name, this.nameAr, this.code});
 
   Country.fromJson(Map<String, dynamic> json) {
     name = json['name'];
+    nameAr = json['nameAr'];
     code = json['code'];
   }
 }
@@ -163,13 +170,15 @@ class ImageItem {
   String? url;
   String? thumbnailUrl;
   String? alt;
+  String? altAr;
 
-  ImageItem({this.url, this.thumbnailUrl, this.alt});
+  ImageItem({this.url, this.thumbnailUrl, this.alt, this.altAr});
 
   ImageItem.fromJson(Map<String, dynamic> json) {
     url = json['url'];
     thumbnailUrl = json['thumbnailUrl'];
     alt = json['alt'];
+    altAr = json['altAr'];
   }
 }
 

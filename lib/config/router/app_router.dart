@@ -31,6 +31,8 @@ import '../../features/cities/manger/city_cubit.dart';
 import '../../features/viator/view/viator_all_tours_page.dart';
 import '../../features/cities/view/city_guide_details_view.dart';
 import '../../features/cities/data/model/city_guide_model.dart';
+import '../../features/legal/presentation/views/terms_and_conditions_view.dart';
+import '../../features/legal/presentation/views/privacy_policy_view.dart';
 
 class AppRouter {
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -139,6 +141,12 @@ class AppRouter {
         return RouterTransitions.buildHorizontal(
           CityGuideDetailsView(place: place),
         );
+      case Routes.termsAndConditions:
+        return RouterTransitions.buildHorizontal(
+          const TermsAndConditionsView(),
+        );
+      case Routes.privacyPolicy:
+        return RouterTransitions.buildHorizontal(const PrivacyPolicyView());
       default:
         return RouterTransitions.build(
           Scaffold(body: Center(child: Text("No Route"))),

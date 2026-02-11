@@ -75,6 +75,7 @@ class ViatorTour {
   Itinerary? itinerary;
   Logistics? logistics;
   List<Tag>? tags;
+  List<ProductOption>? productOptions;
 
   ViatorTour({
     this.sId,
@@ -105,6 +106,7 @@ class ViatorTour {
     this.itinerary,
     this.logistics,
     this.tags,
+    this.productOptions,
   });
 
   ViatorTour.fromJson(Map<String, dynamic> json) {
@@ -179,6 +181,12 @@ class ViatorTour {
       tags = <Tag>[];
       json['tags'].forEach((v) {
         tags!.add(Tag.fromJson(v));
+      });
+    }
+    if (json['productOptions'] != null) {
+      productOptions = <ProductOption>[];
+      json['productOptions'].forEach((v) {
+        productOptions!.add(ProductOption.fromJson(v));
       });
     }
   }
@@ -684,5 +692,45 @@ class Tag {
   Tag.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+  }
+}
+
+class ProductOption {
+  String? productOptionCode;
+  String? description;
+  String? title;
+  List<LanguageGuide>? languageGuides;
+
+  ProductOption({
+    this.productOptionCode,
+    this.description,
+    this.title,
+    this.languageGuides,
+  });
+
+  ProductOption.fromJson(Map<String, dynamic> json) {
+    productOptionCode = json['productOptionCode'];
+    description = json['description'];
+    title = json['title'];
+    if (json['languageGuides'] != null) {
+      languageGuides = <LanguageGuide>[];
+      json['languageGuides'].forEach((v) {
+        languageGuides!.add(LanguageGuide.fromJson(v));
+      });
+    }
+  }
+}
+
+class LanguageGuide {
+  String? type;
+  String? language;
+  String? legacyGuide;
+
+  LanguageGuide({this.type, this.language, this.legacyGuide});
+
+  LanguageGuide.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    language = json['language'];
+    legacyGuide = json['legacyGuide'];
   }
 }

@@ -64,6 +64,24 @@ class CustomDrawer extends StatelessWidget {
 
                   buildDrawerItem(
                     context,
+                    icon: Icons.gavel,
+                    title: isArabic ? 'الشروط والأحكام' : 'Terms & Conditions',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, Routes.termsAndConditions);
+                    },
+                  ),
+                  buildDrawerItem(
+                    context,
+                    icon: Icons.privacy_tip,
+                    title: isArabic ? 'سياسة الخصوصية' : 'Privacy Policy',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, Routes.privacyPolicy);
+                    },
+                  ),
+                  buildDrawerItem(
+                    context,
                     iconPath: 'assets/icons/setting-2.svg',
                     title: isArabic ? 'الإعدادات' : 'Settings',
                     onTap: () {

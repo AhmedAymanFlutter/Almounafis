@@ -2,7 +2,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="almonafs_flutter"
+        android:label="ALMOUNAFIES"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

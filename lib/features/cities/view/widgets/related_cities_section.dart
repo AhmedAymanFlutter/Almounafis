@@ -1,5 +1,6 @@
 import 'package:almonafs_flutter/core/theme/app_text_style.dart';
 import 'package:almonafs_flutter/features/cities/data/model/city_details_model.dart';
+import 'package:almonafs_flutter/features/cities/resources/city_strings.dart';
 import 'package:almonafs_flutter/config/router/routes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RelatedCitiesSection extends StatelessWidget {
   final List<RelatedCity> relatedCities;
+  final bool isArabic;
 
-  const RelatedCitiesSection({super.key, required this.relatedCities});
+  const RelatedCitiesSection({
+    super.key,
+    required this.relatedCities,
+    required this.isArabic,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +26,7 @@ class RelatedCitiesSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0),
           child: Text(
-            "Explore More Cities", // Should be localized ideally
+            isArabic ? CityStringsAr.exploreMore : CityStringsEn.exploreMore,
             style: AppTextStyle.setPoppinsTextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -92,7 +98,9 @@ class RelatedCitiesSection extends StatelessWidget {
                           left: 12,
                           right: 12,
                           child: Text(
-                            city.name ?? "",
+                            isArabic
+                                ? (city.nameAr ?? city.name ?? "")
+                                : (city.name ?? ""),
                             style: AppTextStyle.setPoppinsWhite(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,

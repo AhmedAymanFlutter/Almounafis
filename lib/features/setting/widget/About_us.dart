@@ -252,26 +252,26 @@ class AboutUsScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColor.lightBlue, AppColor.secondaryblue],
-              stops: [0.0, 0.9],
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              'assets/images/almonafis_combany.jpeg',
+              fit: BoxFit.cover,
             ),
-          ),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 40.h),
-              child: Image.asset(
-                'assets/splash/main_logo.png',
-                height: 120.h,
-                width: 120.w,
-                fit: BoxFit.contain,
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.3),
+                    Colors.black.withOpacity(0.7),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

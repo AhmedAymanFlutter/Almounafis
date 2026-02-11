@@ -47,7 +47,6 @@ flutter:
   assets:
     - assets/splash/
     - assets/svg/images/
-    - assets/fonts/poppins/
     - assets/images/
     - assets/icons/
 
